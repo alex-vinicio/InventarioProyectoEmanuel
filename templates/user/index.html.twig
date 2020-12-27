@@ -1,0 +1,102 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Menu{% endblock %}
+    
+
+{% block body %}
+<style>
+   {#  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap'); #}
+    ul{list-style: none; margin: 5px; padding:10px; margin-left: 1%;}
+    #menu li{float:left; margin: 5px; display:inline-block;position:relative;display:inline-block;}
+    #menu a{padding:10px 16px; font-family: 'Roboto', sans-serif; font-size: 18px; text-decoration:none;}
+    #menu{
+        background: rgb(247,251,252); /* Old browsers */
+        background: -moz-linear-gradient(top, rgba(247,251,252,1) 0%, rgba(173,217,228,1) 100%); /* FF3.6-15 */
+        background: -webkit-linear-gradient(top, rgba(247,251,252,1) 0%,rgba(173,217,228,1) 100%); /* Chrome10-25,Safari5.1-6 */
+        background: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(173,217,228,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7fbfc', endColorstr='#add9e4',GradientType=0 ); /* IE6-9 */
+        width:100%;
+        height:50px;
+        margin-left: 0%;
+        border-radius: 10px;
+    }
+    .barra{color:#2C81DB; padding: 0 0 0;}
+    #menu a:hover{color:#2C81DB; background: rgba(0,0,0,0.2); animation:ls ms 0.5;}
+    @keyframes ms{0%{opacity:0; transform:scale(1.6)}}
+    #inner {margin: 0 auto; padding: 0 20px; width: 100%; height: 100%;background: #f1f1f1; padding: 10px;position: absolute;}
+    @media screen and (max-width: 100%) {
+        #inner { width: calc(100% - 80px); }
+    }
+    #menu li>ul{  display:none;   }
+
+    #menu li:hover>ul{
+        
+        display:block;
+        position:absolute;
+        top:auto;
+        left:auto;
+        background: rgb(247,251,252); /* Old browsers */
+        background: -moz-linear-gradient(top, rgba(247,251,252,1) 0%, rgba(173,217,228,1) 100%); /* FF3.6-15 */
+        background: -webkit-linear-gradient(top, rgba(247,251,252,1) 0%,rgba(173,217,228,1) 100%); /* Chrome10-25,Safari5.1-6 */
+        background: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(173,217,228,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7fbfc', endColorstr='#add9e4',GradientType=0 ); /* IE6-9 */
+        border-radius: 10px;
+    }
+    .clearfix::after {content: ""; clear: both; display: table;}
+    .footer { 
+        position: left;
+        left: 0px;
+        bottom: 0;
+        width: 100%;
+        height: 20%;
+        background: rgb(247,251,252); /* Old browsers */
+        background: -moz-linear-gradient(top, rgba(247,251,252,1) 0%, rgba(173,217,228,1) 100%); /* FF3.6-15 */
+        background: -webkit-linear-gradient(top, rgba(247,251,252,1) 0%,rgba(173,217,228,1) 100%); /* Chrome10-25,Safari5.1-6 */
+        background: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(173,217,228,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7fbfc', endColorstr='#add9e4',GradientType=0 ); /* IE6-9 */
+    }
+    
+</style>
+    <div id="inner">
+        <div style="margin-left: 15%; font-family: 'Roboto', sans-serif; font-size: 18px;">
+            <h2>Sistema de inventarios proyecto Emanuel</h2>
+        </div>
+        <nav id="menu">
+            <ul>
+                <li><a href="" onclick="homaPage()">Inicio</a></li>
+                <li class="barra"> | </li>
+                <li><a href="#" onclick="listarInventario(1)">Casa hogar</a>
+                </li>
+                <li class="barra"> | </li>
+                <li><a href="#" onclick="listarInventario(2)">Centro medico</a>
+                </li>
+                <li class="barra"> | </li>
+                <li><a href="#">Trabajo infantil</a></li>
+                <li class="barra"> | </li>
+                <li><a href="#">Apoyo y custodia familiar</a></li>
+                <li style="margin-left: 7%;"><a href="#" onclick="cerrarSesion()">Cerrar Sesion</a></li>
+            </ul>
+        </nav>
+        <div class="clearfix">
+            <div style="width: 40%; padding-left: 15px;float:median; margin-top: 2%;  margin-left: 30%">
+                <img href="#" onclick="listarInventario(1)" style=" padding-left: 25px; width: 30%; height: 30%;" src='assets/img/casa_hogar.png' >
+                <img href="#" onclick="listarInventario(2)" style=" padding-left: 25px; width: 30%; height: 30%;" src='assets/img/fundacion.png' >
+            </div>
+            <div style="width: 30%; padding-left: 20px;float:center; margin-top: 6%;  margin: 15px;">
+                <h3>Inventario por caducar</h3>
+                <div id="productos_proximos_caducar">
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <h3 style="text-align: center;">Sistema de inventarios "Proyecto Emanuel"</h3>
+            <h4 style="text-align: center;"><a style="text-align: center;" href="https://www.facebook.com/" target="_blank">Visitanos en Facebook!</a></h4>
+            <h4 style="text-align: center;"><a style="text-align: center;" href="https://www.twitter.com/" target="_blank">Visitanos en Twitter!</a></h4>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %} 
+    <script type="text/javascript" src="{{ asset('assets/js/usuario/funciones.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/usuario/selectores.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/usuario/login.js') }}"></script>
+{% endblock %} 

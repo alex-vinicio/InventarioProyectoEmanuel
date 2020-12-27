@@ -1,3 +1,19 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+login:
+    path: /
+    controller: App\Controller\AdminController::index
+
+viewAdmin:
+    path: /viewAdmin
+    controller: App\Controller\AdminController::viewAdmin
+
+newInventory:
+    path: /newInventory
+    controller: App\Controller\AdminController::newInventory
+
+casaHogar:
+    path: /casaHogar
+    controller: App\Controller\AdminController::listCasaHogar
+
+centroMedico:
+    path: /centroMedico
+    controller: App\Controller\AdminController::listCentroMedico
