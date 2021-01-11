@@ -119,6 +119,7 @@ async function deleteProducto(id){
         alertify.error('Error al eliminar el producto')
     }
 }
+
 //buscadores
 async function addEventSearchCodProcedencia(){
     const formcod = document.searchCodProceden
@@ -184,7 +185,7 @@ async function getFilterProduct(list,data){
             }
         }
     }   
-    switch(data.length){//manejo de 2 casos
+    switch(data.length){//manejo de 2 ca
         case 2: //caso si ingreso valores en todos los inputs
             list.forEach((lt)=>{ if(lt.codigo.indexOf(codigoP) !== -1 && lt.procedencia.indexOf(procedenciaP) !== -1){ lista.push(lt) } })//guarda en lista si encontro el nombre y estado
             break
