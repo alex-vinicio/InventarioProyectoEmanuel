@@ -1,7 +1,12 @@
 async function getTableCasaHogar($container){
     $container.innerHTML=""
     const lista = await getData('getCasaHogar')
+    getInventario(lista,$container)
+}
+async function getInventario(lista,$container){
+    $container.innerHTML=""
     await renderCasaHogar(lista,$container)
+    await addEventSearchCodProcedencia()
 }
 async function renderCasaHogar(lista,$container){
     let numero = 1
@@ -75,8 +80,7 @@ function templateCasaHogar(table,producto,numero){
         <td onclick="selectProduct(${producto.id})">${producto.codigo}</td>
         <td onclick="selectProduct(${producto.id})">${producto.descripcionProducto}</td>
         <td>${producto.cantidadProducto}</td>
-        <td>${producto.unidadMedida}</td>
-        <td>${producto.medida}</td>`
+        <td>${producto.medida} ${producto.unidadMedida}</td>`
     table = controlDates(table,producto)
     table += `<td>${producto.procedencia}</td>
         <td>${producto.observaciones}</td>
@@ -124,26 +128,28 @@ async function addEventSearchCodProcedencia(){
     formProcedencia.ProcedenciaProd.value = $formHidenProducto.procedenciaProducto.value
     formNombre.nombreProduct.value = $formHidenProducto.nombreProducto.value
     //$divListInventary.innerHTML=""
+    console.log("prueba")
     formcod.addEventListener('submit', async (event)=>{
+        
         event.preventDefault()//recarga solo la tabla, no la pagina
         const datos = dataInputProduct(formcod,formProcedencia,formNombre)// asigna a una lista valores para busqueda de nombre, procedencia y codigo
         const listaProducto = await getData('getCasaHogar')
         const list = await getFilterProduct(listaProducto, datos)// genera una lista de los valores encontrados 
-        await listaProductoTabla(list, $divListInventary) //actualiza tabla con datos encontrados
+        await getInventario(list, $divListInventary) //actualiza tabla con datos encontrados
     })
     formProcedencia.addEventListener('submit', async (event)=>{
         event.preventDefault()
         const datos = dataInputProduct(formcod,formProcedencia,formNombre)
         const listaProducto = await getData('getCasaHogar')
         const list = await getFilterProduct(listaProducto, datos)
-        await listaProductoTabla(list,$divListInventary)
+        await getInventario(list,$divListInventary)
     })
     formNombre.addEventListener('submit', async (event)=>{
         event.preventDefault()
         const datos = dataInputProduct(formcod,formProcedencia,formNombre)
         const listaProducto = await getData('getCasaHogar')
         const list = await getFilterProduct(listaProducto, datos)
-        await listaProductoTabla(list,$divListInventary)
+        await getInventario(list,$divListInventary)
     })
 } 
 function dataInputProduct(formcod,formProcedencia, formNombre){
@@ -180,7 +186,7 @@ async function getFilterProduct(list,data){
     }   
     switch(data.length){//manejo de 2 casos
         case 2: //caso si ingreso valores en todos los inputs
-            list.forEach((lt)=>{ if(lt.codigo.indexOf(codigoP) !== -1 || lt.procedencia.indexOf(procedenciaP) !== -1){ lista.push(lt) } })//guarda en lista si encontro el nombre y estado
+            list.forEach((lt)=>{ if(lt.codigo.indexOf(codigoP) !== -1 && lt.procedencia.indexOf(procedenciaP) !== -1){ lista.push(lt) } })//guarda en lista si encontro el nombre y estado
             break
         case 1: //caso si solo ingreso valor en nombre o estado
             if(codigoP != null){
