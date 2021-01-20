@@ -53,13 +53,6 @@ class Producto
     /**
      * @var string
      *
-     * @ORM\Column(name="medida", type="string", length=20, nullable=false)
-     */
-    private $medida;
-
-    /**
-     * @var string
-     *
      * @ORM\Column(name="estado", type="string", length=20, nullable=false)
      */
     private $estado;
@@ -169,18 +162,6 @@ class Producto
     public function setUnidadMedida(string $unidadMedida): self
     {
         $this->unidadMedida = $unidadMedida;
-
-        return $this;
-    }
-
-    public function getMedida(): ?string
-    {
-        return $this->medida;
-    }
-
-    public function setMedida(string $medida): self
-    {
-        $this->medida = $medida;
 
         return $this;
     }

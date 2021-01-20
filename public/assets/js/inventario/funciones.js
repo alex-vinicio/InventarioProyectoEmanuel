@@ -11,10 +11,34 @@ async function getInventario(lista,$container){
 async function renderCasaHogar(lista,$container){
     let numero = 1
     let table =`<table id="casaHogarTable" class="table table-hover table-condensed table-bordered">`
-    table = templateTitleCasaHogar(table)
+    const responseUser= await getData('getUserData');
+    
+    switch(responseUser[1]){
+        case 1:
+            table = templateTitleProyectoEmanuel(table)
+            break;
+        case 2:
+            table = templateTitleUsuariosNormales(table)
+            break;
+        case 3:
+            table = templateTitleUsuariosNormales(table)
+            break;
+        
+    }    
     if(lista.length != 0){
         lista.forEach((productos)=>{
-            table = templateCasaHogar(table,productos,numero)
+            switch(responseUser[1]){
+                case 1:
+                    table = templateCasaHogar(table,productos,numero)
+                    break;
+                case 2:
+                    table = templateUsuariosNormales(table,productos,numero)
+                    break;
+                case 3:
+                    table = templateUsuariosNormales(table,productos,numero)
+                    break;
+                
+            }
             numero++
         })
     }else{
@@ -23,7 +47,7 @@ async function renderCasaHogar(lista,$container){
     const element = createTemplate(table)
     $container.append(element)
 }
-function templateTitleCasaHogar(table){
+function templateTitleProyectoEmanuel(table){
     table += `
     <thead> 
         <tr>
@@ -43,7 +67,7 @@ function templateTitleCasaHogar(table){
                 </div>
             </th>
             <th>Cantidad</th>
-            <th>Medida</th>
+            <th>Unidad</th>
             <th>Fecha ingreso</th>
             <th>Fecha caducidad</th>
             <th>
@@ -77,10 +101,10 @@ function controlDates(table,producto){
 function templateCasaHogar(table,producto,numero){
     table += `<tr>
         <td>${numero}</td>
-        <td onclick="selectProduct(${producto.id})">${producto.codigo}</td>
-        <td onclick="selectProduct(${producto.id})">${producto.descripcionProducto}</td>
+        <td onclick="selectProduct(${producto.id})"><a href="#">${producto.codigo}</a></td>
+        <td onclick="selectProduct(${producto.id})"><a href="#">${producto.descripcionProducto}</a></td>
         <td>${producto.cantidadProducto}</td>
-        <td>${producto.medida} ${producto.unidadMedida}</td>`
+        <td>${producto.unidadMedida}</td>`
     table = controlDates(table,producto)
     table += `<td>${producto.procedencia}</td>
         <td>${producto.observaciones}</td>
@@ -88,6 +112,75 @@ function templateCasaHogar(table,producto,numero){
         <td>${producto.idGrupo.nombreGrupoM}</td>
         <td>${producto.estado}</td>
         <td class="text-center"><i class="text-danger fa fa-trash" onclick="confirmDeleteProducto(${producto.id})"></i></td>`
+    table+=`</tr>`
+    return table
+}
+//tabla usuario no admin
+function templateTitleUsuariosNormales(table){
+    table += `
+    <thead> 
+        <tr>
+            <th><big>N°</big></th>
+            <th>
+                <div >  
+                    <form name="searchCodProceden">
+                        <input type="text" class="form-control" name="codProduct" placeholder="Codigo:">
+                    </form>
+                </div>
+            </th>
+            <th>
+                <div >  
+                    <form name="searchNombre">
+                        <input type="text" class="form-control" name="nombreProduct" placeholder="Nombre:">
+                    </form>
+                </div>
+            </th>
+            <th>Cantidad</th>
+            <th>Unidad</th>
+            <th>Fecha ingreso</th>
+            <th>Fecha caducidad</th>
+            <th>
+                <div  >
+                    <form name="searchProcedencia">
+                        <input type="text" class="form-control" name="ProcedenciaProd" placeholder="Procedencia:">
+                    </form>
+                </div>
+            </th>
+            <th>Obervaciones</th>
+            <th>Proyecto</th>
+            <th>Grupo</th>
+            <th>Estado</th>
+            <th>Accion</th>
+        </tr>
+    </thead>`
+    return table
+}
+function controlDates(table,producto){
+    let fechaCaducidad
+    if(!producto.fechaCaducidad){
+        fechaCaducidad = `-- -- --`
+    }else{
+        fechaCaducidad = setDateString(producto.fechaCaducidad)
+    }
+    let fechaIngreso = setDateString(producto.fechaIngreso)
+    table += `  <td >${fechaIngreso}</td>
+                <td >${fechaCaducidad}</td>`
+    return table
+}
+function templateUsuariosNormales(table,producto,numero){
+    table += `<tr>
+        <td>${numero}</td>
+        <td onclick="selectProductModiUserNormal('${producto.codigo}')"><a href="#">${producto.codigo}</a></td>
+        <td onclick="selectProductModiUserNormal('${producto.codigo}')"><a href="#">${producto.descripcionProducto}</a></td>
+        <td>${producto.cantidadProducto}</td>
+        <td>${producto.unidadMedida}</td>`
+    table = controlDates(table,producto)
+    table += `<td>${producto.procedencia}</td>
+        <td>${producto.observaciones}</td>
+        <td>${producto.idUnidad.nombreUnidad}</td>
+        <td>${producto.idGrupo.nombreGrupoM}</td>
+        <td>${producto.estado}</td>
+        <td><a style="posittion:center;" href="#" onclick=""productoDetallado(${producto.codigo})>Ver</a></td>`
     table+=`</tr>`
     return table
 }
@@ -104,6 +197,105 @@ async function selectProduct(idProd){
         alertify.error('Accion no realizada')
     } 
 }
+// funciones para crear el modal de dialogo
+async function createTemplateModal(id,$divModalUpdate,producto){
+    let modal = `<div class="modal" id="modalEdit">`
+    modal = templateModalDialogo(modal,producto)   
+
+    const element = createTemplate(modal)
+    $divModalUpdate.append(element)
+}
+async function selectProductModiUserNormal(id){
+    const data = new URLSearchParams(`codigo=${id}`)
+    let productoTransaccion = await getDataPost('getProducto',data)
+    
+    $divModalUpdate.innerHTML = ""
+    createTemplateModal(id,$divModalUpdate,productoTransaccion)
+    
+    var span = document.getElementsByClassName("close")[0];
+    var modal = document.getElementById("modalEdit");
+    var bttonCancel = document.getElementById('closeModal');
+    var bttonGuardar = document.getElementById('registrar_edicion');
+    let auxAction = document.getElementById('accionProducto')
+  
+    await activationModal(span,modal,bttonCancel,bttonGuardar,productoTransaccion,auxAction)
+}
+async function activationModal(span,modal,bttonCancel,bttonGuardar,producto,auxAction){
+    modal.style.display = "block";
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+    window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+    }
+    bottonsEvents(bttonCancel, bttonGuardar,producto)
+    auxAction.addEventListener('change', (event) => {
+        event.preventDefault()
+        let auxDivFecha = document.getElementById('divFechaIngreso')
+        if(auxAction.value != "ingresos"){
+            auxDivFecha.style.display = "none";
+        }else{
+            auxDivFecha.style.display = "inline"; //block
+        }
+    }) 
+}
+async function bottonsEvents(bttonCancel, bttonGuardar){
+    bttonCancel.onclick = function(){
+        modal.style.display = "none";
+    }
+    bttonGuardar.onclick = async function(){
+        let valueCantidad = document.getElementById('accionProductoCantidad').value;
+        let valueAccion = document.getElementById('accionProducto').value;
+        let valueFecha = document.getElementById('fechaIngreso').value
+        if(valueCantidad && (valueCantidad > 0)){
+            if((valueAccion == "salida") && valueCantidad > producto.cantidadProducto){
+                alertify.error('Valor ingresado supera a la cantidad existen!')
+            }else{
+                if((Date.parse(valueFecha) > Date.parse(new Date())) &&  valueFecha)
+                    await registrarAccionesModal(valueAccion,valueCantidad,valueFecha)    
+                else
+                    alertify.error('Ingrese fecha valida')
+            }
+        }else
+            alertify.error('Ingresar valor valido!')
+    }
+}
+async function registrarAccionesModal(accion,cantidad,valueFecha){
+    const data = new URLSearchParams(`action=${accion}&number=${cantidad}&date=${valueFecha}`)
+    const response = await getDataPost('newTransaccionsProduct', data)
+    console.log(response)
+}
+function templateModalDialogo(modal,producto){
+    modal +=`<div class="modal-posision"><div class="modal-header">
+                <span class="close">&times;</span>
+                <h4 align="center">Salida/entrada de producto</h4>
+            </div>
+            <div class="modal-body"><br>
+                <pre>            <black>Codigo:</black>          ${producto.codigo}           
+            <b>Producto:</b>        ${producto.descripcionProducto}
+            <b>Cantidad:</b>        ${producto.cantidadProducto}          
+            <b>Unidad:</b>          ${producto.unidadMedida}</pre>
+                <laber>Seleccione operacion</label>
+                <select id="accionProducto" name="accionProducto">
+                    <option value="ingresos">Ingreso Producto</option>
+                    <option value="salida">Salida producto</option>
+                </select>
+                <br><br>
+                <div id="divFechaIngreso">Fecha caducidad: <input type="date" id="fechaIngreso"></div>
+                <br><br>Cantidad: 
+                <input type="number" id="accionProductoCantidad" name="accionProductoCantidad" min="0"><br><br>
+                <button id="registrar_edicion" name="registrar_edicion" value="Guardar cambios">Guardar</button>
+                    <button id="closeModal" >Cancelar</button>
+            <br><br></div>
+            <div class="modal-footer"><h4 align="center">Llene todos los datos!<h4></div>
+        </div>
+        </div>`
+    return modal
+}
+
+//eliminar produto//
 async function confirmDeleteProducto(codProd){
     alertify.confirm('¿Estás seguro de Eliminar el producto?', function(e){
         if(e){ deleteProducto(codProd)}
@@ -128,8 +320,7 @@ async function addEventSearchCodProcedencia(){
     formcod.codProduct.value = $formHidenProducto.codProducto.value
     formProcedencia.ProcedenciaProd.value = $formHidenProducto.procedenciaProducto.value
     formNombre.nombreProduct.value = $formHidenProducto.nombreProducto.value
-    //$divListInventary.innerHTML=""
-    console.log("prueba")
+    
     formcod.addEventListener('submit', async (event)=>{
         
         event.preventDefault()//recarga solo la tabla, no la pagina

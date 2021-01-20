@@ -33,6 +33,15 @@ class UserController extends AbstractController
         }
         
     }
+
+    /**
+     * @Route("/getUserData", name="getUserData")
+     */
+    public function getUserData( CacheService $cache){
+        $usuario = $cache->get('usuario');
+
+        return $this->json([$usuario->getNombre(),$usuario->getIdRol()->getId()]);
+    }
     
     /**
      * @Route("/logOut", name="logOut")

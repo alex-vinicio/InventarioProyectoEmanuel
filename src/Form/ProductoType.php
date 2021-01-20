@@ -39,10 +39,6 @@ class ProductoType extends AbstractType
                 'label' => '* Unidad Medida', 
                 'attr'=>['class'=>'form-control']
             ])
-            ->add('medida', TextType::class, [
-                'label' => '* Medida', 
-                'attr'=>['class'=>'form-control']
-            ])
             ->add('estado', ChoiceType ::class, [
                 'label' => '* Estado', 
                 'choices' => array(

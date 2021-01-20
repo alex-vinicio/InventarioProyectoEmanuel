@@ -17,3 +17,7 @@ casaHogar:
 centroMedico:
     path: /centroMedico
     controller: App\Controller\AdminController::listCentroMedico
+
+controlPanel:
+    path: /controlPanel
+    controller: App\Controller\AdminController::controlPanel

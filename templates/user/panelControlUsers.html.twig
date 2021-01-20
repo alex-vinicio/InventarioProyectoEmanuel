@@ -5,47 +5,45 @@
 
 {% block body %}
 <style>
-   
+    .clearfix::after {content: ""; clear: both; display: table;}
+    .footer { 
+        position: absolute;
+        left: 0px;
+        bottom: 0;
+        width: 100%;
+        height: 20%;
+        background: rgb(247,251,252); /* Old browsers */
+        background: -moz-linear-gradient(top, rgba(247,251,252,1) 0%, rgba(173,217,228,1) 100%); /* FF3.6-15 */
+        background: -webkit-linear-gradient(top, rgba(247,251,252,1) 0%,rgba(173,217,228,1) 100%); /* Chrome10-25,Safari5.1-6 */
+        background: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(173,217,228,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7fbfc', endColorstr='#add9e4',GradientType=0 ); /* IE6-9 */
+    }
+    
 </style>
     <div id="inner">
         <div style="margin-left: 15%; font-family: 'Roboto', sans-serif; font-size: 18px;">
             <h2>Sistema de inventarios proyecto Emanuel</h2>
+            
         </div>
         <nav id="menu">
             <ul>
-                <li><a href="#" onclick="homaPage()">Inicio</a></li>
+                <li><a href="" onclick="homaPage()">Inicio</a></li>
                 <li class="barra"> | </li>
                 <li><a href="#" onclick="listarInventario(1)">Casa hogar</a>
                 </li>
                 <li class="barra"> | </li>
                 <li><a href="#" onclick="listarInventario(2)">Centro medico</a>
                 </li>
-                <li class="barra"> | </li>
+                <li class="barra" onclick="listarInventario(2)"> | </li>
                 <li><a href="#">Trabajo infantil</a></li>
                 <li class="barra"> | </li>
-                <li><a href="#">Apoyo y custodia familiar</a></li>
+                <li><a href="#" onclick="listarInventario(2)">Apoyo y custodia familiar</a></li>
                 <li style="margin-left: 7%;"><a href="#" onclick="cerrarSesion()">Cerrar Sesion</a></li>
             </ul>
         </nav>
-        <br>
         <div class="clearfix">
-            <form name="hiddenProductos">
-                <input type="hidden" name="codProducto" value="">
-                <input type="hidden" name="procedenciaProducto" value="">
-                <input type="hidden" name="nombreProducto" value="">
-            </form>
-            <div>
-                <label style="margin-right: 45%;"><big><big><b>Listado del inventario "Casa hogar Emanuel"<b></big></big></label>
-                <button class="btn btn-primary" onclick="newProuct()"> Ingresar producto</button>
-            </div>
-            <br>
-            <div id="list_casa_hogar"></div>
-            <form name="hiddenModalDialog">
-                <input type="hidden" name="cantidadProd" value="">
-                <input type="hidden" name="accionProd" value="">
-            </form>
-            <div id="modal"></div>
-            
+            <div id="navigateUser"></div>
+            <p>Continuacion de ingresar, listar y modificar usuarios</p>
         </div>
         <div class="footer">
             <h3 style="text-align: center;">Sistema de inventarios "Proyecto Emanuel"</h3>
@@ -55,7 +53,7 @@
     </div>
 {% endblock %}
 {% block javascripts %} 
-    <script type="text/javascript" src="{{ asset('assets/js/inventario/funciones.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/inventario/selectores.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/usuario/controlPanel/funciones.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/usuario/controlPanel/selectores.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/usuario/login.js') }}"></script>
 {% endblock %} 

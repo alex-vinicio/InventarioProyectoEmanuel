@@ -24,12 +24,20 @@ class AdminController extends AbstractController
         return $this->render('user/index.html.twig');
     }
 
+    public function controlPanel(EntityManagerInterface $em ,CacheService $cache){
+        $usuario = $cache->get('usuario');
+        if(!$usuario):return $this->redirectToRoute('login');endif;
+        return $this->render('user/panelControlUsers.html.twig');
+    }
+
+
     public function listCasaHogar(EntityManagerInterface $em ,CacheService $cache){
         $usuario = $cache->get('usuario');
-        $idRol = $usuario->getIdRol()->getId();
+       
         if(!$usuario){
             return $this->redirectToRoute('login');
         }else{
+            $idRol = $usuario->getIdRol()->getId();
             if($idRol === 2 || $idRol === 1){
                 return $this->render('inventory/listarInvCH.html.twig');
             }else{
@@ -40,10 +48,11 @@ class AdminController extends AbstractController
 
     public function listCentroMedico(EntityManagerInterface $em ,CacheService $cache){
         $usuario = $cache->get('usuario');
-        $idRol = $usuario->getIdRol()->getId();
+        
         if(!$usuario){
             return $this->redirectToRoute('login');
         }else{
+            $idRol = $usuario->getIdRol()->getId();
             if($idRol === 3 || $idRol === 1){
                 return $this->render('inventory/listarCM.html.twig');
             }else{

@@ -2,7 +2,7 @@
 async function addProducto(form){ // prueba del paso del form
     const data = new FormData(form)  
     const response = await getDataPost('newProduct', data) //url es distinto ue nombre de la ruta
-    console.log(response)
+    
     if(!response){
         alertify.error(`Codigo del producto repetido`)
     }else{

@@ -36,7 +36,35 @@ class InventoryController extends AbstractController
             return $this->json(['actualizó',$idUnidad]);
         endif;
     }
-    
+    /**
+     * @Route("/newTransaccionsProduct", name="newTransaccionsProduct")
+     */
+    public function newTransaccionsProduct(Request $request, EntityManagerInterface $em,CacheService $cache)//no asignar otra variable de entrada
+    {  
+        $data1 = $request->request->get('action');
+        $data2 = $request->request->get('number');
+        $fecha = $request->request->get('date');
+
+        return $this->json([$data1,$data2,$fecha]);
+        
+        $idUnidad = $cache->get('departamentoPE');
+        $cacheProducto = $cache->get('viewProducto');
+        $ip = $request->getClientIp();
+        if(!$cacheProducto):
+            $producto = new Producto();
+            $productRepeat = $em->getRepository(Producto::class)->findOneBy(['codigo'=>$data['codigo']]);
+            if($productRepeat){
+                return $this->json(null);
+            }else{
+                $aux = $this->addProduct($producto, $data, $em, $ip, $idUnidad); 
+                return $this->json(['agregado',$idUnidad]);
+            }
+        else:
+            $producto = $em->getRepository(Producto::class)->find($cacheProducto->getId());
+            $this->addProduct($producto, $data, $em, $ip, $idUnidad);
+            return $this->json(['actualizó',$idUnidad]);
+        endif;
+    }
     /**
      * @Route("/deleteProducto", name="deleteProducto")
      */
@@ -53,13 +81,31 @@ class InventoryController extends AbstractController
         }
     }
     /**
+     * @Route("/getProducto", name="getProducto")
+     */
+    public function getProducto(EntityManagerInterface $em, Request $request,CacheService $cache)
+    {
+        $idP = $request->request->get('codigo');
+        $producto = $em->getRepository(Producto::class)->findOneBy(['codigo'=>$idP]);
+        
+        if($producto){
+            return $this->json($producto);   
+        }else{
+            return $this->json(null);
+        }
+    }
+    /**
      * @Route("/cacheGetProducto", name="cacheGetProducto")
      */
     public function cacheGetProducto(EntityManagerInterface $em, CacheService $cache)
     {
         $cacheProducto = $cache->get('viewProducto');
-        $producto = $em->getRepository(Producto::class)->findOneBy(['id'=>$cacheProducto->getId()]);
-        return $this->json($producto);
+        if($cacheProducto){
+            $producto = $em->getRepository(Producto::class)->findOneBy(['id'=>$cacheProducto->getId()]);
+            return $this->json($producto);
+        }else{
+            return $this->json(false);
+        }
     }
     /**
      * @Route("/deleteCacheProducto", name="deleteCacheProducto")
@@ -169,7 +215,6 @@ class InventoryController extends AbstractController
             ->setDescripcionProducto($data['descripcionProducto'])
             ->setCantidadProducto($data['cantidadProducto'])
             ->setUnidadMedida($data['unidadMedida'])
-            ->setMedida($data['medida'])
             ->setEstado($data['estado'])
             ->setFechaIngreso($fechaIngreso)
             ->setFechaCaducidad($fechaCaducidad)

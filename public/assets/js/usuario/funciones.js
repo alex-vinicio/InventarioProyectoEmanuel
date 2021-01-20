@@ -49,11 +49,23 @@ function templateProducCadu(table,producto,numero){
             <td>${producto.codigo}</td>
             <td>${producto.descripcionProducto}</td>
             <td>${producto.cantidadProducto}</td>
-            <td>${producto.medida} ${producto.unidadMedida} </td>`
+            <td>${producto.unidadMedida} </td>`
     table = controlDates(table,producto)
     table += `<td>${producto.idUnidad.nombreUnidad}</td>
             <td>${producto.idGrupo.nombreGrupoM}</td>`
     table += `<td>${producto.estado}</td>`
     table+=`</tr>`
     return table
+}
+//mostrar navegacion usuario
+async function userNavigation($divNameUser){
+    $divNameUser.innerHTML = ""
+    const dateUser = await getData('getUserData')
+    console.log(dateUser)
+    let informacion = `<a href="#" onclick="panelUsuario(${dateUser[1]})"><h4>${dateUser[0]}</h4></a>`
+    const element = createTemplate(informacion)
+    $divNameUser.append(element)
+}
+async function panelUsuario(id){
+    location.href="controlPanel";
 }
