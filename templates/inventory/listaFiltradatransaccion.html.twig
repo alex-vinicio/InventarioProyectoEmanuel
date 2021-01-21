@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Menu{% endblock %}
+    
+
+{% block body %}
+<style>
+   
+</style>
+    <div id="inner">
+        <div style="margin-left: 15%; font-family: 'Roboto', sans-serif; font-size: 18px;">
+            <h2>Sistema de inventarios proyecto Emanuel</h2>
+        </div>
+        <nav id="menu">
+            <ul>
+                <li><a href="#" onclick="homaPage()">Inicio</a></li>
+                <li class="barra"> | </li>
+                <li><a href="#" onclick="listarInventario(1)">Casa hogar</a>
+                </li>
+                <li class="barra"> | </li>
+                <li><a href="#" onclick="listarInventario(2)">Centro medico</a>
+                </li>
+                <li class="barra"> | </li>
+                <li><a href="#">Trabajo infantil</a></li>
+                <li class="barra"> | </li>
+                <li><a href="#">Apoyo y custodia familiar</a></li>
+                <li style="margin-left: 7%;"><a href="#" onclick="cerrarSesion()">Cerrar Sesion</a></li>
+            </ul>
+        </nav>
+        <br>
+        <div class="clearfix">
+            <form name="hiddenProductos">
+                <input type="hidden" name="codProducto" value="">
+                <input type="hidden" name="procedenciaProducto" value="">
+                <input type="hidden" name="nombreProducto" value="">
+            </form>
+            <div>
+                <label style="margin-right: 45%;"><big><big><b>Listado de transacciones"<b></big></big></label>
+                <button class="btn btn-primary" onclick="retornarLista()"> Regresar</button>
+            </div>
+            <br>
+            <div id="list_casa_hogar"></div>
+            <form name="hiddenModalDialog">
+                <input type="hidden" name="cantidadProd" value="">
+                <input type="hidden" name="accionProd" value="">
+            </form>
+            <div id="modal"></div>
+            
+        </div>
+        <div class="footer">
+            <h3 style="text-align: center;">Sistema de inventarios "Proyecto Emanuel"</h3>
+            <h4 style="text-align: center;"><a style="text-align: center;" href="https://www.facebook.com/" target="_blank">Visitanos en Facebook!</a></h4>
+            <h4 style="text-align: center;"><a style="text-align: center;" href="https://www.twitter.com/" target="_blank">Visitanos en Twitter!</a></h4>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %} 
+    <script type="text/javascript" src="{{ asset('assets/js/inventario/funciones.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/inventario/selectores.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/usuario/login.js') }}"></script>
+{% endblock %} 
