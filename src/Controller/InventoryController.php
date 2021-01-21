@@ -6,9 +6,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request; //librerias http
+use Symfony\Component\Validator\Constraints\Date;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Service\CacheService;
-use App\Entity\{GrupoMaterial,Producto,Unidad};
+use App\Entity\{GrupoMaterial,Producto,Unidad,Usuario,Transaccion};
 
 class InventoryController extends AbstractController
 {
@@ -42,29 +43,67 @@ class InventoryController extends AbstractController
     public function newTransaccionsProduct(Request $request, EntityManagerInterface $em,CacheService $cache)//no asignar otra variable de entrada
     {  
         $data1 = $request->request->get('action');
-        $data2 = $request->request->get('number');
+        $cantidad = $request->request->get('number');
         $fecha = $request->request->get('date');
+        $usuarioExterno = $request->request->get('person');
+        $codP = $request->request->get('idP');
 
-        return $this->json([$data1,$data2,$fecha]);
+        $usuarioModificacion = $cache->get('usuario');
+        $producto = $em->getRepository(Producto::class)->findOneBy(['codigo'=>$codP]);
+        $usuario = $em->getRepository(Usuario::class)->findOneBy(['id'=>$usuarioModificacion->getId()]);
+        $transaccion = new Transaccion();
         
-        $idUnidad = $cache->get('departamentoPE');
-        $cacheProducto = $cache->get('viewProducto');
-        $ip = $request->getClientIp();
-        if(!$cacheProducto):
-            $producto = new Producto();
-            $productRepeat = $em->getRepository(Producto::class)->findOneBy(['codigo'=>$data['codigo']]);
-            if($productRepeat){
-                return $this->json(null);
-            }else{
-                $aux = $this->addProduct($producto, $data, $em, $ip, $idUnidad); 
-                return $this->json(['agregado',$idUnidad]);
-            }
-        else:
-            $producto = $em->getRepository(Producto::class)->find($cacheProducto->getId());
-            $this->addProduct($producto, $data, $em, $ip, $idUnidad);
-            return $this->json(['actualizó',$idUnidad]);
-        endif;
+        $operacion = 0;
+        if($data1 === 'salida'){
+            $operacion = $producto->getCantidadProducto() - $cantidad;
+            $producto
+                    ->setCantidadProducto($operacion);
+        }else{
+            $operacion = $producto->getCantidadProducto() + $cantidad;
+            $producto
+                    ->setCantidadProducto($operacion);
+        }
+        
+        $transaccion = $this->seteoDataTransaccion($transaccion,$data1,$cantidad,$fecha,$usuario,$producto,$usuarioExterno,$codP);
+        $aux = $this->envioDatosDB($transaccion,$producto,$em);
+
+        return $this->json($aux);
     }
+    private function envioDatosDB(Transaccion $transaccion,Producto $producto, EntityManagerInterface $em){
+        $em->persist($producto);
+        $em->flush();
+
+        $em->persist($transaccion);
+        $em->flush();
+        return "ok";
+    }
+    private function seteoDataTransaccion($transaccion,$accion,$cantidad,$fecha,Usuario $usuarioModificacion,Producto $producto,$usuarioExterno,$codP){
+        $entrada = $salida = "";
+        if($fecha !== ""):
+            $fechaCaducidad = \DateTime::createFromFormat('Y-m-d', $fecha);
+        else:   
+            $fechaCaducidad = null;
+        endif;
+        $fechaActual = date('Y-m-d');
+        $fechaOperacion = \DateTime::createFromFormat('Y-m-d', $fechaActual);
+        if($accion == "ingresos"){
+            $entrada = "Se aumento ${cantidad} unidades al producto con cod: ${codP}";
+        }else{
+            $salida = "Se resto ${cantidad} unidades al producto con cod: ${codP}";
+        }
+        $transaccion
+                    ->setDescripcionProducto($cantidad)
+                    ->setResponsable($usuarioExterno)
+                    ->setEntradaProducto($entrada)
+                    ->setSalidaProducto($salida)
+                    ->setFechaOperacion($fechaOperacion)
+                    ->setFechaCaducidad($fechaCaducidad)
+                    ->setIdUsuario($usuarioModificacion)
+                    ->setCodigoProducto($producto)
+                    ;
+        return $transaccion;
+    }
+
     /**
      * @Route("/deleteProducto", name="deleteProducto")
      */
@@ -87,9 +126,10 @@ class InventoryController extends AbstractController
     {
         $idP = $request->request->get('codigo');
         $producto = $em->getRepository(Producto::class)->findOneBy(['codigo'=>$idP]);
-        
+        $usuario = $em->getRepository(Usuario::class)->findAll();
+        $usuarioExternos = $this->filtroUsuariosExternos($usuario);
         if($producto){
-            return $this->json($producto);   
+            return $this->json([$producto,$usuarioExternos]);   
         }else{
             return $this->json(null);
         }
@@ -225,5 +265,13 @@ class InventoryController extends AbstractController
             ->setIdGrupo($grupo)
             ;
         return $producto;
+    }
+    private function filtroUsuariosExternos($usuario){
+        $lista =[];
+        foreach($usuario as $data){
+            if($data->getIdRol()->getId() > 5)
+                array_push($lista,$data);
+        }
+        return $lista;
     }
 }

@@ -58,6 +58,13 @@ class Transaccion
     private $fechaOperacion;
 
     /**
+     * @var \DateTime|null
+     *
+     * @ORM\Column(name="fecha_caducidad", type="datetime", nullable=true)
+     */
+    private $fechaCaducidad;
+
+    /**
      * @var \Usuario
      *
      * @ORM\ManyToOne(targetEntity="Usuario")
@@ -138,6 +145,18 @@ class Transaccion
     public function setFechaOperacion(\DateTimeInterface $fechaOperacion): self
     {
         $this->fechaOperacion = $fechaOperacion;
+
+        return $this;
+    }
+
+    public function getFechaCaducidad(): ?\DateTimeInterface
+    {
+        return $this->fechaCaducidad;
+    }
+
+    public function setFechaCaducidad(?\DateTimeInterface $fechaCaducidad): self
+    {
+        $this->fechaCaducidad = $fechaCaducidad;
 
         return $this;
     }
