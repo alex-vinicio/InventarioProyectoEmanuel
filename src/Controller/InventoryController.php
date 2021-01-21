@@ -69,41 +69,47 @@ class InventoryController extends AbstractController
 
         return $this->json($aux);
     }
-    private function envioDatosDB(Transaccion $transaccion,Producto $producto, EntityManagerInterface $em){
-        $em->persist($producto);
-        $em->flush();
-
-        $em->persist($transaccion);
-        $em->flush();
-        return "ok";
-    }
-    private function seteoDataTransaccion($transaccion,$accion,$cantidad,$fecha,Usuario $usuarioModificacion,Producto $producto,$usuarioExterno,$codP){
-        $entrada = $salida = "";
-        if($fecha !== ""):
-            $fechaCaducidad = \DateTime::createFromFormat('Y-m-d', $fecha);
-        else:   
-            $fechaCaducidad = null;
-        endif;
-        $fechaActual = date('Y-m-d');
-        $fechaOperacion = \DateTime::createFromFormat('Y-m-d', $fechaActual);
-        if($accion == "ingresos"){
-            $entrada = "Se aumento ${cantidad} unidades al producto con cod: ${codP}";
+    /**
+     * @Route("/cacheSetproductoDetallado", name="cacheSetproductoDetallado")
+     */
+    public function cacheSetproductoDetallado(EntityManagerInterface $em, CacheService $cache, Request $request)
+    {
+        $idP = $request->request->get('idP');
+        //$transacciones = $em->getRepository(Transaccion::class)->findAll(['codigoProducto'=>$idP]);
+        if($idP){
+            $cache->add('transaccionProductoId',$idP);
+            return $this->json("ok");
         }else{
-            $salida = "Se resto ${cantidad} unidades al producto con cod: ${codP}";
+            return $this->json(null);
         }
-        $transaccion
-                    ->setDescripcionProducto($cantidad)
-                    ->setResponsable($usuarioExterno)
-                    ->setEntradaProducto($entrada)
-                    ->setSalidaProducto($salida)
-                    ->setFechaOperacion($fechaOperacion)
-                    ->setFechaCaducidad($fechaCaducidad)
-                    ->setIdUsuario($usuarioModificacion)
-                    ->setCodigoProducto($producto)
-                    ;
-        return $transaccion;
     }
-
+    /**
+     * @Route("/deleteCacheTransaccion", name="deleteCacheTransaccion")
+     */
+    public function deleteCacheTransaccion(EntityManagerInterface $em, CacheService $cache)
+    {
+        return $this->json($cache->delete('transaccionProductoId'));
+    }
+    /**
+     * @Route("/getCacheTransaccion", name="getCacheTransaccion")
+     */
+    public function getCacheTransaccion(EntityManagerInterface $em, CacheService $cache)
+    {
+        return $this->json($cache->get('transaccionProductoId'));
+    }
+    /**
+     * @Route("/getProductosTransacciones", name="getProductosTransacciones")
+     */
+    public function getProductosTransacciones(EntityManagerInterface $em, CacheService $cache, Request $request)
+    {   
+        $idP = $cache->get('transaccionProductoId');
+        $transacciones = $em->getRepository(Transaccion::class)->findBy(['codigoProducto'=>$idP],['fechaCaducidad'=>'ASC']);
+        if($transacciones){
+            return $this->json($transacciones);
+        }else{
+            return $this->json(null);
+        }
+    }
     /**
      * @Route("/deleteProducto", name="deleteProducto")
      */
@@ -273,5 +279,39 @@ class InventoryController extends AbstractController
                 array_push($lista,$data);
         }
         return $lista;
+    }
+    private function envioDatosDB(Transaccion $transaccion,Producto $producto, EntityManagerInterface $em){
+        $em->persist($producto);
+        $em->flush();
+
+        $em->persist($transaccion);
+        $em->flush();
+        return "ok";
+    }
+    private function seteoDataTransaccion($transaccion,$accion,$cantidad,$fecha,Usuario $usuarioModificacion,Producto $producto,$usuarioExterno,$codP){
+        $entrada = $salida = "";
+        if($fecha !== ""):
+            $fechaCaducidad = \DateTime::createFromFormat('Y-m-d', $fecha);
+        else:   
+            $fechaCaducidad = null;
+        endif;
+        $fechaActual = date('Y-m-d');
+        $fechaOperacion = \DateTime::createFromFormat('Y-m-d', $fechaActual);
+        if($accion == "ingresos"){
+            $entrada = "Se aumento ${cantidad} unidades al producto con cod: ${codP}";
+        }else{
+            $salida = "Se resto ${cantidad} unidades al producto con cod: ${codP}";
+        }
+        $transaccion
+                    ->setDescripcionProducto($cantidad)
+                    ->setResponsable($usuarioExterno)
+                    ->setEntradaProducto($entrada)
+                    ->setSalidaProducto($salida)
+                    ->setFechaOperacion($fechaOperacion)
+                    ->setFechaCaducidad($fechaCaducidad)
+                    ->setIdUsuario($usuarioModificacion)
+                    ->setCodigoProducto($producto)
+                    ;
+        return $transaccion;
     }
 }

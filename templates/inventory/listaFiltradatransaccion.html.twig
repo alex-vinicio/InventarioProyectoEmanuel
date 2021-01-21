@@ -35,17 +35,11 @@
                 <input type="hidden" name="nombreProducto" value="">
             </form>
             <div>
-                <label style="margin-right: 45%;"><big><big><b>Listado de transacciones"<b></big></big></label>
+                <label style="margin-right: 45%;"><big><big><b>Listado de transacciones<b></big></big></label>
                 <button class="btn btn-primary" onclick="retornarLista()"> Regresar</button>
             </div>
             <br>
-            <div id="list_casa_hogar"></div>
-            <form name="hiddenModalDialog">
-                <input type="hidden" name="cantidadProd" value="">
-                <input type="hidden" name="accionProd" value="">
-            </form>
-            <div id="modal"></div>
-            
+            <div id="listarTransacciones"></div>            
         </div>
         <div class="footer">
             <h3 style="text-align: center;">Sistema de inventarios "Proyecto Emanuel"</h3>
@@ -55,7 +49,7 @@
     </div>
 {% endblock %}
 {% block javascripts %} 
-    <script type="text/javascript" src="{{ asset('assets/js/inventario/funciones.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/inventario/selectores.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/inventario/listaDetallada/funciones.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/inventario/listaDetallada/selector.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/usuario/login.js') }}"></script>
 {% endblock %} 

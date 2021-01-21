@@ -176,7 +176,7 @@ function templateUsuariosNormales(table,producto,numero){
         <td>${producto.idUnidad.nombreUnidad}</td>
         <td>${producto.idGrupo.nombreGrupoM}</td>
         <td>${producto.estado}</td>
-        <td><a style="posittion:center;" href="#" onclick=""productoDetallado(${producto.codigo})>Ver</a></td>`
+        <td><a style="posittion:center;" href="#" onclick="productoDetallado(${producto.id})"> Ver</a></td>`
     table+=`</tr>`
     return table
 }
@@ -411,4 +411,12 @@ async function getFilterProduct(list,data){
             break   
     }
     return lista
+}
+//redirrecion productos detallados
+async function productoDetallado(idProd){
+    await getData('deleteCacheTransaccion')
+    const data = new URLSearchParams(`idP=${idProd}`) // manejar 2 valores en URLSearchParams(`id=${idLAC}&idLI=${idLI}`)
+    const response = await getDataPost('cacheSetproductoDetallado', data)
+    if(response)
+        location.href="transaccionProducto";  
 }

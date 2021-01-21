@@ -76,4 +76,16 @@ class AdminController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+    public function transaccionProducto(EntityManagerInterface $em ,CacheService $cache){
+        $usuario = $cache->get('usuario');
+        $cacheProductoDetallado = $cache->get('transaccionProducto');
+        if(!$usuario):return $this->redirectToRoute('login');endif;
+        if($cacheProductoDetallado){
+            return $this->render('inventory/listaFiltradatransaccion.html.twig');
+        }else{
+            return $this->redirectToRoute('viewAdmin');
+        }
+        
+    }
+    
 }

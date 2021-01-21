@@ -21,3 +21,7 @@ centroMedico:
 controlPanel:
     path: /controlPanel
     controller: App\Controller\AdminController::controlPanel
+
+transaccionProducto:
+    path: /transaccionProducto
+    controller: App\Controller\AdminController::transaccionProducto
