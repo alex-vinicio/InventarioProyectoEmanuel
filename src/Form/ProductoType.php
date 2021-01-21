@@ -70,7 +70,7 @@ class ProductoType extends AbstractType
                 'attr'=>['class'=>'form-control']
             ])
             ->add('observaciones', TextareaType::class, [
-                'label' => 'Observaciones', 
+                'label' => '* Observaciones', 
                 'attr'=>['class'=>'form-control']
             ])
             ->add('idGrupo', EntityType::class, [

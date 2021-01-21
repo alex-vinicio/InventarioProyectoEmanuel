@@ -4,3 +4,4 @@ const $divNameUser = document.getElementById('navigateUser');
 (async function load(){
     await userNavigation($divNameUser)
 })()
+
