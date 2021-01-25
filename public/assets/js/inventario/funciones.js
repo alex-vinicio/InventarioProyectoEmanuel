@@ -194,17 +194,11 @@ async function selectProduct(idProd){
     } 
 }
 // funciones para crear el modal de dialogo
-async function createTemplateModal(id,$divModalUpdate,producto){
-    let modal = `<div class="modal" id="modalEdit">`
-    modal = templateModalDialogo(modal,producto)   
 
-    const element = createTemplate(modal)
-    $divModalUpdate.append(element)
-}
 async function selectProductModiUserNormal(id){
     const data = new URLSearchParams(`codigo=${id}`)
     let productoTransaccion = await getDataPost('getProducto',data)
-
+    console.log(productoTransaccion)
     $divModalUpdate.innerHTML = ""
     createTemplateModal(id,$divModalUpdate,productoTransaccion)
     
@@ -212,11 +206,17 @@ async function selectProductModiUserNormal(id){
     var modal = document.getElementById("modalEdit");
     var bttonCancel = document.getElementById('closeModal');
     var bttonGuardar = document.getElementById('registrar_edicion');
-    let auxAction = document.getElementById('accionProducto')
   
-    await activationModal(span,modal,bttonCancel,bttonGuardar,productoTransaccion,auxAction)
+    await activationModal(span,modal,bttonCancel,bttonGuardar,productoTransaccion)
 }
-async function activationModal(span,modal,bttonCancel,bttonGuardar,producto,auxAction){
+async function createTemplateModal(id,$divModalUpdate,producto){
+    let modal = `<div class="modal" id="modalEdit">`
+    modal = templateModalDialogo(modal,producto)   
+
+    const element = createTemplate(modal)
+    $divModalUpdate.append(element)
+}
+async function activationModal(span,modal,bttonCancel,bttonGuardar,producto,){
     modal.style.display = "block";
     span.onclick = function() {
         modal.style.display = "none";
@@ -226,53 +226,35 @@ async function activationModal(span,modal,bttonCancel,bttonGuardar,producto,auxA
           modal.style.display = "none";
         }
     }
-    bottonsEvents(bttonCancel, bttonGuardar,producto)
-    auxAction.addEventListener('change', (event) => {
-        event.preventDefault()
-        let auxDivFecha = document.getElementById('divFechaIngreso')
-        if(auxAction.value != "ingresos"){
-            auxDivFecha.style.display = "none";
-        }else{
-            auxDivFecha.style.display = "inline"; //block
-        }
-    }) 
+    bottonsEvents(bttonCancel, bttonGuardar,producto,modal)
 }
-async function bottonsEvents(bttonCancel, bttonGuardar, producto){
+async function bottonsEvents(bttonCancel, bttonGuardar, producto,modal){
     bttonCancel.onclick = function(){
         modal.style.display = "none";
     }
     bttonGuardar.onclick = async function(){
         let valueCantidad = document.getElementById('accionProductoCantidad').value;
-        let valueAccion = document.getElementById('accionProducto').value;
         let valueFecha = document.getElementById('fechaIngreso').value
         let valuePersonExternal = document.getElementById('usuariosExternos').value
-        await validacionDatosTransaccionModal(valueAccion,valueCantidad,valueFecha,valuePersonExternal,producto)
+        await validacionDatosTransaccionModal(valueCantidad,valueFecha,valuePersonExternal,producto)
         modal.style.display = "none";
         location.reload();
     }
 }
-async function validacionDatosTransaccionModal(valueAccion,valueCantidad,valueFecha,valuePersonExternal,producto){
+async function validacionDatosTransaccionModal(valueCantidad,valueFecha,valuePersonExternal,producto){
     if(valueCantidad && (valueCantidad > 0)){
-        if((valueAccion === "salida")){
-            if(valueCantidad <= producto[0].cantidadProducto){
-                await registrarAccionesModal(valueAccion,valueCantidad,valueFecha,valuePersonExternal,producto)
-            }else{
-                alertify.error('Valor ingresado supera a la cantidad existen!')
-            }
-        }else{
-            if(valueFecha)
-                if(Date.parse(valueFecha) > Date.parse(new Date()))
-                    await registrarAccionesModal(valueAccion,valueCantidad,valueFecha,valuePersonExternal,producto) 
-                else   
-                    alertify.error('Ingrese fecha valida')   
-            else
-                await registrarAccionesModal(valueAccion,valueCantidad,valueFecha,valuePersonExternal,producto)
-                
-        }
+        if(valueFecha){
+            if(Date.parse(valueFecha) > Date.parse(new Date()))
+                await registrarAccionesModal(valueCantidad,valueFecha,valuePersonExternal,producto) 
+            else   
+                alertify.error('Ingrese fecha valida')   
+        }else
+            await registrarAccionesModal(valueCantidad,valueFecha,valuePersonExternal,producto)
     }else
         alertify.error('Ingresar valor valido!')
 }
-async function registrarAccionesModal(accion,cantidad,valueFecha,persona,producto){
+async function registrarAccionesModal(cantidad,valueFecha,persona,producto){
+    let accion = "entrada"
     const data = new URLSearchParams(`action=${accion}&number=${cantidad}&date=${valueFecha}&person=${persona}&idP=${producto[0].codigo}`)
     const response = await getDataPost('newTransaccionsProduct', data)
     console.log(response)
@@ -290,13 +272,8 @@ function templateModalDialogo(modal,producto){
             <b>Producto:</b>        ${producto[0].descripcionProducto}
             <b>Cantidad:</b>        ${producto[0].cantidadProducto}          
             <b>Unidad:</b>          ${producto[0].unidadMedida}</pre>
-                <laber>Seleccione operacion</label>
-                <select id="accionProducto" name="accionProducto">
-                    <option value="ingresos">Ingreso Producto</option>
-                    <option value="salida">Salida producto</option>
-                </select>
-                <br><br>
-                <div id="divFechaIngreso">Fecha caducidad: <input type="date" id="fechaIngreso"></div>
+                <laber>Operacion: <b>Ingreso Producto<b></label>
+                <br>
                 <br>Cantidad: 
                 <input type="number" id="accionProductoCantidad" name="accionProductoCantidad" min="0"><br>
                 <br>Institucion/persona dona/recibe:<select id="usuariosExternos" name="usuariosExternos">`
@@ -417,6 +394,7 @@ async function productoDetallado(idProd){
     await getData('deleteCacheTransaccion')
     const data = new URLSearchParams(`idP=${idProd}`) // manejar 2 valores en URLSearchParams(`id=${idLAC}&idLI=${idLI}`)
     const response = await getDataPost('cacheSetproductoDetallado', data)
+    console.log(idProd)
     if(response)
         location.href="transaccionProducto";  
 }

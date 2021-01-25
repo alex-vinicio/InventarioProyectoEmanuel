@@ -46,7 +46,7 @@ class Producto
     /**
      * @var string
      *
-     * @ORM\Column(name="unidad_medida", type="string", length=20, nullable=false)
+     * @ORM\Column(name="unidad_medida", type="string", length=30, nullable=false)
      */
     private $unidadMedida;
 
@@ -87,7 +87,21 @@ class Producto
     private $observaciones;
 
     /**
-     * @var float
+     * @var string|null
+     *
+     * @ORM\Column(name="marca", type="string", length=20, nullable=true)
+     */
+    private $marca;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="color", type="string", length=20, nullable=true)
+     */
+    private $color;
+
+    /**
+     * @var float|null
      *
      * @ORM\Column(name="tiempo_entre_gestion", type="float", precision=10, scale=0, nullable=true)
      */
@@ -210,6 +224,30 @@ class Producto
     public function setProcedencia(string $procedencia): self
     {
         $this->procedencia = $procedencia;
+
+        return $this;
+    }
+
+    public function getMarca(): ?string
+    {
+        return $this->marca;
+    }
+
+    public function setMarca(string $marca): self
+    {
+        $this->marca = $marca;
+
+        return $this;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(string $color): self
+    {
+        $this->color = $color;
 
         return $this;
     }

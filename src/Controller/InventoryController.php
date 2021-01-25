@@ -266,6 +266,8 @@ class InventoryController extends AbstractController
             ->setFechaCaducidad($fechaCaducidad)
             ->setProcedencia($data['procedencia'])
             ->setObservaciones($data['observaciones'])
+            ->setMarca($data['marca'])
+            ->setColor($data['color'])
             //->setTiempoEntreGestion()
             ->setIdUnidad($departamento)
             ->setIdGrupo($grupo)

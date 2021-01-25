@@ -44,10 +44,22 @@ class ProductoType extends AbstractType
                 'choices' => array(
                     'Activo' => 'Activo',
                     'Caducado' => 'Caducado',
-                    'Procesando' => 'Procesando'
+                    'Mantenimiento' => 'Mantenimiento',
+                    'Nuevo' => 'Nuevo',
+                    'Usado' => 'Usado',
+                    'Viejo' => 'Viejo',
+                    'Suspendido' => 'Suspendido'
                 ),
                 'placeholder' => 'Estado producto',
                 'required' => true,
+                'attr'=>['class'=>'form-control']
+            ])
+            ->add('marca', TextType::class, [
+                'label' => '* Marca', 
+                'attr'=>['class'=>'form-control']
+            ])
+            ->add('color', TextType::class, [
+                'label' => 'Color', 
                 'attr'=>['class'=>'form-control']
             ])
             ->add('fechaIngreso',  DateType::class, [

@@ -66,6 +66,12 @@ class AdminController extends AbstractController
         $usuario = $cache->get('usuario');
         $cacheProducto = $cache->get('viewProducto');
         if(!$usuario):return $this->redirectToRoute('login');endif;
+        $idRol = $usuario->getIdRol()->getId();
+        if($idRol === 2){
+            return $this->redirectToRoute('casaHogar');
+        }else{
+            return $this->redirectToRoute('centroMedico');
+        }
         if($cacheProducto){
             $producto = $em->getRepository(Producto::class)->findOneBy(['id'=>$cacheProducto->getId()]);
             $form = $this->createForm(ProductoType::class, $producto = $producto);
@@ -78,7 +84,7 @@ class AdminController extends AbstractController
     }
     public function transaccionProducto(EntityManagerInterface $em ,CacheService $cache){
         $usuario = $cache->get('usuario');
-        $cacheProductoDetallado = $cache->get('transaccionProducto');
+        $cacheProductoDetallado = $cache->get('transaccionProductoId');
         if(!$usuario):return $this->redirectToRoute('login');endif;
         if($cacheProductoDetallado){
             return $this->render('inventory/listaFiltradatransaccion.html.twig');

@@ -1,6 +1,7 @@
 async function getTableTransaccion($container){
     $container.innerHTML=""
     const lista = await getData('getProductosTransacciones')
+    console.log(lista)
     getInventario(lista,$container)
 }
 async function getInventario(lista,$container){
