@@ -10,7 +10,7 @@ async function getInventario(lista,$container){
 }
 async function renderCasaHogar(lista,$container){
     let numero = 1
-    let table =`<table id="casaHogarTable" class="table table-hover table-condensed table-bordered">`
+    let table =`<table id="casaHogarTable" class="table table-responsive table-striped table-hover table-condensed table-bordered">`
     const responseUser= await getData('getUserData');
     
     switch(responseUser[1]){
@@ -51,35 +51,35 @@ function templateTitleProyectoEmanuel(table){
     table += `
     <thead> 
         <tr>
-            <th><big>N°</big></th>
-            <th>
+            <th scope="col><big>N°</big></th>
+            <th scope="col>
                 <div >  
                     <form name="searchCodProceden">
                         <input type="text" class="form-control" name="codProduct" placeholder="Codigo:">
                     </form>
                 </div>
             </th>
-            <th>
+            <th scope="col>
                 <div >  
                     <form name="searchNombre">
                         <input type="text" class="form-control" name="nombreProduct" placeholder="Nombre:">
                     </form>
                 </div>
             </th>
-            <th>Cantidad</th>
-            <th>Unidad</th>
-            <th>
+            <th scope="col>Cantidad</th>
+            <th scope="col>Unidad</th>
+            <th scope="col>
                 <div  >
                     <form name="searchProcedencia">
                         <input type="text" class="form-control" name="ProcedenciaProd" placeholder="Procedencia:">
                     </form>
                 </div>
             </th>
-            <th>Obervaciones</th>
-            <th>Proyecto</th>
-            <th>Grupo</th>
-            <th>Estado</th>
-            <th>Acciones</th>
+            <th scope="col>Obervaciones</th>
+            <th scope="col>Proyecto</th>
+            <th scope="col>Grupo</th>
+            <th scope="col>Estado</th>
+            <th scope="col">Acciones</th>
         </tr>
     </thead>`
     return table
@@ -198,7 +198,7 @@ async function selectProduct(idProd){
 async function selectProductModiUserNormal(id){
     const data = new URLSearchParams(`codigo=${id}`)
     let productoTransaccion = await getDataPost('getProducto',data)
-    console.log(productoTransaccion)
+    
     $divModalUpdate.innerHTML = ""
     createTemplateModal(id,$divModalUpdate,productoTransaccion)
     
@@ -234,7 +234,7 @@ async function bottonsEvents(bttonCancel, bttonGuardar, producto,modal){
     }
     bttonGuardar.onclick = async function(){
         let valueCantidad = document.getElementById('accionProductoCantidad').value;
-        let valueFecha = document.getElementById('fechaIngreso').value
+        let valueFecha = document.getElementById('fechaCaducidad').value
         let valuePersonExternal = document.getElementById('usuariosExternos').value
         await validacionDatosTransaccionModal(valueCantidad,valueFecha,valuePersonExternal,producto)
         modal.style.display = "none";
@@ -265,7 +265,7 @@ async function registrarAccionesModal(cantidad,valueFecha,persona,producto){
 function templateModalDialogo(modal,producto){
     modal +=`<div class="modal-posision"><div class="modal-header">
                 <span class="close">&times;</span>
-                <h4 align="center">Salida/entrada de producto</h4>
+                <h4 align="center">Ingreso de producto concurrente</h4>
             </div>
             <div class="modal-body"><br>
                 <pre>            <black>Codigo:</black>          ${producto[0].codigo}           
@@ -276,11 +276,18 @@ function templateModalDialogo(modal,producto){
                 <br>
                 <br>Cantidad: 
                 <input type="number" id="accionProductoCantidad" name="accionProductoCantidad" min="0"><br>
-                <br>Institucion/persona dona/recibe:<select id="usuariosExternos" name="usuariosExternos">`
+                <br>Fecha Caducidad: <input type="date" id="fechaCaducidad">
+                <br><br>Marca: <input type="text" id="marcaT">
+                <br><br>Color: <input type="text" id="colorT">
+                <br><br>Donante:<select id="usuariosExternos" name="usuariosExternos">`
     producto[1].forEach((userExternal)=>{
         modal+=`    <option value="${userExternal.nombre}">${userExternal.nombre}</option>`
     })
-    modal +=`       </select><br><br>
+    modal +=`       </select> <a href="#" onclick="nuevoDonante()">nuevo donante</a><br><br>
+                    Categoria: <select id="categoriaT" name="categoriaT">
+                        <option value="perecibles">Perecibles</option>
+                        <option value="noperecibles">No perecibles</option>
+                    </select><br><br>
                     <button id="registrar_edicion" name="registrar_edicion" value="Guardar cambios">Guardar</button>
                             <button id="closeModal" >Cancelar</button>
                     <br><br></div>

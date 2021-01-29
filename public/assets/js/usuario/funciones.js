@@ -5,7 +5,7 @@ async function getTableProxCaducar($container){
 }
 async function renderProductoProxCad(lista,$container){
     let numero = 1
-    let table =`<table id="productCaduTable" class="table table-hover table-condensed table-bordered">`
+    let table =`<table id="productCaduTable" class="table table-responsive table-striped table-hover table-condensed table-bordered">`
     table = templateTitleProducCadu(table)
     if(lista.length != 0){
         lista.forEach((productos)=>{

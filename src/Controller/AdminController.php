@@ -70,6 +70,7 @@ class AdminController extends AbstractController
         if($idRol === 2){
             return $this->redirectToRoute('casaHogar');
         }else{
+            if($idRol === 3)
             return $this->redirectToRoute('centroMedico');
         }
         if($cacheProducto){

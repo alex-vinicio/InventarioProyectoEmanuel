@@ -39,14 +39,14 @@ class Transaccion
     /**
      * @var string
      *
-     * @ORM\Column(name="entrada_producto", type="string", length=50, nullable=false)
+     * @ORM\Column(name="entrada_producto", type="string", length=150, nullable=false)
      */
     private $entradaProducto;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="salida_producto", type="string", length=50, nullable=false)
+     * @ORM\Column(name="salida_producto", type="string", length=150, nullable=false)
      */
     private $salidaProducto;
 

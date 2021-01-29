@@ -29,10 +29,9 @@
         </nav>
         <br>
         <div class="clearfix">
-            <form name="hiddenProductos">
-                <input type="hidden" name="codProducto" value="">
-                <input type="hidden" name="procedenciaProducto" value="">
-                <input type="hidden" name="nombreProducto" value="">
+            <form name="hiddenProductosTransaccion">
+                <input type="hidden" name="ingreso" value="">
+                <input type="hidden" name="salida" value="">
             </form>
             <div>
                 <label style="margin-right: 45%;"><big><big><b>Listado de transacciones<b></big></big></label>
@@ -49,7 +48,9 @@
     </div>
 {% endblock %}
 {% block javascripts %} 
+		
     <script type="text/javascript" src="{{ asset('assets/js/inventario/listaDetallada/funciones.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/inventario/listaDetallada/selector.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/usuario/login.js') }}"></script>
+    
 {% endblock %} 

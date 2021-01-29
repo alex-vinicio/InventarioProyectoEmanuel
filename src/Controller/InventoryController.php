@@ -70,12 +70,45 @@ class InventoryController extends AbstractController
         return $this->json($aux);
     }
     /**
+     * @Route("/listTransaccion", name="listTransaccion")
+     */
+    public function listTransaccion(EntityManagerInterface $em, CacheService $cache)
+    {
+        $listaT = [];
+        $idTransaccion = $cache->get('transaccionProductoId');
+        $transacciones = $em->getRepository(Transaccion::class)->findBy(['codigoProducto'=>$idTransaccion]);
+        if($transacciones){
+            foreach($transacciones as $object){
+                if($object->getDescripcionProducto() !== "0")
+                    array_push($listaT,$object);
+            }
+            return $this->json($listaT);
+        }else{
+            return $this->json(null);
+        }
+        
+    }
+    /**
+     * @Route("/getOneProductTransaction", name="getOneProductTransaction")
+     */
+    public function getOneProductTransaction(EntityManagerInterface $em, Request $request,CacheService $cache)
+    {
+        $idPT = $request->request->get('codigo');
+        $producto = $em->getRepository(Producto::class)->findOneBy(['codigo'=>$idP]);
+        $usuario = $em->getRepository(Usuario::class)->findAll();
+        $usuarioExternos = $this->filtroUsuariosExternos($usuario);
+        if($producto){
+            return $this->json([$producto,$usuarioExternos]);   
+        }else{
+            return $this->json(null);
+        }
+    }
+    /**
      * @Route("/cacheSetproductoDetallado", name="cacheSetproductoDetallado")
      */
     public function cacheSetproductoDetallado(EntityManagerInterface $em, CacheService $cache, Request $request)
     {
         $idP = $request->request->get('idP');
-        //$transacciones = $em->getRepository(Transaccion::class)->findAll(['codigoProducto'=>$idP]);
         if($idP){
             $cache->add('transaccionProductoId',$idP);
             return $this->json("ok");
@@ -97,19 +130,7 @@ class InventoryController extends AbstractController
     {
         return $this->json($cache->get('transaccionProductoId'));
     }
-    /**
-     * @Route("/getProductosTransacciones", name="getProductosTransacciones")
-     */
-    public function getProductosTransacciones(EntityManagerInterface $em, CacheService $cache, Request $request)
-    {   
-        $idP = $cache->get('transaccionProductoId');
-        $transacciones = $em->getRepository(Transaccion::class)->findBy(['codigoProducto'=>$idP],['fechaCaducidad'=>'ASC']);
-        if($transacciones){
-            return $this->json($transacciones);
-        }else{
-            return $this->json(null);
-        }
-    }
+   
     /**
      * @Route("/deleteProducto", name="deleteProducto")
      */
@@ -292,6 +313,7 @@ class InventoryController extends AbstractController
     }
     private function seteoDataTransaccion($transaccion,$accion,$cantidad,$fecha,Usuario $usuarioModificacion,Producto $producto,$usuarioExterno,$codP){
         $entrada = $salida = "";
+        $nombre = $producto->getDescripcionProducto();
         if($fecha !== ""):
             $fechaCaducidad = \DateTime::createFromFormat('Y-m-d', $fecha);
         else:   
@@ -300,9 +322,9 @@ class InventoryController extends AbstractController
         $fechaActual = date('Y-m-d');
         $fechaOperacion = \DateTime::createFromFormat('Y-m-d', $fechaActual);
         if($accion == "ingresos"){
-            $entrada = "Se aumento ${cantidad} unidades al producto con cod: ${codP}";
+            $entrada = "Se aumento ${cantidad} unidades al producto con cod: ${nombre}";
         }else{
-            $salida = "Se resto ${cantidad} unidades al producto con cod: ${codP}";
+            $salida = "Se resto ${cantidad} unidades al producto con cod: ${nombre}";
         }
         $transaccion
                     ->setDescripcionProducto($cantidad)
