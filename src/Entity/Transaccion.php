@@ -64,6 +64,27 @@ class Transaccion
      */
     private $fechaCaducidad;
 
+     /**
+     * @var string|null
+     *
+     * @ORM\Column(name="marca", type="string", length=20, nullable=true)
+     */
+    private $marca;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="color", type="string", length=20, nullable=true)
+     */
+    private $color;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="procedencia", type="string", length=50, nullable=true)
+     */
+    private $procedencia;
+
     /**
      * @var \Usuario
      *
@@ -152,6 +173,42 @@ class Transaccion
     public function getFechaCaducidad(): ?\DateTimeInterface
     {
         return $this->fechaCaducidad;
+    }
+
+    public function getMarca(): ?string
+    {
+        return $this->marca;
+    }
+
+    public function setMarca(string $marca): self
+    {
+        $this->marca = $marca;
+
+        return $this;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(string $color): self
+    {
+        $this->color = $color;
+
+        return $this;
+    }
+
+    public function getProcedencia(): ?string
+    {
+        return $this->procedencia;
+    }
+
+    public function setProcedencia(string $procedencia): self
+    {
+        $this->procedencia = $procedencia;
+
+        return $this;
     }
 
     public function setFechaCaducidad(?\DateTimeInterface $fechaCaducidad): self

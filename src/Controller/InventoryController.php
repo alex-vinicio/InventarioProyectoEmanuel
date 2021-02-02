@@ -47,24 +47,36 @@ class InventoryController extends AbstractController
         $fecha = $request->request->get('date');
         $usuarioExterno = $request->request->get('person');
         $codP = $request->request->get('idP');
+        $marca = $request->request->get('marca');
+        $color = $request->request->get('color');
+        $idT = $request->request->get('idT');
 
         $usuarioModificacion = $cache->get('usuario');
         $producto = $em->getRepository(Producto::class)->findOneBy(['codigo'=>$codP]);
         $usuario = $em->getRepository(Usuario::class)->findOneBy(['id'=>$usuarioModificacion->getId()]);
-        $transaccion = new Transaccion();
+        
         
         $operacion = 0;
         if($data1 === 'salida'){
+            $transaccion = $em->getRepository(Transaccion::class)->findOneBy(['id'=>$idT]);
+            
             $operacion = $producto->getCantidadProducto() - $cantidad;
+            $operacionTransac = $transaccion->getDescripcionProducto() - $cantidad;
+            //return $this->json([$cantidad,$operacionTransac,$transaccion->getDescripcionProducto()]);
             $producto
                     ->setCantidadProducto($operacion);
+            $transaccion
+                    ->setDescripcionProducto($operacionTransac);
         }else{
+            $transaccion = new Transaccion();
             $operacion = $producto->getCantidadProducto() + $cantidad;
             $producto
                     ->setCantidadProducto($operacion);
+            $transaccion
+                    ->setDescripcionProducto($cantidad);
         }
         
-        $transaccion = $this->seteoDataTransaccion($transaccion,$data1,$cantidad,$fecha,$usuario,$producto,$usuarioExterno,$codP);
+        $transaccion = $this->seteoDataTransaccion($transaccion,$data1,$cantidad,$fecha,$usuario,$producto,$usuarioExterno,$codP,$marca,$color);
         $aux = $this->envioDatosDB($transaccion,$producto,$em);
 
         return $this->json($aux);
@@ -79,7 +91,7 @@ class InventoryController extends AbstractController
         $transacciones = $em->getRepository(Transaccion::class)->findBy(['codigoProducto'=>$idTransaccion]);
         if($transacciones){
             foreach($transacciones as $object){
-                if($object->getDescripcionProducto() !== "0")
+                if($object->getDescripcionProducto() !== "")
                     array_push($listaT,$object);
             }
             return $this->json($listaT);
@@ -123,6 +135,23 @@ class InventoryController extends AbstractController
     {
         return $this->json($cache->delete('transaccionProductoId'));
     }
+
+    /**
+     * @Route("/getTransaccionSalida", name="getTransaccionSalida")
+     */
+    public function getTransaccionSalida(EntityManagerInterface $em, Request $request)
+    {
+        $idP = $request->request->get('codigo');
+        $transaccion = $em->getRepository(Transaccion::class)->findOneBy(['id'=>$idP]);
+        $usuario = $em->getRepository(Usuario::class)->findAll();
+        $usuarioExternos = $this->filtroUsuariosExternos($usuario);
+        if($transaccion){
+            return $this->json([$transaccion,$usuarioExternos]);
+        }else{
+            return $this->json(null);
+        }
+    }
+
     /**
      * @Route("/getCacheTransaccion", name="getCacheTransaccion")
      */
@@ -311,7 +340,7 @@ class InventoryController extends AbstractController
         $em->flush();
         return "ok";
     }
-    private function seteoDataTransaccion($transaccion,$accion,$cantidad,$fecha,Usuario $usuarioModificacion,Producto $producto,$usuarioExterno,$codP){
+    private function seteoDataTransaccion($transaccion,$accion,$cantidad,$fecha,Usuario $usuarioModificacion,Producto $producto,$usuarioExterno,$codP,$marca,$color){
         $entrada = $salida = "";
         $nombre = $producto->getDescripcionProducto();
         if($fecha !== ""):
@@ -319,18 +348,22 @@ class InventoryController extends AbstractController
         else:   
             $fechaCaducidad = null;
         endif;
+        if(!$marca){$marca = "desconocida";}
+        if(!$color){$color = "desconocido";}
         $fechaActual = date('Y-m-d');
         $fechaOperacion = \DateTime::createFromFormat('Y-m-d', $fechaActual);
-        if($accion == "ingresos"){
+        if($accion === "entrada"){
             $entrada = "Se aumento ${cantidad} unidades al producto con cod: ${nombre}";
         }else{
             $salida = "Se resto ${cantidad} unidades al producto con cod: ${nombre}";
         }
         $transaccion
-                    ->setDescripcionProducto($cantidad)
+                    
                     ->setResponsable($usuarioExterno)
                     ->setEntradaProducto($entrada)
                     ->setSalidaProducto($salida)
+                    ->setMarca($marca)
+                    ->setColor($color)
                     ->setFechaOperacion($fechaOperacion)
                     ->setFechaCaducidad($fechaCaducidad)
                     ->setIdUsuario($usuarioModificacion)

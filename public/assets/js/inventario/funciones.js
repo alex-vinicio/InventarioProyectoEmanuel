@@ -272,22 +272,20 @@ function templateModalDialogo(modal,producto){
             <b>Producto:</b>        ${producto[0].descripcionProducto}
             <b>Cantidad:</b>        ${producto[0].cantidadProducto}          
             <b>Unidad:</b>          ${producto[0].unidadMedida}</pre>
-                <laber>Operacion: <b>Ingreso Producto<b></label>
+            <laber>Operacion: <b>Ingreso Producto<b></label>
                 <br>
                 <br>Cantidad: 
-                <input type="number" id="accionProductoCantidad" name="accionProductoCantidad" min="0"><br>
-                <br>Fecha Caducidad: <input type="date" id="fechaCaducidad">
-                <br><br>Marca: <input type="text" id="marcaT">
+                <input type="number" id="accionProductoCantidad" name="accionProductoCantidad" min="0">`
+                if(producto[0].idGrupo.id===1){
+                    modal += `<br><br>Fecha Caducidad: <input type="date" id="fechaCaducidad"></input>`
+                }
+    modal +=`   <br><br>Marca: <input type="text" id="marcaT">
                 <br><br>Color: <input type="text" id="colorT">
                 <br><br>Donante:<select id="usuariosExternos" name="usuariosExternos">`
     producto[1].forEach((userExternal)=>{
         modal+=`    <option value="${userExternal.nombre}">${userExternal.nombre}</option>`
     })
     modal +=`       </select> <a href="#" onclick="nuevoDonante()">nuevo donante</a><br><br>
-                    Categoria: <select id="categoriaT" name="categoriaT">
-                        <option value="perecibles">Perecibles</option>
-                        <option value="noperecibles">No perecibles</option>
-                    </select><br><br>
                     <button id="registrar_edicion" name="registrar_edicion" value="Guardar cambios">Guardar</button>
                             <button id="closeModal" >Cancelar</button>
                     <br><br></div>

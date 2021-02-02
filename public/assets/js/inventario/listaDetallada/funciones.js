@@ -77,9 +77,15 @@ function templateProducTransaccion(table,producto,numero){
     table += `<td style="text-align: center">${producto.responsable} </td>`
     table = controlDates(table,producto)
     table += `  <td style="text-align: center">${producto.descripcionProducto}</td>
-                <td>${producto.codigoProducto.procedencia}</td>
-                <td class="text-center"><a href="#" onclick="salidaRegistro(${producto.id})">Editar</a></td>
-            </tr>`
+                <td>${producto.codigoProducto.procedencia}</td>`
+    if(producto.descripcionProducto != "0"){
+        table += `<td class="text-center"><a href="#" onclick="salidaRegistro(${producto.id})">Editar</a></td>`
+    }else{
+        table += `<td class="text-center">--</td>`
+    }
+
+                
+        table += `</tr>`
     return table
 } 
 function llenarEspaciosTabla(table,producto){
@@ -103,11 +109,11 @@ async function retornarLista(){
 }
 //generacion modal
 async function salidaRegistro(idTransaccion){
-    const data = new URLSearchParams(`codigo=${id}`)
-    let productoTransaccion = await getDataPost('getProducto',data)
-    
+    const data = new URLSearchParams(`codigo=${idTransaccion}`)
+    let productoTransaccion = await getDataPost('getTransaccionSalida',data)
+    console.log(productoTransaccion)
     $divModalUpdate.innerHTML = ""
-    createTemplateModal(id,$divModalUpdate,productoTransaccion)
+    createTemplateModal(idTransaccion,$divModalUpdate,productoTransaccion)
     
     var span = document.getElementsByClassName("close")[0];
     var modal = document.getElementById("modalEdit");
@@ -116,7 +122,84 @@ async function salidaRegistro(idTransaccion){
   
     await activationModal(span,modal,bttonCancel,bttonGuardar,productoTransaccion)
 }
+async function createTemplateModal(id,$divModalUpdate,producto){
+    let modal = `<div class="modal" id="modalEdit">`
+    modal = templateModalDialogo(modal,producto)   
 
+    const element = createTemplate(modal)
+    $divModalUpdate.append(element)
+}
+async function activationModal(span,modal,bttonCancel,bttonGuardar,producto,){
+    modal.style.display = "block";
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+    window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+    }
+    bottonsEvents(bttonCancel, bttonGuardar,producto,modal)
+}
+async function bottonsEvents(bttonCancel, bttonGuardar, producto,modal){
+    bttonCancel.onclick = function(){
+        modal.style.display = "none";
+    }
+    bttonGuardar.onclick = async function(){
+        let valueCantidad = document.getElementById('cantidadP').value;
+        let valuePersonExternal = document.getElementById('usuariosExternos').value
+        await validacionDatosTransaccionModal(valueCantidad,valuePersonExternal,producto)
+        modal.style.display = "none";
+        getTableTransaccion($divListInventary)
+    }
+}
+async function validacionDatosTransaccionModal(valueCantidad,valuePersonExternal,producto){
+    if(valueCantidad && ((valueCantidad > 0)&&(valueCantidad <= producto[0].descripcionProducto))){
+        await registrarAccionesModal(valueCantidad,valuePersonExternal,producto)
+    }else
+        alertify.error('Ingresar valor valido!')
+}
+async function registrarAccionesModal(cantidad,persona,producto){
+    let accion = "salida"
+    let valueFecha = ""
+    var marca = document.getElementById('marcaT');
+    var color = document.getElementById('colorT');
+    const data = new URLSearchParams(`idT=${producto[0].id}&action=${accion}&number=${cantidad}&date=${valueFecha}&person=${persona}&idP=${producto[0].codigoProducto.codigo}&marca=${marca}&color=${color}`)
+    const response = await getDataPost('newTransaccionsProduct', data)
+    console.log(response)
+    if(response){
+        alertify.success('transaccion guardada!')
+    }
+}
+function templateModalDialogo(modal,producto){
+    modal +=`<div class="modal-posision"><div class="modal-header">
+                <span class="close">&times;</span>
+                <h4 align="center">Salida de producto</h4>
+            </div>
+            <div class="modal-body"><br>
+                <pre>            <black>Producto:</black>          ${producto[0].codigoProducto.descripcionProducto}           
+            <b>Procedencia:</b>        ${producto[0].procedencia}
+            <b>Cantidad:</b>        ${producto[0].descripcionProducto}          
+            <b>Unidad:</b>          ${producto[0].codigoProducto.unidadMedida}
+            <b>Marca:</b>          ${producto[0].marca}
+            <b>Color:</b>          ${producto[0].color}</pre>
+            <laber>Operacion: <b>Ingreso Producto<b></label>
+                <br>
+                <br>Cantidad: 
+                <input type="number" id="cantidadP" name="cantidadP" min="0">
+                <br><br>Donante:<select id="usuariosExternos" name="usuariosExternos">`
+    producto[1].forEach((userExternal)=>{
+        modal+=`    <option value="${userExternal.nombre}">${userExternal.nombre}</option>`
+    })
+    modal +=`       </select> <a href="#" onclick="nuevoDonante()">nuevo donante</a><br><br>
+                    <button id="registrar_edicion" name="registrar_edicion" value="Guardar cambios">Guardar</button>
+                            <button id="closeModal" >Cancelar</button>
+                    <br><br></div>
+                    <div class="modal-footer"><h4 align="center">Llene todos los datos!<h4></div>
+                </div>
+            </div>`
+    return modal
+}
 //buscadores             
 async function addEventSearchTransaccion(){
     const formSalida = document.searchSalida
