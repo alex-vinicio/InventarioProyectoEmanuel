@@ -25,3 +25,11 @@ controlPanel:
 transaccionProducto:
     path: /transaccionProducto
     controller: App\Controller\AdminController::transaccionProducto
+
+usuariosGestion:
+    path: /usuariosGestion
+    controller: App\Controller\AdminController::usuariosGestion
+
+patrimonio:
+    path: /patrimonio
+    controller: App\Controller\AdminController::listPatrimonio

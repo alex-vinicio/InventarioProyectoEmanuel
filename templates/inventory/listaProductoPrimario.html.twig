@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Menu{% endblock %}
+{% block title %}Patrimonio{% endblock %}
     
 
 {% block body %}
@@ -43,26 +43,29 @@
         <div class="clearfix">
             <div id="navigateUser"></div>
             <br>
-            <div class="row">
-                <div class="col-xl-9 col-lg-11 col-md-10 col-sm-12">
-                    <div class="form-row">
-                        <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-4">
-                            <label>  Nuevo usuario</laber><br>
-                            <img href="#" onclick="listarInventario(7)" style=" padding-left: 0px; width: 40%; height: 40%;" src='assets/img/user.png' >
-                        </div>
-                        <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-4">
-                            <label>  Gestion patrimonio</label><br>
-                            <img href="#" onclick="listarPatrimonio()" style=" padding-left: 0px; width: 70%; height: 70%;" src='assets/img/patrimonio.png' >
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <form name="hiddenUsers">
-                <input type="hidden" name="nombreUser" value="">
-                <input type="hidden" name="rolUser" value="">
+            <form name="hiddenPatrimonio">
+                <input type="hidden" name="codigoProduct" value="">
+                <input type="hidden" name="procedencia" value="">
             </form>
-            <h4><b>Listado de usuario</b></h4>
-            <div id="tablaUsuarios"></div>
+            <h4><b>Listado de bienes inmuebles</b></h4>
+            <form action="" name="actions">
+                <label>Vehiculos
+                    <input type="radio" name="option" value="vehiculos" checked>
+                </label>
+                <label>  Vienes Inmuebles
+                    <input type="radio" name="option" value="inmuebles" >
+                </label>
+                <label>  Terrenos
+                    <input type="radio" name="option" value="terreno" >
+                </label>
+            </form>
+            <form name="hiddenvehiInm">
+                <input type="hidden" name="placaVehi" value="">
+                <input type="hidden" name="codInm" value="">
+            </form>
+            <div id="tablaProductoPatrim"></div>
+            {# mostrar consultar segun eleccion #}
+            
         </div>
         <div class="footer">
             <h3 style="text-align: center;">Sistema de inventarios "Proyecto Emanuel"</h3>
@@ -72,7 +75,7 @@
     </div>
 {% endblock %}
 {% block javascripts %} 
-    <script type="text/javascript" src="{{ asset('assets/js/usuario/controlPanel/funciones.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/usuario/controlPanel/selectores.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/inventario/inventarioPrincipal/funciones.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/inventario/inventarioPrincipal/selectores.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/usuario/login.js') }}"></script>
 {% endblock %} 

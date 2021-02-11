@@ -111,7 +111,7 @@ async function retornarLista(){
 async function salidaRegistro(idTransaccion){
     const data = new URLSearchParams(`codigo=${idTransaccion}`)
     let productoTransaccion = await getDataPost('getTransaccionSalida',data)
-    console.log(productoTransaccion)
+
     $divModalUpdate.innerHTML = ""
     createTemplateModal(idTransaccion,$divModalUpdate,productoTransaccion)
     
@@ -119,8 +119,9 @@ async function salidaRegistro(idTransaccion){
     var modal = document.getElementById("modalEdit");
     var bttonCancel = document.getElementById('closeModal');
     var bttonGuardar = document.getElementById('registrar_edicion');
+    var bttCreateUserExternl = document.getElementById('nuevoDonante');
   
-    await activationModal(span,modal,bttonCancel,bttonGuardar,productoTransaccion)
+    await activationModal(span,modal,bttonCancel,bttonGuardar,productoTransaccion,bttCreateUserExternl)
 }
 async function createTemplateModal(id,$divModalUpdate,producto){
     let modal = `<div class="modal" id="modalEdit">`
@@ -129,7 +130,7 @@ async function createTemplateModal(id,$divModalUpdate,producto){
     const element = createTemplate(modal)
     $divModalUpdate.append(element)
 }
-async function activationModal(span,modal,bttonCancel,bttonGuardar,producto,){
+async function activationModal(span,modal,bttonCancel,bttonGuardar,producto,bttCreateUserExternl){
     modal.style.display = "block";
     span.onclick = function() {
         modal.style.display = "none";
@@ -139,9 +140,9 @@ async function activationModal(span,modal,bttonCancel,bttonGuardar,producto,){
           modal.style.display = "none";
         }
     }
-    bottonsEvents(bttonCancel, bttonGuardar,producto,modal)
+    bottonsEvents(bttonCancel, bttonGuardar,producto,modal,bttCreateUserExternl)
 }
-async function bottonsEvents(bttonCancel, bttonGuardar, producto,modal){
+async function bottonsEvents(bttonCancel, bttonGuardar, producto,modal,bttCreateUserExternl){
     bttonCancel.onclick = function(){
         modal.style.display = "none";
     }
@@ -152,19 +153,27 @@ async function bottonsEvents(bttonCancel, bttonGuardar, producto,modal){
         modal.style.display = "none";
         getTableTransaccion($divListInventary)
     }
+    bttCreateUserExternl.onclick = async function(){
+        location.href="usuariosGestion";
+    }
 }
 async function validacionDatosTransaccionModal(valueCantidad,valuePersonExternal,producto){
-    if(valueCantidad && ((valueCantidad > 0)&&(valueCantidad <= producto[0].descripcionProducto))){
-        await registrarAccionesModal(valueCantidad,valuePersonExternal,producto)
+    if(valueCantidad){
+        console.log(valueCantidad)
+        if((valueCantidad > 0) && (valueCantidad <= producto[0].descripcionProducto)){
+            
+            await registrarAccionesModal(valueCantidad,valuePersonExternal,producto)
+        }else{
+            alertify.error('Valor incorrecto!')
+        }        
     }else
-        alertify.error('Ingresar valor valido!')
+        alertify.error('Ingrese un valido!')
 }
 async function registrarAccionesModal(cantidad,persona,producto){
     let accion = "salida"
-    let valueFecha = ""
-    var marca = document.getElementById('marcaT');
-    var color = document.getElementById('colorT');
-    const data = new URLSearchParams(`idT=${producto[0].id}&action=${accion}&number=${cantidad}&date=${valueFecha}&person=${persona}&idP=${producto[0].codigoProducto.codigo}&marca=${marca}&color=${color}`)
+    let valueFecha = null
+    let marca = color = proceden= null
+    const data = new URLSearchParams(`idT=${producto[0].id}&action=${accion}&number=${cantidad}&date=${valueFecha}&person=${persona}&idP=${producto[0].codigoProducto.codigo}&marca=${marca}&color=${color}&proceden=${proceden}`)
     const response = await getDataPost('newTransaccionsProduct', data)
     console.log(response)
     if(response){
@@ -186,12 +195,12 @@ function templateModalDialogo(modal,producto){
             <laber>Operacion: <b>Ingreso Producto<b></label>
                 <br>
                 <br>Cantidad: 
-                <input type="number" id="cantidadP" name="cantidadP" min="0">
+                <input type="number" id="cantidadP" placeholder="ejemplo: 3">
                 <br><br>Donante:<select id="usuariosExternos" name="usuariosExternos">`
     producto[1].forEach((userExternal)=>{
         modal+=`    <option value="${userExternal.nombre}">${userExternal.nombre}</option>`
     })
-    modal +=`       </select> <a href="#" onclick="nuevoDonante()">nuevo donante</a><br><br>
+    modal +=`       </select> <a href="#" id="nuevoDonante" onclick="nuevoDonante('usuarioExterno')">nuevo donante</a><br><br>
                     <button id="registrar_edicion" name="registrar_edicion" value="Guardar cambios">Guardar</button>
                             <button id="closeModal" >Cancelar</button>
                     <br><br></div>

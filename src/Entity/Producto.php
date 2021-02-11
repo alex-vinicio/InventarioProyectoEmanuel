@@ -101,6 +101,83 @@ class Producto
     private $color;
 
     /**
+     * @var string|null
+     *
+     * @ORM\Column(name="motor", type="string", length=75, nullable=true)
+     */
+    private $motor;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="cilindraje", type="string", length=50, nullable=true)
+     */
+    private $cilindraje;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="modelo", type="string", length=50, nullable=true)
+     */
+    private $modelo;
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(name="num_pasajeros", type="integer", nullable=true)
+     */
+    private $numPasajero;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="chasis", type="string", length=75, nullable=true)
+     */
+    private $chasis;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="anio_modelo", type="string", length=25, nullable=true)
+     */
+    private $anioModelo;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="tipo_vehiculo", type="string", length=100, nullable=true)
+     */
+    private $tipoVehiculo;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="combustible", type="string", length=50, nullable=true)
+     */
+    private $combustible;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="ramv_cpn", type="string", length=100, nullable=true)
+     */
+    private $ramvCpn;
+
+    /**
+     * @var bool|null
+     *
+     * @ORM\Column(name="remarcado", type="boolean", length=20, nullable=true)
+     */
+    private $remarcado;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="clave_catastral", type="string", length=100, nullable=true)
+     */
+    private $claveCatastral;
+
+    /**
      * @var float|null
      *
      * @ORM\Column(name="tiempo_entre_gestion", type="float", precision=10, scale=0, nullable=true)
@@ -276,6 +353,138 @@ class Producto
         return $this;
     }
 
+    //------------- Aumento de seters y geterns a la tabla
+    public function getMotor(): ?string
+    {
+        return $this->motor;
+    }
+
+    public function setMotor(string $motor): self
+    {
+        $this->motor = $motor;
+
+        return $this;
+    }
+
+    public function getCilindraje(): ?string
+    {
+        return $this->cilindraje;
+    }
+
+    public function setCilindraje(string $cilindraje): self
+    {
+        $this->cilindraje = $cilindraje;
+
+        return $this;
+    }
+
+    public function getModelo(): ?string
+    {
+        return $this->modelo;
+    }
+
+    public function setModelo(string $modelo): self
+    {
+        $this->modelo = $modelo;
+
+        return $this;
+    }
+
+    public function getNumPasajero(): ?int
+    {
+        return $this->numPasajero;
+    }
+
+    public function setNumPasajero(int $numPasajero): self
+    {
+        $this->numPasajero = $numPasajero;
+
+        return $this;
+    }
+
+    public function getChasis(): ?string
+    {
+        return $this->chasis;
+    }
+
+    public function setChasis(string $chasis): self
+    {
+        $this->chasis = $chasis;
+
+        return $this;
+    }
+
+    public function getAnioModelo(): ?string
+    {
+        return $this->anioModelo;
+    }
+
+    public function setAnioModelo(string $anioModelo): self
+    {
+        $this->anioModelo = $anioModelo;
+
+        return $this;
+    }
+
+    public function getTipoVehiculo(): ?string
+    {
+        return $this->tipoVehiculo;
+    }
+
+    public function setTipoVehiculo(string $tipoVehiculo): self
+    {
+        $this->tipoVehiculo = $tipoVehiculo;
+
+        return $this;
+    }
+
+    public function getCombustible(): ?string
+    {
+        return $this->combustible;
+    }
+
+    public function setCombustible(string $combustible): self
+    {
+        $this->combustible = $combustible;
+
+        return $this;
+    }
+
+    public function getRamvCpn(): ?string
+    {
+        return $this->ramvCpn;
+    }
+
+    public function setRamvCpn(string $ramvCpn): self
+    {
+        $this->ramvCpn = $ramvCpn;
+
+        return $this;
+    }
+
+    public function getRemarcado(): ?bool
+    {
+        return $this->remarcado;
+    }
+
+    public function setRemarcado(bool $remarcado): self
+    {
+        $this->remarcado = $remarcado;
+
+        return $this;
+    }
+    public function getClaveCatastral(): ?string
+    {
+        return $this->claveCatastral;
+    }
+
+    public function setClaveCatastral(string $claveCatastral): self
+    {
+        $this->claveCatastral = $claveCatastral;
+
+        return $this;
+    }
+    //---------------------------------------
     public function getIdUnidad(): ?Unidad
     {
         return $this->idUnidad;

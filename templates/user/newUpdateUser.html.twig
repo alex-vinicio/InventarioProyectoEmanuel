@@ -1,0 +1,99 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}user{% endblock %}
+    
+
+{% block body %}
+<style>
+    
+</style>
+    <div id="inner">
+        <div style="margin-left: 15%; font-family: 'Roboto', sans-serif; font-size: 18px;">
+            <h2>Sistema de inventarios proyecto Emanuel</h2>
+        </div>
+        <nav id="menu">
+            <ul>
+                <li><a href="#" onclick="homaPage()">Inicio</a></li>
+                <li class="barra"> | </li>
+                <li><a href="#" onclick="listarInventario(1)">Casa hogar</a>
+                </li>
+                <li class="barra"> | </li>
+                <li><a href="#" onclick="listarInventario(2)">Centro medico</a>
+                </li>
+                <li class="barra"> | </li>
+                <li><a href="#" onclick="listarInventario(6)">Patrimonio</a></li>
+                <li class="barra"> | </li>
+                <li style="margin-left: 25%;"><a href="#" onclick="cerrarSesion()">Cerrar Sesion</a></li>
+            </ul>
+        </nav>
+        <br>
+        <div class="clearfix">
+             <div>
+                <label><big><big><b>Crear/actualizar usuario<b></big></big></label>
+            </div>
+            <br>
+            <div class="card-body">
+                <form id="usuario" name="usuario" method="post">
+                    <input type="hidden" id="id" name="id">
+                    <div class="row">
+                        <div class="col-xl-9 col-lg-11 col-md-10 col-sm-12">
+                            <div class="form-row">
+                                <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-4">
+                                    <label>* Nombre usuario</label>
+							        <input type="text" id="nombreU" name="nombreU" class="form-control" placeholder="ejem: Marco Cuenca">
+                                </div>
+                                <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-4">
+                                    <label>* Correo electronico</label>
+							        <input type="email" id="correoU" name="correoU" class="form-control" placeholder="ejem: marcocuenca">
+                                </div>
+                                <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-4">
+                                    <div id="passwordDiv"></div>
+                                    </div>
+                                <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-4">
+                                    <div id="tipoUsuario"></div>
+                                </div>
+                                                               
+                                <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-5">
+                                    {# <label>seleccione tipo operacion</label>
+                                    <select id="tipo_operacion">
+                                        <option value="doancion">Donacion</option>
+                                        <option value="compra">Compra</option>
+                                    </select> #}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-xl-9 col-lg-11 col-md-10 col-sm-12">
+                            <div class="form-row">
+                                <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-4">
+                                    {{ form_label(form.guardar) }}
+                                    {{ form_widget(form.guardar) }}
+                                </div>
+                                <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-4">
+                                    {{ form_label(form.cancelar) }}
+                                    {{ form_widget(form.cancelar) }}
+                                </div>
+                                <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-4">
+                                    <input style="margin-left: 35%;"class="btn btn-primary" type="reset" value="Limpiar formulario">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="footer">
+            <h3 style="text-align: center;">Sistema de inventarios "Proyecto Emanuel"</h3>
+            <h4 style="text-align: center;"><a style="text-align: center;" href="https://www.facebook.com/" target="_blank">Visitanos en Facebook!</a></h4>
+            <h4 style="text-align: center;"><a style="text-align: center;" href="https://www.twitter.com/" target="_blank">Visitanos en Twitter!</a></h4>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %} 
+    <script type="text/javascript" src="{{ asset('assets/js/usuario/createUpdateUsuario/funciones.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/usuario/createUpdateUsuario/selectores.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/usuario/login.js') }}"></script>
+    
+{% endblock %} 

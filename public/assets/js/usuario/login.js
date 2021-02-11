@@ -16,7 +16,7 @@ function homaPage(){
 }
 //recoguer el id del menu
 function setSelectMenu(nameSelect){
-    
+    console.log(nameSelect)
     switch(nameSelect){
         case 1:
             redictCasaHogar()
@@ -24,9 +24,15 @@ function setSelectMenu(nameSelect){
         case 2:
             redictCentroMedico()
             break;
+        case 7:
+            redictNewUser()
+            break;
         default:
             redictHomeMenu()    
     }
+}
+function redictNewUser(){
+    location.href="usuariosGestion";
 }
 function redictCasaHogar(){
     location.href="casaHogar";

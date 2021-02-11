@@ -7,8 +7,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Service\CacheService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Form\ProductoType;
-use App\Entity\{GrupoMaterial,Producto,Unidad};
+use App\Form\{ProductoType, UsuarioType};
+use App\Entity\{GrupoMaterial,Producto,Unidad,Usuario,Rol};
 use Symfony\Component\HttpFoundation\Request; //librerias http
 
 class AdminController extends AbstractController
@@ -93,6 +93,41 @@ class AdminController extends AbstractController
             return $this->redirectToRoute('viewAdmin');
         }
         
+    }
+
+    public function usuariosGestion(EntityManagerInterface $em ,CacheService $cache){
+        $usuario = $cache->get('usuario');
+        if(!$usuario):return $this->redirectToRoute('login');endif;
+        $idRol = $usuario->getIdRol()->getId();
+        if($idRol >= 1 && $idRol<=5){
+            $form = $this->createForm(UsuarioType::class, $usuario = new Usuario());
+            return $this->render('user/newUpdateUser.html.twig', [
+                'form' => $form->createView(),
+            ]);
+        }else{
+            return $this->redirectToRoute('login');
+        }
+        /* if($cacheProducto){
+            $producto = $em->getRepository(Producto::class)->findOneBy(['id'=>$cacheProducto->getId()]);
+            $form = $this->createForm(ProductoType::class, $producto = $producto);
+        }else{
+            $form = $this->createForm(ProductoType::class, $producto = new Producto());
+        } */
+        
+    }
+    public function listPatrimonio(EntityManagerInterface $em ,CacheService $cache){
+        $usuario = $cache->get('usuario');
+       
+        if(!$usuario){
+            return $this->redirectToRoute('login');
+        }else{
+            $idRol = $usuario->getIdRol()->getId();
+            if($idRol === 1){
+                return $this->render('inventory/listaProductoPrimario.html.twig');
+            }else{
+                return $this->redirectToRoute('viewAdmin');
+            }
+        }
     }
     
 }
