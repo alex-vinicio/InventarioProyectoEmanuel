@@ -105,15 +105,14 @@ class InventoryController extends AbstractController
      */
     public function listInmuebles(EntityManagerInterface $em, CacheService $cache,Request $request)
     {
-        $listaT = [];
         $idInm = $request->request->get('idInm');
         $usuario = $cache->get('usuario');
-        
         if($usuario->getIdRol()->getId() === 1){
             $departamento = $cache->get('departamentoPE');
             $productos = $em->getRepository(Producto::class)->findBy(['idUnidad'=>$departamento],['id'=>'ASC']);
             if($productos){
-                if($idInm === 1){
+                if($idInm === "1"){
+                    $listaT = [];
                     foreach($productos as $listadoProd){
                         if($listadoProd->getTipoVehiculo()){
                             array_push($listaT,$listadoProd);
@@ -121,8 +120,9 @@ class InventoryController extends AbstractController
                     }
                     return $this->json($listaT);
                 }else{
+                    $listaT = [];
                     foreach($productos as $listadoProd){
-                        if($listadoProd->getTipoVehiculo() === null){
+                        if(!$listadoProd->getTipoVehiculo()){
                             array_push($listaT,$listadoProd);
                         }
                     }
@@ -133,8 +133,7 @@ class InventoryController extends AbstractController
             }
         }else{
             return $this->json("Usuario no valido!");
-        }
-        
+        } 
     }
     /**
      * @Route("/getOneProductTransaction", name="getOneProductTransaction")

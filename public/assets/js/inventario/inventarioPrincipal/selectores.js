@@ -16,7 +16,7 @@ async function getTablePatrimonio(){
     $divListInventaryP.innerHTML=""
     if($optionsForm.option.value == "vehiculos"){
         const data = new URLSearchParams(`idInm=1`) 
-        const lista = await getDataPost('listarInmuebles',data)     
+        const lista = await getDataPost('listarInmuebles',data)    
         await getVehiculo(lista,$divListInventaryP)
     }else{
         if($optionsForm.option.value == "inmuebles"){

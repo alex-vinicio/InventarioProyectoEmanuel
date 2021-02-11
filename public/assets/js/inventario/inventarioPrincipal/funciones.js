@@ -6,14 +6,14 @@ async function renderVehiculo(lista,$container){
     let numero = 1
     let table =`<table class="table table-responsive table-striped table-hover table-condensed table-bordered">`
     table = templateTitleVehiculo(table)
-    /* if(lista.length != 0){
-        lista.forEach((cursos)=>{
-            table = templateDataVehiculo(table,cursos,numero)
+    if(lista.length != 0){
+        lista.forEach((inventario)=>{
+            table = templateDataVehiculo(table,inventario,numero)
             numero++
         })
     }else{
-        table += `<tr><td colspan="4">No hay Datos para mostrar</td></tr>`
-    } */
+        table += `<tr class="text-center"><td colspan="15">No hay Datos para mostrar</td></tr>`
+    }
     const element = createTemplate(table)
     $container.append(element)
 }
@@ -40,24 +40,39 @@ function templateTitleVehiculo(table){
             <th>Combustible</th>
             <th>Ramv/cpn</th>
             <th>Remarcado</th>
+            <th>N° Pasajeros</th>
             <th>Accion</th>
         </tr>
     </thead>`
     return table
 }
-function templateDataVehiculo(table,curso,numero){
-    /* table += `<tr>
+function templateDataVehiculo(table,inventario,numero){
+    table += `<tr>
         <td>${numero}</td>
-        <td>${curso.descripcion}</td>  
+        <td>${inventario.codigo}</td>
+        <td>${inventario.motor}</td>
+        <td>${inventario.cilindraje}</td>
+        <td>${inventario.modelo}</td>
+        <td>${inventario.marca}</td>
+        <td>${inventario.color}</td>
+        <td>${inventario.chasis}</td>
+        <td>${inventario.tipoVehiculo}</td>  
+        <td>${inventario.anioModelo}</td>
+        <td>${inventario.combustible}</td>
+        <td>${inventario.ramvCpn}</td>  
+        <td>${inventario.remarcado}</td>
+        <td>${inventario.combustible}</td>
+        <td>${inventario.ramvCpn}</td>
+        <td>${inventario.numPasajero}</td>  
     `
-    table = getAccionsVehiculo(table,curso)
+    table = getAccionsVehiculo(table,inventario)
     table+=`</tr>`
-    return table */
+    return table
 }
 
-function getAccionsVehiculo(table, curso){
-    /* table += `<td class="text-center"><i class="text-danger fa fa-trash" onclick="confirmDeleteCur(${ curso.id})"></i></td>`
-    return table */
+function getAccionsVehiculo(table, inventario){
+    table += `<td class="text-center"><i class="text-danger fa fa-trash" onclick="confirmDeleteCur(${ inventario.id})"></i></td>`
+    return table
 }
 
 // -------------------- separacion de vehiculo y demas vienes
@@ -69,14 +84,14 @@ async function renderInmueble(lista,$container){
     let numero = 1
     let table =`<table class="table table-responsive table-striped table-hover table-condensed table-bordered">`
     table = templateTitleInmueble(table)
-    /* if(lista.length != 0){
-        lista.forEach((cursos)=>{
-            table = templateDataInmueble(table,cursos,numero)
+    if(lista.length != 0){
+        lista.forEach((inventario)=>{
+            table = templateDataInmueble(table,inventario,numero)
             numero++
         })
     }else{
-        table += `<tr><td colspan="4">No hay Datos para mostrar</td></tr>`
-    } */
+        table += `<tr class="text-center"><td colspan="11">No hay Datos para mostrar</td></tr>`
+    }
     const element = createTemplate(table)
     $container.append(element)
 }
@@ -97,25 +112,33 @@ function templateTitleInmueble(table){
         <th >Unidad</th>
         <th>Procedencia</th>
         <th>Obervaciones</th>
-        <th>Proyecto</th>
         <th>Grupo</th>
         <th>Estado</th>
+        <th>Fecha registro</th>
         <th>Acciones</th>
         </tr>
     </thead>`
     return table
 }
-function templateDataInmueble(table,curso,numero){
-    /* table += `<tr>
+function templateDataInmueble(table,inventario,numero){
+    table += `<tr>
         <td>${numero}</td>
-        <td>${curso.descripcion}</td>  
+        <td>${inventario.codigo}</td>  
+        <td>${inventario.descripcionProducto}</td>
+        <td>${inventario.cantidadProducto}</td>
+        <td>${inventario.unidadMedida}</td>
+        <td>${inventario.procedencia}</td>
+        <td>${inventario.observaciones}</td>
+        <td>${inventario.idGrupo.nombreGrupoM}</td>
+        <td>${inventario.estado}</td>
+        <td>${inventario.fechaIngreso}</td>
     `
-    table = getAccionsInmueble(table,curso)
+    table = getAccionsInmueble(table,inventario)
     table+=`</tr>`
-    return table */
+    return table
 }
 
-function getAccionsInmueble(table, curso){
-    /* table += `<td class="text-center"><i class="text-danger fa fa-trash" onclick="confirmDeleteCur(${ curso.id})"></i></td>`
-    return table */
+function getAccionsInmueble(table, inventario){
+    table += `<td class="text-center"><i class="text-danger fa fa-trash" onclick="confirmDeleteCur(${ inventario.id})"></i></td>`
+    return table
 }
