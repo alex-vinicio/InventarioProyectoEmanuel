@@ -16,6 +16,21 @@ async function getFormPatrimonio(){
         await formVehiculo($divformP)
         const data = new URLSearchParams(`id=2`) // manejar 2 valores en URLSearchParams(`id=${idLAC}&idLI=${idLI}`)
         const response = await getDataPost('tipoPatrimonioCache', data)
+
+        //se define despues del load para recnocer a los forms
+        const $formvehiculo= document.forms.producto
+        const $idBtnLimpiar = document.getElementById('limpiarForm');
+
+        $idBtnLimpiar.addEventListener('click', async (event)=>{
+            event.preventDefault()
+            $formvehiculo.reset();
+        })
+
+        $formvehiculo.addEventListener('submit', async (event)=>{
+            event.preventDefault()
+            addProductoPatrimonio($formvehiculo)
+            
+        })
     }else{
         await formInmueble($divformP)
         const data = new URLSearchParams(`id=1`) 
@@ -32,7 +47,7 @@ async function getFormPatrimonio(){
         $formGeneral.addEventListener('submit', async (event)=>{
             event.preventDefault()
             addProductoPatrimonio($formGeneral)
-            console.log("enviado corecto")
+            
         })
     }
 }
@@ -41,31 +56,13 @@ async function addProductoPatrimonio(form){ // prueba del paso del form
     const data = new FormData(form)  
     const response = await getDataPost('newProduct', data) //url es distinto ue nombre de la ruta
     console.log(response)
-    /* if(!response){
+    if(!response){
         alertify.error(`Codigo del producto repetido`)
     }else{
         alertify.success(`se ${response[0]} con éxito`)
         await getData('deleteCacheProducto')
-        if(response[1] === 3) {
-            location.href="patrimonio";
-        }else{
-            location.href="controlPanel";
-        }
-    } */
+        location.href="patrimonio";
+    }
     
 }
 
-//se define despues del load para recnocer a los forms
-const $formvehiculo= document.forms.producto
-const $idBtnLimpiar = document.getElementById('limpiarForm');
-
-$idBtnLimpiar.addEventListener('click', async (event)=>{
-    event.preventDefault()
-    $formvehiculo.reset();
-})
-
-$formvehiculo.addEventListener('submit', async (event)=>{
-    event.preventDefault()
-    addProductoPatrimonio($formvehiculo)
-    console.log("enviado corecto")
-})

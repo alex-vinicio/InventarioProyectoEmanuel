@@ -18,28 +18,36 @@ class InventoryController extends AbstractController
      */
     public function newProduct(Request $request, EntityManagerInterface $em,CacheService $cache)//no asignar otra variable de entrada
     {  
+        $listData = [];
         $idProductoPatrimonio = $cache->get('patrimonio'); 
         if($idProductoPatrimonio){
-            $data = $request->request;
+            if($idProductoPatrimonio === "1"){//productos generales
+                $data = $request->request;
+                $listData = $this->cargaDatosProductosGenerales($data);
+            }else{//vehiculos
+                $data = $request->request;
+                $listData = $this->cargaDatosVehiculos($data);
+            }
         }else{
             $data = $request->request->get('producto');
+            $listData = $this->cargaDatosProductosInsumosTrans($data);
         }
         $idUnidad = $cache->get('departamentoPE');
         $cacheProducto = $cache->get('viewProducto');
         $ip = $request->getClientIp();
-        return $this->json([$data,$idUnidad]);
+        /* return $this->json([$data->get('claveCatastral'),$idUnidad]); */
         if(!$cacheProducto):
             $producto = new Producto();
-            $productRepeat = $em->getRepository(Producto::class)->findOneBy(['codigo'=>$data['codigo']]);
+            $productRepeat = $em->getRepository(Producto::class)->findOneBy(['codigo'=>$listData[0]['codigo']]);
             if($productRepeat){
                 return $this->json(null);
             }else{
-                $aux = $this->addProduct($producto, $data, $em, $ip, $idUnidad); 
+                $aux = $this->addProduct($producto, $listData, $em, $ip, $idUnidad); 
                 return $this->json(['agregado',$idUnidad]);
             }
         else:
             $producto = $em->getRepository(Producto::class)->find($cacheProducto->getId());
-            $this->addProduct($producto, $data, $em, $ip, $idUnidad);
+            $this->addProduct($producto, $listData, $em, $ip, $idUnidad);
             return $this->json(['actualizó',$idUnidad]);
         endif;
     }
@@ -112,6 +120,7 @@ class InventoryController extends AbstractController
     public function listInmuebles(EntityManagerInterface $em, CacheService $cache,Request $request)
     {
         $idInm = $request->request->get('idInm');
+        $id = intval($idInm);
         $usuario = $cache->get('usuario');
         if($usuario->getIdRol()->getId() === 1){
             $departamento = $cache->get('departamentoPE');
@@ -126,13 +135,23 @@ class InventoryController extends AbstractController
                     }
                     return $this->json($listaT);
                 }else{
-                    $listaT = [];
-                    foreach($productos as $listadoProd){
-                        if(!$listadoProd->getTipoVehiculo()){
-                            array_push($listaT,$listadoProd);
+                    if($idInm === "2"){
+                        $listaT = [];
+                        foreach($productos as $listadoProd){
+                            if(!$listadoProd->getTipoVehiculo() && !$listadoProd->getClaveCatastral()){
+                                array_push($listaT,$listadoProd);
+                            }
                         }
-                    }
-                    return $this->json($listaT);
+                        return $this->json($listaT);
+                    }else{
+                        $listaT = [];
+                        foreach($productos as $listadoProd){
+                            if($listadoProd->getClaveCatastral()){
+                                array_push($listaT,$listadoProd);
+                            }
+                        }
+                        return $this->json($listaT);
+                    }  
                 }  
             }else{
                 return $this->json(null);
@@ -350,34 +369,177 @@ class InventoryController extends AbstractController
         
     }
     // ----------------------- private function ---------------
+    private function cargaDatosProductosGenerales($data){
+        $lista = [];    
+        array_push($lista,[
+            'idGrupo'=>"2",
+            'codigo'=>$data->get('codigo'),
+            'descripcionProducto'=>$data->get('descripcion'),
+            'cantidad'=>$data->get('cantidad'),
+            'unidadMedida'=>"",
+            'estado'=> "activo",
+            'procedencia'=> "donaciones",
+            'observaciones'=>$data->get('observaciones'),
+            'fechaCaducidad'=> "",
+            'fechaIngreso'=> "",
+            'marca'=>$data->get('marca'),
+            'color'=>$data->get('color'),
+            'motor'=>"",
+            'cilindraje'=>"",
+            'modelo'=>$data->get('modelo'),
+            'numPasajeros'=>0,
+            'chasis'=>"",
+            'anioModelo'=>"",
+            'tipoVehiculo'=>"",
+            'combustible'=>"",
+            'ramvcpn'=>"",
+            'remarcado'=>"",
+            'claveCatastral'=>$data->get('claveCatastral'),
+            'tamanio'=>$data->get('tamanio'),
+            'forma'=>$data->get('forma'),
+            'kilometraje'=>0
+        ]);
+        return $lista;
+    }
+    private function cargaDatosVehiculos($data){
+        $lista = [];    
+        array_push($lista,[
+            'idGrupo'=>"2",
+            'codigo'=>$data->get('placa'),
+            'descripcionProducto'=>"",
+            'cantidad'=>0,
+            'unidadMedida'=>"",
+            'estado'=> "activo",
+            'procedencia'=> "donaciones",
+            'observaciones'=>"",
+            'fechaCaducidad'=> "",
+            'fechaIngreso'=> "",
+            'marca'=>$data->get('marca'),
+            'color'=>$data->get('color'),
+            'motor'=>$data->get('motor'),
+            'cilindraje'=>$data->get('cilindraje'),
+            'modelo'=>$data->get('modelo'),
+            'numPasajeros'=>$data->get('pasajeros'),
+            'chasis'=>$data->get('chasis'),
+            'anioModelo'=>$data->get('anioModelo'),
+            'tipoVehiculo'=>$data->get('claseV'),
+            'combustible'=>$data->get('conbustible'),
+            'ramvcpn'=>$data->get('ramvcpn'),
+            'remarcado'=>$data->get('remarcado'),
+            'claveCatastral'=>"",
+            'tamanio'=>"",
+            'forma'=>"",
+            'kilometraje'=>$data->get('kilometro')
+        ]);
+        return $lista;
+    }
+    private function cargaDatosProductosInsumosTrans($data){
+        $lista = [];  
+        rray_push($lista,[
+            'idGrupo'=>"1",
+            'codigo'=>$data['codigo'],
+            'descripcionProducto'=>$data['descripcionProducto'],
+            'cantidad'=>$data['cantidadProducto'],
+            'unidadMedida'=>$data['unidadMedida'],
+            'estado'=> $data['estado'],
+            'procedencia'=> $data['procedencia'],
+            'observaciones'=>$data['observaciones'],
+            'fechaCaducidad'=> $data['fechaCaducidad'],
+            'fechaIngreso'=> $data['fechaIngreso'],
+            'marca'=>$data['marca'],
+            'color'=>$data['color'],
+            'motor'=>"",
+            'cilindraje'=>"",
+            'modelo'=>"",
+            'numPasajeros'=>0,
+            'chasis'=>"",
+            'anioModelo'=>"",
+            'tipoVehiculo'=>"",
+            'combustible'=>"",
+            'ramvcpn'=>"",
+            'remarcado'=>"",
+            'claveCatastral'=>"",
+            'tamanio'=>"",
+            'forma'=>"",
+            'kilometraje'=>0
+        ]);  
+        return $lista;
+    }
     private function addProduct(Producto $producto, $data,EntityManagerInterface $em, $ip, $idUnidad){
         
         $departamento = $em->getRepository(Unidad::class)->findOneBy(['id'=>$idUnidad]);
-        $categoriaProducto = $em->getRepository(GrupoMaterial::class)->findOneBy(['id'=>$data['idGrupo']]);
+        $categoriaProducto = $em->getRepository(GrupoMaterial::class)->findOneBy(['id'=>$data[0]['idGrupo']]);
         $producto = $this->setDataProduct($producto, $data, $ip, $departamento, $categoriaProducto);
         $em->persist($producto);
         $em->flush();
     }
     private function setDataProduct(Producto $producto, $data, $ip,Unidad $departamento,GrupoMaterial $grupo){
-        $fechaCaducidad = $data['fechaCaducidad'];
+        $fechaCaducidad = $data[0]['fechaCaducidad'];
         if($fechaCaducidad):
             $fechaCaducidad = \DateTime::createFromFormat('Y-m-d', $fechaCaducidad);
         else:   
             $fechaCaducidad = null;
         endif;
-        $fechaIngreso = \DateTime::createFromFormat('Y-m-d', $data['fechaIngreso']);
+        $fechaIngreso = $data[0]['fechaIngreso'];
+        if($fechaIngreso):
+            $fechaIngreso = \DateTime::createFromFormat('Y-m-d', $fechaIngreso);
+        else:
+            $fechaActual = date('Y-m-d');
+            $fechaIngreso = \DateTime::createFromFormat('Y-m-d', $fechaActual);
+        endif;
+
+        if($data[0]['remarcado'] || $data[0]['remarcado']!= "no"){
+            $valorBool = true;
+        }else{
+            $valorBool = false;
+        }
+        if($data[0]['numPasajeros'] != 0){
+            $numPas = intval($data[0]['numPasajeros']);
+        }else{
+            $numPas = 0;
+        }
+        if($data[0]['cantidad'] != 0){
+            $cantidad = intval($data[0]['cantidad']);
+        }else{
+            $cantidad = 0;
+        }
+        if($data[0]['kilometraje'] != 0){
+            $km = intval($data[0]['kilometraje']);
+        }else{
+            $km = 0;
+        }
+        if($data[0]['claveCatastral']){
+            $claveCatastral = $data[0]['claveCatastral'];
+        }else{
+            $claveCatastral = "";
+        }
+
         $producto
-            ->setCodigo($data['codigo'])
-            ->setDescripcionProducto($data['descripcionProducto'])
-            ->setCantidadProducto($data['cantidadProducto'])
-            ->setUnidadMedida($data['unidadMedida'])
-            ->setEstado($data['estado'])
+            ->setCodigo($data[0]['codigo'])
+            ->setDescripcionProducto($data[0]['descripcionProducto'])
+            ->setCantidadProducto($cantidad)
+            ->setUnidadMedida($data[0]['unidadMedida'])
+            ->setEstado($data[0]['estado'])
             ->setFechaIngreso($fechaIngreso)
             ->setFechaCaducidad($fechaCaducidad)
-            ->setProcedencia($data['procedencia'])
-            ->setObservaciones($data['observaciones'])
-            ->setMarca($data['marca'])
-            ->setColor($data['color'])
+            ->setProcedencia($data[0]['procedencia'])
+            ->setObservaciones($data[0]['observaciones'])
+            ->setMarca($data[0]['marca'])
+            ->setColor($data[0]['color'])
+            ->setMotor($data[0]['motor'])
+            ->setCilindraje($data[0]['cilindraje'])
+            ->setModelo($data[0]['modelo'])
+            ->setNumPasajero($numPas)
+            ->setkilometraje($km)
+            ->setChasis($data[0]['chasis'])
+            ->setAnioModelo($data[0]['anioModelo'])
+            ->setTipoVehiculo($data[0]['tipoVehiculo'])
+            ->setCombustible($data[0]['combustible'])
+            ->setRamvCpn($data[0]['ramvcpn'])
+            ->setRemarcado($valorBool)
+            ->setClaveCatastral($claveCatastral)
+            ->setTamanio($data[0]['tamanio'])
+            ->setForma($data[0]['forma'])
             //->setTiempoEntreGestion()
             ->setIdUnidad($departamento)
             ->setIdGrupo($grupo)

@@ -124,19 +124,19 @@ async function formInmueble($container){
                                     </div>
                                     <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-4">
                                         <label for="estado">* Estado</label><br>
-                                        <input type="text" name="estado" placeholder="Camioneta"  required/>
+                                        <input type="text" name="estado" placeholder="Activo"  required/>
                                     </div>
                                     <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-4">
                                         <label for="forma">Forma</label><br>
-                                        <input type="text" name="forma" placeholder="2016" />
+                                        <input type="text" name="forma" placeholder="circular" />
                                     </div>
                                     <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-4">
                                         <label for="observaciones">* Observaciones</label><br>
                                         <textarea name="observaciones" placeholder="S/N....."  required></textarea>
                                     </div>
                                     <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-4">
-                                        <label for="claveCatastral">* Clave Catastral</label><br>
-                                        <input type="number" name="claveCatastral" placeholder="123412" min=0 required/>
+                                        <label for="claveCatastral">Clave Catastral</label><br>
+                                        <input type="text" name="claveCatastral" placeholder="1234-1212-00059" min=0 />
                                     </div>
                                 </div>
                             </div>

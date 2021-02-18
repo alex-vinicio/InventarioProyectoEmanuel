@@ -48,11 +48,11 @@
                 <input type="hidden" name="procedencia" value="">
             </form>
             <div class="derecha">
-                <button id="nuevoInmueble" onclick="nuevoProducto()" class="btn btn-primary">Nuevo inmueble</button>
+                <button id="nuevoInmueble" onclick="nuevoProducto()" class="btn btn-primary">Nuevo activo fijo</button>
             </div>
             <h4><b>Listado de activos fijos</b></h4>
             
-            <input type="checkbox" id="spoiler1"></input>
+            <input class="btn btn-primary" type="checkbox" id="spoiler1"></input>   
             <label for="spoiler1">Bienes muebles</label>
             <div class="spoiler">
                  <form action="" name="actions">
@@ -60,23 +60,28 @@
                         <input type="radio" name="option" value="vehiculos" checked>
                     </label>
                     <label> Bienes muebles generales
-                        <input type="radio" name="option" value="inmuebles" >
+                        <input type="radio" name="option" value="muebles" >
                     </label>
+                    <div class="derecha">
+                        <a href="#" onclick="aprobar('nueble')"><img width="25px" src="assets/img/excel.png"></a>
+                    </div>
                 </form>
+                
                 <div id="tablaProductoPatrim"></div>
             </div>
 
-            <input type="checkbox" id="spoiler2"></input>
+            <input class="btn btn-primary" type="checkbox" id="spoiler2"></input>
             <label for="spoiler2" >Bienes Inmuebles</label>
             <div class="spoiler">
-                <form action="" name="actions">
-                    {# <label>Vehiculos
-                        <input type="radio" name="option" value="vehiculos" checked>
-                    </label> #}
+                <form action="" name="actions1">
                     <label> Bienes inmuebles generales
-                        <input type="radio" name="option" value="inmuebles" >
+                        <input type="radio" name="option" value="inmuebles" checked>
                     </label>
+                    <div class="derecha">
+                        <a href="#" onclick="aprobar('nueble')"><img width="25px" src="assets/img/excel.png"></a>
+                    </div>
                 </form>
+                <div id="tablaProductoPatrimInmueble"></div>
             </div>
 
            
