@@ -18,10 +18,16 @@ class InventoryController extends AbstractController
      */
     public function newProduct(Request $request, EntityManagerInterface $em,CacheService $cache)//no asignar otra variable de entrada
     {  
-        $data = $request->request->get('producto');
+        $idProductoPatrimonio = $cache->get('patrimonio'); 
+        if($idProductoPatrimonio){
+            $data = $request->request;
+        }else{
+            $data = $request->request->get('producto');
+        }
         $idUnidad = $cache->get('departamentoPE');
         $cacheProducto = $cache->get('viewProducto');
         $ip = $request->getClientIp();
+        return $this->json([$data,$idUnidad]);
         if(!$cacheProducto):
             $producto = new Producto();
             $productRepeat = $em->getRepository(Producto::class)->findOneBy(['codigo'=>$data['codigo']]);
@@ -284,6 +290,25 @@ class InventoryController extends AbstractController
         $cache->add('departamentoPE', $departamento);
         return $this->json($departamento);
     }
+
+    /**
+     * @Route("/tipoPatrimonioCache", name="tipoPatrimonioCache")
+     */
+    public function tipoPatrimonioCache(EntityManagerInterface $em, Request $request,CacheService $cache)
+    {
+        $departamento = $request->request->get('id');
+        $cache->add('patrimonio', $departamento);
+        return $this->json($departamento);
+    }
+
+    /**
+     * @Route("/deleteTipoPatrimonioCache", name="deleteTipoPatrimonioCache")
+     */
+    public function deleteTipoPatrimonioCache(EntityManagerInterface $em, Request $request,CacheService $cache)
+    {
+        return $this->json($cache->delete('patrimonio', $departamento));
+    }
+
     /**
      * @Route("/getTypePoductoCache", name="getTypePoductoCache")
      */

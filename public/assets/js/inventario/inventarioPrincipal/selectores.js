@@ -19,14 +19,8 @@ async function getTablePatrimonio(){
         const lista = await getDataPost('listarInmuebles',data)    
         await getVehiculo(lista,$divListInventaryP)
     }else{
-        if($optionsForm.option.value == "inmuebles"){
-            const data = new URLSearchParams(`idInm=2`) 
-            const lista = await getDataPost('listarInmuebles',data)  
-            await getInmueble(lista,$divListInventaryP)
-        }else{
-            const data = new URLSearchParams(`idInm=3`) 
-            const lista = await getDataPost('listarInmuebles',data)  
-            await getInmueble(lista,$divListInventaryP)
-        }
+        const data = new URLSearchParams(`idInm=2`) 
+        const lista = await getDataPost('listarInmuebles',data)  
+        await getInmueble(lista,$divListInventaryP)
     }
 }

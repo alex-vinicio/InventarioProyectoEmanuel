@@ -40,7 +40,8 @@ function templateTitleVehiculo(table){
             <th>Combustible</th>
             <th>Ramv/cpn</th>
             <th>Remarcado</th>
-            <th>N° Pasajeros</th>
+            <th>Combustible</th>
+            <th>Ramv/cpn</th>
             <th>Accion</th>
         </tr>
     </thead>`
@@ -63,7 +64,6 @@ function templateDataVehiculo(table,inventario,numero){
         <td>${inventario.remarcado}</td>
         <td>${inventario.combustible}</td>
         <td>${inventario.ramvCpn}</td>
-        <td>${inventario.numPasajero}</td>  
     `
     table = getAccionsVehiculo(table,inventario)
     table+=`</tr>`
@@ -90,7 +90,7 @@ async function renderInmueble(lista,$container){
             numero++
         })
     }else{
-        table += `<tr class="text-center"><td colspan="11">No hay Datos para mostrar</td></tr>`
+        table += `<tr class="text-center"><td colspan="14">No hay Datos para mostrar</td></tr>`
     }
     const element = createTemplate(table)
     $container.append(element)
@@ -107,31 +107,43 @@ function templateTitleInmueble(table){
                 </form>
             </div>
         </th>
-        <th>Nombre</th>
+        <th>Descripcion</th>
         <th >Cantidad</th>
-        <th >Unidad</th>
-        <th>Procedencia</th>
-        <th>Obervaciones</th>
-        <th>Grupo</th>
+        <th >Marca</th>
+        <th>Modelo</th>
+        <th>Tamaño</th>
+        <th>Color</th>
         <th>Estado</th>
-        <th>Fecha registro</th>
-        <th>Acciones</th>
+        <th>Forma</th>
+        <th>Observaciones</th>
+        <th>Clave catastral</th>
+        <th>fecha actualizacion</th>
+        <th>accion</th>
         </tr>
     </thead>`
     return table
 }
 function templateDataInmueble(table,inventario,numero){
+    
     table += `<tr>
         <td>${numero}</td>
         <td>${inventario.codigo}</td>  
         <td>${inventario.descripcionProducto}</td>
         <td>${inventario.cantidadProducto}</td>
-        <td>${inventario.unidadMedida}</td>
-        <td>${inventario.procedencia}</td>
-        <td>${inventario.observaciones}</td>
-        <td>${inventario.idGrupo.nombreGrupoM}</td>
+        <td>${inventario.marca}</td>
+        <td>${inventario.modelo}</td>
+        <td>${inventario.tamanio}</td>
+        <td>${inventario.color}</td>
         <td>${inventario.estado}</td>
-        <td>${inventario.fechaIngreso}</td>
+        <td>${inventario.forma}</td>
+        <td>${inventario.observaciones}</td>`
+        if(inventario.claveCatastral){
+            table+=`<td>${inventario.claveCatastral}</td>`
+        }else{
+            table+=`<td class="text-center"> ----</td>`
+        }
+        
+        table+=`<td>${inventario.fechaIngreso}</td>
     `
     table = getAccionsInmueble(table,inventario)
     table+=`</tr>`
@@ -141,4 +153,8 @@ function templateDataInmueble(table,inventario,numero){
 function getAccionsInmueble(table, inventario){
     table += `<td class="text-center"><i class="text-danger fa fa-trash" onclick="confirmDeleteCur(${ inventario.id})"></i></td>`
     return table
+}
+
+function nuevoProducto(){
+    location.href="gestionPatrimonio";
 }

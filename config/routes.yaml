@@ -33,3 +33,7 @@ usuariosGestion:
 patrimonio:
     path: /patrimonio
     controller: App\Controller\AdminController::listPatrimonio
+
+gestionPatrimonio:
+    path: /gestionPatrimonio
+    controller: App\Controller\AdminController::gestionPatrimonio

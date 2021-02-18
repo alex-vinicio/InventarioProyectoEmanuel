@@ -129,5 +129,26 @@ class AdminController extends AbstractController
             }
         }
     }
+    public function gestionPatrimonio(EntityManagerInterface $em ,CacheService $cache){
+        $usuario = $cache->get('usuario');
+        $cacheProducto = $cache->get('viewProducto');
+        if(!$usuario):return $this->redirectToRoute('login');endif;
+        $idRol = $usuario->getIdRol()->getId();
+        if($idRol === 2){
+            return $this->redirectToRoute('casaHogar');
+        }else{
+            if($idRol === 3)
+            return $this->redirectToRoute('centroMedico');
+        }
+        if($cacheProducto){
+            $producto = $em->getRepository(Producto::class)->findOneBy(['id'=>$cacheProducto->getId()]);
+            $form = $this->createForm(ProductoType::class, $producto = $producto);
+        }else{
+            $form = $this->createForm(ProductoType::class, $producto = new Producto());
+        }
+        return $this->render('inventory/crearProductoPatrimonio.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
     
 }

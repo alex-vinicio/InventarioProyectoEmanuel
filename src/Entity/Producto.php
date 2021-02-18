@@ -129,6 +129,13 @@ class Producto
     private $numPasajero;
 
     /**
+     * @var int|null
+     *
+     * @ORM\Column(name="kilometraje", type="integer", nullable=true)
+     */
+    private $kilometraje;
+
+    /**
      * @var string|null
      *
      * @ORM\Column(name="chasis", type="string", length=75, nullable=true)
@@ -176,6 +183,20 @@ class Producto
      * @ORM\Column(name="clave_catastral", type="string", length=100, nullable=true)
      */
     private $claveCatastral;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="tamanio", type="string", length=25, nullable=true)
+     */
+    private $tamanio;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="forma", type="string", length=50, nullable=true)
+     */
+    private $forma;
 
     /**
      * @var float|null
@@ -402,6 +423,18 @@ class Producto
         return $this;
     }
 
+    public function getKilometraje(): ?int
+    {
+        return $this->kilometraje;
+    }
+
+    public function setKilometraje(int $kilometraje): self
+    {
+        $this->kilometraje = $kilometraje;
+
+        return $this;
+    }
+
     public function getChasis(): ?string
     {
         return $this->chasis;
@@ -481,6 +514,30 @@ class Producto
     public function setClaveCatastral(string $claveCatastral): self
     {
         $this->claveCatastral = $claveCatastral;
+
+        return $this;
+    }
+
+    public function getTamanio(): ?string
+    {
+        return $this->tamanio;
+    }
+
+    public function setTamanio(string $tamanio): self
+    {
+        $this->tamanio = $tamanio;
+
+        return $this;
+    }
+
+    public function getForma(): ?string
+    {
+        return $this->forma;
+    }
+
+    public function setForma(string $forma): self
+    {
+        $this->forma = $forma;
 
         return $this;
     }

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Patrimonio{% endblock %}
+{% block title %}gestionInmuebles{% endblock %}
     
 
 {% block body %}
@@ -48,44 +48,22 @@
                 <input type="hidden" name="procedencia" value="">
             </form>
             <div class="derecha">
-                <button id="nuevoInmueble" onclick="nuevoProducto()" class="btn btn-primary">Nuevo inmueble</button>
+                <button id="nuevoInmueble" onclick="returnListar()" class="btn btn-primary">Cancelar</button>
             </div>
-            <h4><b>Listado de activos fijos</b></h4>
+            <h4><b>Creacion/Modificacion de activos fijos</b></h4>
             
-            <input type="checkbox" id="spoiler1"></input>
-            <label for="spoiler1">Bienes muebles</label>
-            <div class="spoiler">
-                 <form action="" name="actions">
-                    <label>Vehiculos
-                        <input type="radio" name="option" value="vehiculos" checked>
-                    </label>
-                    <label> Bienes muebles generales
-                        <input type="radio" name="option" value="inmuebles" >
-                    </label>
-                </form>
-                <div id="tablaProductoPatrim"></div>
-            </div>
-
-            <input type="checkbox" id="spoiler2"></input>
-            <label for="spoiler2" >Bienes Inmuebles</label>
-            <div class="spoiler">
-                <form action="" name="actions">
-                    {# <label>Vehiculos
-                        <input type="radio" name="option" value="vehiculos" checked>
-                    </label> #}
-                    <label> Bienes inmuebles generales
-                        <input type="radio" name="option" value="inmuebles" >
-                    </label>
-                </form>
-            </div>
-
-           
-            <form name="hiddenvehiInm">
-                <input type="hidden" name="placaVehi" value="">
-                <input type="hidden" name="codInm" value="">
+            <form action="" name="actions">
+                <label>Vehiculos
+                    <input type="radio" name="option" value="vehiculos" checked>
+                </label>
+                <label style="margin-left:15px;"> Productos generales
+                    <input type="radio" name="option" value="inmuebles" >
+                </label>
             </form>
+            <br>
+            <div style="border-bottom:1px solid #777;"></div><br>
+            <div id="formInmueble"></div>
             {# mostrar consultar segun eleccion #}
-            
         </div>
         <div class="footer">
             <h3 style="text-align: center;">Sistema de inventarios "Proyecto Emanuel"</h3>
@@ -95,7 +73,7 @@
     </div>
 {% endblock %}
 {% block javascripts %} 
-    <script type="text/javascript" src="{{ asset('assets/js/inventario/inventarioPrincipal/funciones.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/inventario/inventarioPrincipal/selectores.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/inventario/inventarioPrincipal/crearInventarioP/funciones.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/inventario/inventarioPrincipal/crearInventarioP/selectores.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/usuario/login.js') }}"></script>
 {% endblock %} 
