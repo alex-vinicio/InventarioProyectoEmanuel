@@ -73,8 +73,12 @@ function templateUsuario(table,usuario,numero){
     table += `<tr>
             <td>${numero}</td>
             <td>${usuario.nombre}</td>
-            <td>${usuario.usuario}</td>
-            <td>${usuario.estado}</td>`
+            <td>${usuario.usuario}</td>`
+    if(usuario.estado === true){
+        table += `<td>Activo</td>`
+    }else{
+        table += `<td>Suspendido</td>`
+    }
     table = controlDates(table,usuario)
     table += `<td>${usuario.idRol.nombreRol}</td>
     <td class="text-center"><i class="text-danger fa fa-trash" onclick="confirmDeleteCur(${usuario.id})"></i></td>`
@@ -83,7 +87,7 @@ function templateUsuario(table,usuario,numero){
 }
 //eliminar un usuario
 function confirmDeleteCur(id){
-    alertify.confirm('¿Estás seguro de que deseas Eliminar el curso?', function(e){
+    alertify.confirm('¿Estás seguro de que deseas Eliminar el usuario?', function(e){
         if(e){ deleteCursos(id)}
     });
 }

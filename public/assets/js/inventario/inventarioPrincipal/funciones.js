@@ -284,3 +284,75 @@ async function deleteProductoInm(id){
         alertify.error('Error al eliminar el producto')
     }
 }
+async function generacionExporteExcel(){
+    //creacion libro de trabajo
+    let activosFijos = null;
+    var wb = XLSX.utils.book_new();
+    var ws_data = null;
+    wb.Props = {//asignacion de datos generales del libro
+        Title: "Reporte activos fijos proyectos Emanuel",
+        Subject: "Reporte activos fijos",
+        Author: "Sistema web inventarios Proyectos Emanuel",
+        CreatedDate: new Date()
+    };
+    await casosGeneracionHojaTrabajo(activosFijos,wb,ws_data)
+    //function exportar libro xlms
+    var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+    s2ab(wbout)//convertir de tipo binario a octeto
+    if(list[0] === 1){
+        saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'reporteVehiculos.xlsx');//guardar el archivo excel con libreria FIleSaver.js y blob
+    }else{
+        if(list[0] === 2){
+            saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'reporteBienesMueblesGeneral.xlsx');
+        }else{
+            saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'reporteBienesInmueblesGeneral.xlsx');
+        }   
+    }
+    alertify.success('!Se genero el reporte con exito!')
+}
+async function exportarExcel(){
+    alertify.confirm('¿Desea continuar con la exportacion del reporte de activos fijos en excel?', function(e){
+        if(e){ generacionExporteExcel()}
+    });
+}
+function s2ab(s) { 
+    var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+    var view = new Uint8Array(buf);  //create uint8array as viewer
+    for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+    return buf;    
+}
+async function casosGeneracionHojaTrabajo(activosFijos,wb,ws_data){
+    if(list[0] === 1){
+        const data = new URLSearchParams(`idInm=1`) 
+        const lista = await getDataPost('listarInmuebles',data)
+        activosFijos = lista
+        wb.SheetNames.push("Bienes muebles-vehiculo"); // creacion hoja de trabajo y agregar al libro
+        activosFijos.forEach((activos)=>{
+            ws_data = [['vehiculo' , activos.codigo]];
+        })
+        var ws = XLSX.utils.aoa_to_sheet(ws_data);
+            wb.Sheets["Bienes muebles-vehiculo"] = ws;
+    }else{
+        if(list[0] === 2){
+            const data = new URLSearchParams(`idInm=2`) 
+            const lista = await getDataPost('listarInmuebles',data)
+            activosFijos = lista
+            wb.SheetNames.push("Bienes muebles-general");
+            activosFijos.forEach((activos)=>{
+                ws_data = [['mueble-general' , activos.codigo]];
+            })
+            var ws = XLSX.utils.aoa_to_sheet(ws_data);
+            wb.Sheets["Bienes muebles-general"] = ws;
+        }else{
+            const data = new URLSearchParams(`idInm=3`) 
+            const lista = await getDataPost('listarInmuebles',data)
+            activosFijos = lista
+            wb.SheetNames.push("Bienes inmuebles");
+            activosFijos.forEach((activos)=>{
+                ws_data = [['inmueble' , activos.codigo]];
+            })
+            var ws = XLSX.utils.aoa_to_sheet(ws_data);
+            wb.Sheets["Bienes inmuebles"] = ws;
+        }
+    }
+}

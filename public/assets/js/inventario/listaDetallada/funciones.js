@@ -192,7 +192,7 @@ function templateModalDialogo(modal,producto){
             <b>Unidad:</b>          ${producto[0].codigoProducto.unidadMedida}
             <b>Marca:</b>          ${producto[0].marca}
             <b>Color:</b>          ${producto[0].color}</pre>
-            <laber>Operacion: <b>Ingreso Producto<b></label>
+            <laber>Operacion: <b>salida Producto<b></label>
                 <br>
                 <br>Cantidad: 
                 <input type="number" id="cantidadP" placeholder="ejemplo: 3">
