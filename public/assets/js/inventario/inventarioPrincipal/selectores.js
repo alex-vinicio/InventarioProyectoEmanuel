@@ -3,6 +3,7 @@ const $formHidenProducto = document.forms.hiddenPatrimonio
 const $optionsForm1 = document.forms.actions1
 const $spoiler1 = document.getElementById('spoiler1')
 const $spoiler2 = document.getElementById('spoiler2')
+const $formHidden = document.forms.hiddenvehiInm
 let list = [];
 const $divListInventoryInmueble = document.getElementById('tablaProductoPatrimInmueble');
 const $divListInventaryP = document.getElementById('tablaProductoPatrim');

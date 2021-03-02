@@ -3,11 +3,21 @@ const $formHidenProducto = document.forms.hiddenPatrimonio
 const $divformP= document.getElementById('formInmueble');
 //listado automatico
 (async function load(){
-    await getFormPatrimonio()
+    const response = await getData('getCacheAF');
+    if(response){
+        if(response[1] === "1"){
+            await getFormPatrimonio($divformP)
+        }else{
+            $optionsForm.option.value = "inmuebles"
+            await getFormPatrimonio($divformP)
+        }   
+    }else{
+        await getFormPatrimonio()
+    }
 })()
 
 $optionsForm.addEventListener('change', async ()=>{
-    await getFormPatrimonio()
+        await getFormPatrimonio()
 })
 
 async function getFormPatrimonio(){
@@ -43,7 +53,7 @@ async function getFormPatrimonio(){
             event.preventDefault()
             $formGeneral.reset();
         })
-        console.log($formGeneral.elements.codigo.value)
+        
         $formGeneral.addEventListener('submit', async (event)=>{
             event.preventDefault()
             addProductoPatrimonio($formGeneral)

@@ -82,7 +82,6 @@ async function formVehiculo($container){
                     </form>
                     </div>
                     `
-    const $idForm = document.getElementById('vehiculoForm')
     const element = createTemplate(contenido)
     $container.append(element)
 }

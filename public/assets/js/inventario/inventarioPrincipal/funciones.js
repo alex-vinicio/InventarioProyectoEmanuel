@@ -7,7 +7,7 @@ async function generalTableVehiculo($container){
 async function getVehiculo(lista,$container){
     $container.innerHTML = ""
     await renderVehiculo(lista,$container)
-    //addEventSearchCurso()
+    await addEventSearchActivosFijos1()
 }
 async function renderVehiculo(lista,$container){
     let numero = 1
@@ -31,7 +31,7 @@ function templateTitleVehiculo(table){
             <th>N°</th>
             <th scope="col">
                 <div >
-                    <form name="searPlaca">
+                    <form name="searchCod1">
                         <input type="text" class="form-control" name="placa" placeholder="Placa:">
                     </form>
                 </div>
@@ -57,7 +57,7 @@ function templateTitleVehiculo(table){
 function templateDataVehiculo(table,inventario,numero){
     table += `<tr>
         <td>${numero}</td>
-        <td>${inventario.codigo}</td>
+        <td onclick="updateAF(${inventario.id},1)"><a href="#">${inventario.codigo}</a></td>
         <td>${inventario.motor}</td>
         <td>${inventario.cilindraje}</td>
         <td>${inventario.modelo}</td>
@@ -92,7 +92,7 @@ async function generalTableInmueble($container){
 async function getInmueble(lista,$container){
     $container.innerHTML = ""
     await renderInmueble(lista,$container)
-    //addEventSearchCurso()
+    await addEventSearchActivosFijos2()
 }
 async function renderInmueble(lista,$container){
     let numero = 1
@@ -116,8 +116,8 @@ function templateTitleInmueble(table){
         <th>N°</th>
         <th>
             <div >  
-                <form name="searchCodProceden">
-                    <input type="text" class="form-control" name="codProduct" placeholder="Codigo:">
+                <form name="searchCod2">
+                    <input type="text" class="form-control" name="inmueble" placeholder="Codigo:">
                 </form>
             </div>
         </th>
@@ -141,7 +141,7 @@ function templateDataInmueble(table,inventario,numero){
     
     table += `<tr>
         <td>${numero}</td>
-        <td>${inventario.codigo}</td>  
+        <td onclick="updateAF(${inventario.id},3)"><a href="#">${inventario.codigo}</a></td>  
         <td>${inventario.descripcionProducto}</td>
         <td>${inventario.cantidadProducto}</td>
         <td>${inventario.marca}</td>
@@ -195,7 +195,7 @@ async function generalTableMueble($container){
 async function getMueble(lista,$container){
     $container.innerHTML = ""
     await renderMueble(lista,$container)
-    //addEventSearchCurso()
+    await addEventSearchActivosFijos3()
 }
 async function renderMueble(lista,$container){
     let numero = 1
@@ -219,8 +219,8 @@ function templateTitleMueble(table){
         <th>N°</th>
         <th>
             <div >  
-                <form name="searchCodProceden">
-                    <input type="text" class="form-control" name="codProduct" placeholder="Codigo:">
+                <form name="searchCod3">
+                    <input type="text" class="form-control" name="mueble" placeholder="Codigo:">
                 </form>
             </div>
         </th>
@@ -243,7 +243,7 @@ function templateDataMueble(table,inventario,numero){
     
     table += `<tr>
         <td>${numero}</td>
-        <td>${inventario.codigo}</td>  
+        <td onclick="updateAF(${inventario.id},2)"><a href="#">${inventario.codigo}</a></td>  
         <td>${inventario.descripcionProducto}</td>
         <td>${inventario.cantidadProducto}</td>
         <td>${inventario.marca}</td>
@@ -284,6 +284,75 @@ async function deleteProductoInm(id){
         alertify.error('Error al eliminar el producto')
     }
 }
+//Buscadores------------------
+async function addEventSearchActivosFijos1(){//buscador para vehiculos
+	const form = document.searchCod1
+    form.placa.value = $formHidden.placaVehi.value
+			
+	form.addEventListener('submit', async (event)=>{
+		event.preventDefault()
+        const search = form.elements.placa.value
+        $formHidden.placaVehi.value = search
+		const data = new URLSearchParams(`idInm=1`) 
+        const respose = await getDataPost('listarInmuebles',data)
+		let lista = [];
+		const listaPersonas = respose;
+
+		if(search === ""){
+			await getVehiculo(listaPersonas, $divListInventaryP)
+		}else{
+			listaPersonas.forEach((lt)=>{ 
+			if(lt.codigo.indexOf(search) !== -1){ lista.push(lt) } }) 
+            await getVehiculo(lista, $divListInventaryP);
+		}
+	 })
+}
+async function addEventSearchActivosFijos3(){//buscador para muebles general
+	const form = document.searchCod3
+    form.mueble.value = $formHidden.codMueble.value
+			
+	form.addEventListener('submit', async (event)=>{
+		event.preventDefault()
+        const search = form.elements.mueble.value
+        $formHidden.codMueble.value = search
+		const data = new URLSearchParams(`idInm=2`) 
+        const respose = await getDataPost('listarInmuebles',data)
+		let lista = [];
+		const listaPersonas = respose;
+
+		if(search === ""){
+			await getMueble(listaPersonas, $divListInventaryP)
+		}else{
+			listaPersonas.forEach((lt)=>{ 
+			if(lt.codigo.indexOf(search) !== -1){ lista.push(lt) } }) 
+            await getMueble(lista, $divListInventaryP);
+		}
+	 })
+}
+async function addEventSearchActivosFijos2(){//buscador para inmuebles
+	const form = document.searchCod2
+    form.inmueble.value = $formHidden.codInmueble.value
+			
+	form.addEventListener('submit', async (event)=>{
+		event.preventDefault()
+        const search = form.elements.inmueble.value
+        $formHidden.codInmueble.value = search
+		const data = new URLSearchParams(`idInm=3`) 
+        const respose = await getDataPost('listarInmuebles',data)
+		let lista = [];
+		const listaPersonas = respose;
+
+		if(search === ""){
+			await getInmueble(listaPersonas, $divListInventoryInmueble)
+		}else{
+			listaPersonas.forEach((lt)=>{ 
+			if(lt.codigo.indexOf(search) !== -1){ lista.push(lt) } }) 
+            await getInmueble(lista, $divListInventoryInmueble);
+		}
+	 })
+}
+
+//funciones para generacion de documento excel 
 async function generacionExporteExcel(){
     //creacion libro de trabajo
     let activosFijos = null;
@@ -355,4 +424,16 @@ async function casosGeneracionHojaTrabajo(activosFijos,wb,ws_data){
             wb.Sheets["Bienes inmuebles"] = ws;
         }
     }
+}
+//direcionamiento a interfaz modificacion de activos fijos
+async function updateAF(id, tipo){
+    const data = new URLSearchParams(`id=${id}&tipo=${tipo}`)
+    const clearCache = await getData('limpiarCacheModifieAF')
+    const response = await getDataPost('cacheUpdateAF',data)
+    if(response === "ok"){
+        location.href="gestionPatrimonio";
+    }else{
+        alertify.error("Accion no permitida!");
+    }
+   
 }

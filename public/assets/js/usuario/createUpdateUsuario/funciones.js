@@ -41,3 +41,12 @@ function templateTipoU(containerTipoU,codU){
     const element = createTemplate(select)
     containerTipoU.append(element)
 }
+async function getDatosupdate(data,form){
+    form.reset()
+    form.elements.nombreU.value = "";
+    form.elements.id.value = data.id
+    form.elements.nombreU.value = data.nombre
+    form.elements.correoU.value = data.usuario
+    form.elements.passUserInter.value = data.password
+    form.elements.tipoU.value = data.idRol.id
+}

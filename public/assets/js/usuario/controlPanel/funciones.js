@@ -50,7 +50,7 @@ function templateTitleProducCadu(table){
             </th>
             <th>Email</th>
             <th>Estado</th>
-            <th>Fecha creacion</th>
+            <th>Fecha Operacion</th>
             <th>
                 <div >  
                     <form name="searchRol">
@@ -69,11 +69,10 @@ function controlDates(table,usuario){
     return table
 }
 function templateUsuario(table,usuario,numero){
-    
     table += `<tr>
             <td>${numero}</td>
-            <td>${usuario.nombre}</td>
-            <td>${usuario.usuario}</td>`
+            <td onclick="modificarUsuario('${usuario.id}')"><a href="#">${usuario.nombre}</a></td>
+            <td onclick="modificarUsuario('${usuario.id}')"><a href="#">${usuario.usuario}</a></td>`
     if(usuario.estado === true){
         table += `<td>Activo</td>`
     }else{
@@ -172,5 +171,15 @@ async function listarPatrimonio(){
         location.href="patrimonio";
     }else{
         location.href="viewAdmin";
+    }
+}
+async function modificarUsuario(id){
+    const data = new URLSearchParams(`idU=${id}`)
+    const clearCache = await getData('limpiarCacheModifie')
+    const response = await getDataPost('cacheUpdateUser',data)
+    if(response === true){
+        location.href="usuariosGestion";
+    }else{
+        alertify.error("Accion no permitida")
     }
 }

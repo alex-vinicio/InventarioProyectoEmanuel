@@ -60,11 +60,11 @@ class UserController extends AbstractController
         $ipC = $request->getClientIp();
         $userLogin = $cache->get('usuario');
         $rol = $em->getRepository(Rol::class)->findOneBy(['id'=>$tipo]);
-        
         if(!$id){
             $usuario = new Usuario;
             $aux = "creado";
         }else{
+            $usuario = $em->getRepository(Usuario::class)->findOneBy(['id'=>$id]);
             $aux = "modificado";
         }
         $usuario = $this->setUser($rol,$nombre,$pws,$correo,$usuario,$ipC);
@@ -88,6 +88,53 @@ class UserController extends AbstractController
         }else{
             return $this->json("Usuario no permitido");
         }
+    }
+
+     /**
+     * @Route("/cacheUpdateUser", name="cacheUpdateUser")
+     */
+    public function cacheUpdateUser(Request $request, EntityManagerInterface $em,CacheService $cache){
+        $usuario = $cache->get('usuario');
+        $idU = $request->request->get('idU');
+        $tipoRol = $usuario->getIdRol()->getId();
+        if($tipoRol === 1){
+            $userModifie = $em->getRepository(Usuario::class)->findOneBy(['id'=>$idU]);
+            if($userModifie){
+                $cache->add('idUserModifie',$idU);
+                return $this->json(true);
+            }else{
+                return $this->json(null);
+            }
+        }else{
+            return $this->json("Usuario no permitido");
+        }
+    }
+    /**
+     * @Route("/getUserModifie", name="getUserModifie")
+     */
+    public function getUserModifie( CacheService $cache, EntityManagerInterface $em){
+        $usuario = $cache->get('usuario');
+        $tipoRol = $usuario->getIdRol()->getId();
+        $id = $cache->get('idUserModifie');
+        if($tipoRol === 1){
+            $userModifie = $em->getRepository(Usuario::class)->findOneBy(['id'=>$id]);
+            if($userModifie){
+                return $this->json([$userModifie,true]);
+            }else{
+                return $this->json(null);
+            }
+        }else{
+            return $this->json("usuario no permitido!");
+        }
+        
+    }
+
+    /**
+     * @Route("/limpiarCacheModifie", name="limpiarCacheModifie")
+     */
+    public function limpiarCacheModifie( CacheService $cache){
+        $cache->delete('idUserModifie');
+        return $this->json(true);
     }
 
     /**

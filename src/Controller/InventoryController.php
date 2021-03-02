@@ -319,13 +319,51 @@ class InventoryController extends AbstractController
         $cache->add('patrimonio', $departamento);
         return $this->json($departamento);
     }
+    //cache para matrimonio
+    /**
+     * @Route("/cacheUpdateAF", name="cacheUpdateAF")
+     */
+    public function cacheUpdateAF(EntityManagerInterface $em, Request $request,CacheService $cache)
+    {
+        $usuario = $cache->get('usuario');
+        $tipoRol = $usuario->getIdRol()->getId();
+        
+        $id = $request->request->get('id');
+        $tipo = $request->request->get('tipo');
+        if($tipoRol){
+            $activoFijo =  $em->getRepository(Producto::class)->findOneBy(['id'=>$id]);
+            if($activoFijo){
+                $cache->add('patrimonioUpdate', [$id, $tipo]);
+                return $this->json("ok");
+            }else{
+                return $this->json(null);
+            }
+        }else{
+            return $this->json("usuario no permitido!");
+        }
+    }
+    /**
+     * @Route("/limpiarCacheModifieAF", name="limpiarCacheModifieAF")
+     */
+    public function limpiarCacheModifieAF(EntityManagerInterface $em, Request $request,CacheService $cache)
+    {
+        return $this->json($cache->delete('patrimonioUpdate'));
+    }
+    /**
+     * @Route("/getCacheAF", name="getCacheAF")
+     */
+    public function getCacheAF(EntityManagerInterface $em, Request $request,CacheService $cache)
+    {
+        $activosFijos = $cache->get('patrimonioUpdate');
+        return $this->json($activosFijos);
+    }
 
     /**
      * @Route("/deleteTipoPatrimonioCache", name="deleteTipoPatrimonioCache")
      */
     public function deleteTipoPatrimonioCache(EntityManagerInterface $em, Request $request,CacheService $cache)
     {
-        return $this->json($cache->delete('patrimonio', $departamento));
+        return $this->json($cache->delete('patrimonio'));
     }
 
     /**
