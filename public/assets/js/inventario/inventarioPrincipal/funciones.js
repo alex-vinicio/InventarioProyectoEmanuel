@@ -47,8 +47,6 @@ function templateTitleVehiculo(table){
             <th>Combustible</th>
             <th>Ramv/cpn</th>
             <th>Remarcado</th>
-            <th>Combustible</th>
-            <th>Ramv/cpn</th>
             <th>Accion</th>
         </tr>
     </thead>`
@@ -67,11 +65,13 @@ function templateDataVehiculo(table,inventario,numero){
         <td>${inventario.tipoVehiculo}</td>  
         <td>${inventario.anioModelo}</td>
         <td>${inventario.combustible}</td>
-        <td>${inventario.ramvCpn}</td>  
-        <td>${inventario.remarcado}</td>
-        <td>${inventario.combustible}</td>
-        <td>${inventario.ramvCpn}</td>
-    `
+        <td>${inventario.ramvCpn}</td>`
+        if(inventario.remarcado === true ){
+            table += `<td><input type="checkbox" value="true" checked></td>`
+        }else{
+            table += `<td><input type="checkbox" value="false" ></td>`
+        }
+        
     table = getAccionsVehiculo(table,inventario)
     table+=`</tr>`
     return table
@@ -390,17 +390,30 @@ function s2ab(s) {
     for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
     return buf;    
 }
+function encabezadoExcelGeneral(date, user, title){
+     // creacion hoja de trabajo y agregar al libro
+    ws_data = [['','','', title]];
+    ws_data.push(['']);
+    ws_data.push(['','fecha:', date.toUTCString()]);
+    ws_data.push(['','Usuario:', user[0]]);
+    ws_data.push(['']);
+    return ws_data;
+}
 async function casosGeneracionHojaTrabajo(activosFijos,wb,ws_data){
+    var fechaActual = new Date()
+    var userName = await getData('getUserData')
     if(list[0] === 1){
         const data = new URLSearchParams(`idInm=1`) 
         const lista = await getDataPost('listarInmuebles',data)
         activosFijos = lista
-        wb.SheetNames.push("Bienes muebles-vehiculo"); // creacion hoja de trabajo y agregar al libro
+        wb.SheetNames.push("Bienes muebles-vehiculo");
+        ws_data = encabezadoExcelGeneral(fechaActual,userName,'Reporte Bienes muebles-vehiculo')
+        ws_data.push(['','Placa','Motor','Cilindraje','Modelo','Marca','Color','Chasis','clase','Año modelo','Combustible','Ramv/cpn','Remarcado']);
         activosFijos.forEach((activos)=>{
-            ws_data = [['vehiculo' , activos.codigo]];
+            ws_data.push(['',activos.codigo, activos.motor, activos.cilindraje, activos.modelo, activos.marca, activos.color, activos.chasis, activos.tipoVehiculo,activos.anioModelo,activos.combustible, activos.ramvCpn,activos.remarcado]);
         })
         var ws = XLSX.utils.aoa_to_sheet(ws_data);
-            wb.Sheets["Bienes muebles-vehiculo"] = ws;
+        wb.Sheets["Bienes muebles-vehiculo"] = ws;
     }else{
         if(list[0] === 2){
             const data = new URLSearchParams(`idInm=2`) 
