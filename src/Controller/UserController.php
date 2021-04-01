@@ -20,6 +20,7 @@ class UserController extends AbstractController
         $mail = $request->request->get('correo_u');
         $passw = $request->request->get('contrasenia_u');
         if($mail && $passw){
+            //return $this->json([$mail,$passw]);
             $usuario = $em->getRepository(Usuario::class)->findOneBy(['usuario'=>$mail,'password'=>$passw]);
         }else{
             return $this->json(false);

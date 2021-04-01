@@ -82,7 +82,7 @@ class Producto
     /**
      * @var string
      *
-     * @ORM\Column(name="observaciones", type="string", length=200, nullable=true)
+     * @ORM\Column(name="observaciones", type="string", length=400, nullable=true)
      */
     private $observaciones;
 
@@ -204,6 +204,13 @@ class Producto
      * @ORM\Column(name="tiempo_entre_gestion", type="float", precision=10, scale=0, nullable=true)
      */
     private $tiempoEntreGestion;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="lote", type="string", length=75, nullable=true)
+     */
+    private $lote;
 
     /**
      * @var \Unidad
@@ -526,6 +533,18 @@ class Producto
     public function setTamanio(string $tamanio): self
     {
         $this->tamanio = $tamanio;
+
+        return $this;
+    }
+
+    public function getLote(): ?string
+    {
+        return $this->lote;
+    }
+
+    public function setLote(string $lote): self
+    {
+        $this->lote = $lote;
 
         return $this;
     }

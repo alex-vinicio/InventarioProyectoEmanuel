@@ -264,7 +264,8 @@ function getAccionsMueble(table, inventario){
     table += `<td class="text-center"><i class="text-danger fa fa-trash" onclick="confirmDeleteProductoInm(${ inventario.id})"></i></td>`
     return table
 }
-function nuevoProducto(){
+async function nuevoProducto(){
+    const clearCache = await getData('limpiarCacheModifieAF')
     location.href="gestionPatrimonio";
 }
 //eliminar produto//
@@ -443,6 +444,7 @@ async function updateAF(id, tipo){
     const data = new URLSearchParams(`id=${id}&tipo=${tipo}`)
     const clearCache = await getData('limpiarCacheModifieAF')
     const response = await getDataPost('cacheUpdateAF',data)
+    
     if(response === "ok"){
         location.href="gestionPatrimonio";
     }else{

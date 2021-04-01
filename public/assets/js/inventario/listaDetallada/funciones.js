@@ -32,7 +32,7 @@ function templateTitleProducTransaccion(table){
     <thead> 
         <tr>
             <th scope="col">N°</th>
-            <th scope="col">Responsable</th>
+            <th >Responsable</th>
             <th scope="col">
                 <div >  
                     <form name="searchSalida">
@@ -52,6 +52,8 @@ function templateTitleProducTransaccion(table){
             <th scope="col">Caducidad</th>
             <th scope="col">Cantidad</th>
             <th scope="col">Procedencia</th>
+            <th scope="col">Marca</th>
+            <th scope="col">color</th>
             <th scope="col">accion</th>
         </tr>
     </thead>`
@@ -77,7 +79,9 @@ function templateProducTransaccion(table,producto,numero){
     table += `<td style="text-align: center">${producto.responsable} </td>`
     table = controlDates(table,producto)
     table += `  <td style="text-align: center">${producto.descripcionProducto}</td>
-                <td>${producto.codigoProducto.procedencia}</td>`
+                <td>${producto.codigoProducto.procedencia}</td>
+                <td>${producto.marca}</td>
+                <td>${producto.color}</td>`
     if(producto.descripcionProducto != "0"){
         table += `<td class="text-center"><a href="#" onclick="salidaRegistro(${producto.id})">Editar</a></td>`
     }else{
@@ -191,12 +195,16 @@ function templateModalDialogo(modal,producto){
             <b>Cantidad:</b>        ${producto[0].descripcionProducto}          
             <b>Unidad:</b>          ${producto[0].codigoProducto.unidadMedida}
             <b>Marca:</b>          ${producto[0].marca}
-            <b>Color:</b>          ${producto[0].color}</pre>
-            <laber>Operacion: <b>salida Producto<b></label>
+            <b>Color:</b>          ${producto[0].color}`
+        if(producto[0].codigoProducto.lote){   
+            modal += `<br><b>            Lote:</b>            ${producto[0].codigoProducto.lote}`
+        }
+        modal +=`</pre>
+                <laber>Operacion: <b>salida Producto<b></label>
                 <br>
                 <br>Cantidad: 
                 <input type="number" id="cantidadP" placeholder="ejemplo: 3">
-                <br><br>Donante:<select id="usuariosExternos" name="usuariosExternos">`
+                <br><br>Adquirien:<select id="usuariosExternos" name="usuariosExternos">`
     producto[1].forEach((userExternal)=>{
         modal+=`    <option value="${userExternal.nombre}">${userExternal.nombre}</option>`
     })

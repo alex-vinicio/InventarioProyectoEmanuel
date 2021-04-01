@@ -7,9 +7,13 @@ const $divformP= document.getElementById('formInmueble');
     if(response){
         if(response[1] === "1"){
             await getFormPatrimonio($divformP)
+            const $form1= document.forms.producto
+            await lLenarFormVehiculo($form1,response[2])
         }else{
             $optionsForm.option.value = "inmuebles"
             await getFormPatrimonio($divformP)
+            const $form2 = document.forms.productoGeneral
+            await llenarFormGeneral($form2,response[2])
         }   
     }else{
         await getFormPatrimonio()
@@ -24,7 +28,7 @@ async function getFormPatrimonio(){
     $divformP.innerHTML=""
     if($optionsForm.option.value == "vehiculos"){
         await formVehiculo($divformP)
-        const data = new URLSearchParams(`id=2`) // manejar 2 valores en URLSearchParams(`id=${idLAC}&idLI=${idLI}`)
+        const data = new URLSearchParams(`id=2`) 
         const response = await getDataPost('tipoPatrimonioCache', data)
 
         //se define despues del load para recnocer a los forms
@@ -65,7 +69,6 @@ async function getFormPatrimonio(){
 async function addProductoPatrimonio(form){ // prueba del paso del form
     const data = new FormData(form)  
     const response = await getDataPost('newProduct', data) //url es distinto ue nombre de la ruta
-    console.log(response)
     if(!response){
         alertify.error(`Codigo del producto repetido`)
     }else{

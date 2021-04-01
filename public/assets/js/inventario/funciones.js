@@ -286,8 +286,12 @@ function templateModalDialogo(modal,producto){
                 <pre>            <black>Codigo:</black>          ${producto[0].codigo}           
             <b>Producto:</b>        ${producto[0].descripcionProducto}
             <b>Cantidad:</b>        ${producto[0].cantidadProducto}          
-            <b>Unidad:</b>          ${producto[0].unidadMedida}</pre>
-            <laber>Operacion: <b>Ingreso Producto<b></label>
+            <b>Unidad:</b>          ${producto[0].unidadMedida}`
+    if(producto[0].lote){
+        modal += `<br><b>            Lote:</b>            ${producto[0].lote}`
+    }
+    modal += `</pre>
+                <laber>Operacion: <b>Ingreso Producto<b></label>
                 <br>
                 <br>Cantidad: 
                 <input type="number" id="accionProductoCantidad" name="accionProductoCantidad" min="0" placeholder="ejemplo: 3">`
@@ -420,7 +424,7 @@ async function productoDetallado(idProd){
     await getData('deleteCacheTransaccion')
     const data = new URLSearchParams(`idP=${idProd}`) // manejar 2 valores en URLSearchParams(`id=${idLAC}&idLI=${idLI}`)
     const response = await getDataPost('cacheSetproductoDetallado', data)
-    console.log(idProd)
+    
     if(response)
         location.href="transaccionProducto";  
 }

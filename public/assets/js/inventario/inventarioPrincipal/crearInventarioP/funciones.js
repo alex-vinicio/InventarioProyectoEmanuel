@@ -64,6 +64,10 @@ async function formVehiculo($container){
                                         <label for="kilometro">* Km</label><br>
                                         <input type="number" id="kilometro" name="kilometro" min=0 placeholder="88456"  required/>
                                     </div>
+                                    <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-4">
+                                        <label for="observaciones">* Observaciones</label><br>
+                                        <textarea name="observaciones" placeholder="S/N....."  required></textarea>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-xl-9 col-lg-11 col-md-10 col-sm-12">
@@ -156,4 +160,45 @@ async function formInmueble($container){
                     </div>`
     const element = createTemplate(contenido)
     $container.append(element)
+}
+//seccion llenado formuario de modificado
+async function lLenarFormVehiculo(form,data){
+    form.reset()
+    form.elements.placa.value = data.codigo
+    form.elements.motor.value = data.motor
+    form.elements.cilindraje.value = data.cilindraje
+    form.elements.modelo.value = data.modelo
+    form.elements.marca.value = data.marca
+    form.elements.color.value = data.color
+    form.elements.chasis.value = data.chasis
+    form.elements.claseV.value = data.tipoVehiculo
+    form.elements.anioModelo.value = data.anioModelo
+    form.elements.conbustible.value = data.combustible
+    form.elements.ramvcpn.value = data.ramvCpn
+    if(data.remarcado === true){
+        form.elements.remarcado.value = "Si"
+    }else{
+        form.elements.remarcado.value = "No"
+    }
+    form.elements.pasajeros.value = data.numPasajero
+    form.elements.kilometro.value = data.kilometraje
+    form.elements.observaciones.value = data.observaciones
+}
+
+async function llenarFormGeneral(form,data){
+    form.reset()
+    form.elements.codigo.value = data.codigo
+    form.elements.descripcion.value = data.descripcionProducto
+    form.elements.cantidad.value = data.cantidadProducto
+    form.elements.marca.value = data.marca
+    form.elements.modelo.value = data.modelo
+    form.elements.tamanio.value = data.tamanio
+    form.elements.color.value = data.color
+    form.elements.estado.value = data.estado
+    form.elements.forma.value = data.forma
+    form.elements.observaciones.value = data.observaciones
+    if(data.claveCatastral){
+        form.elements.claveCatastral.value = data.claveCatastral
+    }
+
 }

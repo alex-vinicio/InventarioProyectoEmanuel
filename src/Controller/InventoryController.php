@@ -19,6 +19,7 @@ class InventoryController extends AbstractController
     public function newProduct(Request $request, EntityManagerInterface $em,CacheService $cache)//no asignar otra variable de entrada
     {  
         $listData = [];
+        $lote = "";
         $idProductoPatrimonio = $cache->get('patrimonio'); 
         if($idProductoPatrimonio){
             if($idProductoPatrimonio === "1"){//productos generales
@@ -29,14 +30,26 @@ class InventoryController extends AbstractController
                 $listData = $this->cargaDatosVehiculos($data);
             }
         }else{
+            if($request->request->get('lote')){
+                $lote = $request->request->get('lote');
+            }
             $data = $request->request->get('producto');
-            $listData = $this->cargaDatosProductosInsumosTrans($data);
+            $listData = $this->cargaDatosProductosInsumosTrans($data,$lote);
         }
         $idUnidad = $cache->get('departamentoPE');
         $cacheProducto = $cache->get('viewProducto');
+        $cachePatrimonio = $cache->get('patrimonioUpdate');
         $ip = $request->getClientIp();
-        /* return $this->json([$data->get('claveCatastral'),$idUnidad]); */
-        if(!$cacheProducto):
+        if($cachePatrimonio){
+            $codP = intval($cachePatrimonio[0]);
+            $usuarioModificacion = $cache->get('usuario');
+            $producto = $em->getRepository(Producto::class)->find($codP);
+            $usuario = $em->getRepository(Usuario::class)->findOneBy(['id'=>$usuarioModificacion->getId()]);
+            $transaccion = new Transaccion();
+            $transaccion = $this->flushDataTransac($em, $transaccion, $producto, $usuario, $listData);
+        }
+
+        if((!$cacheProducto) && (!$cachePatrimonio)):
             $producto = new Producto();
             $productRepeat = $em->getRepository(Producto::class)->findOneBy(['codigo'=>$listData[0]['codigo']]);
             if($productRepeat){
@@ -46,11 +59,17 @@ class InventoryController extends AbstractController
                 return $this->json(['agregado',$idUnidad]);
             }
         else:
-            $producto = $em->getRepository(Producto::class)->find($cacheProducto->getId());
+            if($cacheProducto){
+                $producto = $em->getRepository(Producto::class)->find($cacheProducto->getId());
+            }else{
+                $idP = intval($cachePatrimonio[0]);
+                $producto = $em->getRepository(Producto::class)->find($idP);
+            }
             $this->addProduct($producto, $listData, $em, $ip, $idUnidad);
             return $this->json(['actualizó',$idUnidad]);
         endif;
     }
+
     /**
      * @Route("/newTransaccionsProduct", name="newTransaccionsProduct")
      */
@@ -69,7 +88,6 @@ class InventoryController extends AbstractController
         $usuarioModificacion = $cache->get('usuario');
         $producto = $em->getRepository(Producto::class)->findOneBy(['codigo'=>$codP]);
         $usuario = $em->getRepository(Usuario::class)->findOneBy(['id'=>$usuarioModificacion->getId()]);
-        /* return $this->json($procedencia); */
         
         $operacion = 0;
         if($data1 === 'salida'){
@@ -352,10 +370,19 @@ class InventoryController extends AbstractController
     /**
      * @Route("/getCacheAF", name="getCacheAF")
      */
-    public function getCacheAF(EntityManagerInterface $em, Request $request,CacheService $cache)
+    public function getCacheAF(EntityManagerInterface $em, CacheService $cache)
     {
+        $activosFijos = [];
         $activosFijos = $cache->get('patrimonioUpdate');
-        return $this->json($activosFijos);
+        if($activosFijos){
+            $idP = intval($activosFijos[0]); //convertir a int
+            $dataProducto = $em->getRepository(Producto::class)->findOneBy(['id'=>$idP]); //buscar el producto
+            array_push($activosFijos,$dataProducto); //insertar en la cola el producto
+            return $this->json($activosFijos);
+        }else{
+            return $this->json(null);
+        }
+        
     }
 
     /**
@@ -435,7 +462,8 @@ class InventoryController extends AbstractController
             'claveCatastral'=>$data->get('claveCatastral'),
             'tamanio'=>$data->get('tamanio'),
             'forma'=>$data->get('forma'),
-            'kilometraje'=>0
+            'kilometraje'=>0,
+            'lote'=>""
         ]);
         return $lista;
     }
@@ -449,7 +477,7 @@ class InventoryController extends AbstractController
             'unidadMedida'=>"",
             'estado'=> "activo",
             'procedencia'=> "donaciones",
-            'observaciones'=>"",
+            'observaciones'=>$data->get('observaciones'),
             'fechaCaducidad'=> "",
             'fechaIngreso'=> "",
             'marca'=>$data->get('marca'),
@@ -467,13 +495,14 @@ class InventoryController extends AbstractController
             'claveCatastral'=>"",
             'tamanio'=>"",
             'forma'=>"",
-            'kilometraje'=>$data->get('kilometro')
+            'kilometraje'=>$data->get('kilometro'),
+            'lote'=>""
         ]);
         return $lista;
     }
-    private function cargaDatosProductosInsumosTrans($data){
+    private function cargaDatosProductosInsumosTrans($data,$lote){
         $lista = [];  
-        rray_push($lista,[
+        array_push($lista,[
             'idGrupo'=>"1",
             'codigo'=>$data['codigo'],
             'descripcionProducto'=>$data['descripcionProducto'],
@@ -499,7 +528,8 @@ class InventoryController extends AbstractController
             'claveCatastral'=>"",
             'tamanio'=>"",
             'forma'=>"",
-            'kilometraje'=>0
+            'kilometraje'=>0,
+            'lote'=>$lote
         ]);  
         return $lista;
     }
@@ -581,6 +611,7 @@ class InventoryController extends AbstractController
             //->setTiempoEntreGestion()
             ->setIdUnidad($departamento)
             ->setIdGrupo($grupo)
+            ->setLote($data[0]['lote'])
             ;
         return $producto;
     }
@@ -632,5 +663,33 @@ class InventoryController extends AbstractController
                     ->setProcedencia($procedencia)
                     ;
         return $transaccion;
+    }
+    private function flushDataTransac(EntityManagerInterface $em, Transaccion $transaccion, Producto $producto, Usuario $usuarioModificacion,$data){
+        $fechaActual = date('Y-m-d');
+        $fechaOperacion = \DateTime::createFromFormat('Y-m-d', $fechaActual);
+        if($data[0]['motor'] !== ""){
+            $valorSalida=$data[0]['codigo'];
+            $observacion = $data[0]['observaciones'];
+            $descripcion = 1;
+        }else{
+            $observacion = $data[0]['observaciones'];
+            $descripcion = $data[0]['cantidad'];
+        }
+        $transaccion
+                    ->setDescripcionProducto($descripcion)
+                    ->setResponsable("Activos fijos")
+                    ->setEntradaProducto($observacion)
+                    ->setSalidaProducto("")
+                    ->setMarca($data[0]['marca'])
+                    ->setColor($data[0]['color'])
+                    ->setFechaOperacion($fechaOperacion)
+                    ->setFechaCaducidad(null)
+                    ->setIdUsuario($usuarioModificacion)
+                    ->setCodigoProducto($producto)
+                    ->setProcedencia("Donacion/compra")
+                    ;
+
+        $em->persist($transaccion);
+        $em->flush();
     }
 }
