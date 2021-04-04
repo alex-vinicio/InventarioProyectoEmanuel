@@ -10,6 +10,7 @@ const $divListInventaryP = document.getElementById('tablaProductoPatrim');
 //listado automatico
 (async function load(){
     await getTablePatrimonio(list)
+    await numeroReportes()
 })()
 
 $optionsForm.addEventListener('change', async ()=>{

@@ -132,6 +132,51 @@ class InventoryController extends AbstractController
         }
         
     }
+
+     /**
+     * @Route("/listarTransaccionAF", name="listarTransaccionAF")
+     */
+    public function listarTransaccionAF(EntityManagerInterface $em, CacheService $cache,Request $request)
+    {
+        $idInm = $request->request->get('idInm');
+        $id = intval($idInm);
+        $usuario = $cache->get('usuario');
+        if($usuario->getIdRol()->getId() === 1){
+            $productos = $em->getRepository(Producto::class)->findBy(['idUnidad'=>3],['id'=>'ASC']);
+            if($productos){
+                $listaT = [];
+                if($idInm === "1"){
+                    foreach($productos as $listadoProd){
+                        if($listadoProd->getTipoVehiculo()){
+                            $transaccion = $em->getRepository(Transaccion::class)->findBy(['codigoProducto'=>$listadoProd->getId()],['id'=>'ASC']);
+                            array_push($listaT, $transaccion);
+                        }
+                    }
+                }else{
+                    if($idInm === "2"){
+                        foreach($productos as $listadoProd){
+                            if(!$listadoProd->getTipoVehiculo() && !$listadoProd->getClaveCatastral()){
+                                $transaccion = $em->getRepository(Transaccion::class)->findBy(['codigoProducto'=>$listadoProd->getId()],['id'=>'ASC']);
+                                array_push($listaT, $transaccion);
+                            }
+                        }
+                    }else{
+                        foreach($productos as $listadoProd){
+                            if($listadoProd->getClaveCatastral()){
+                                $transaccion = $em->getRepository(Transaccion::class)->findBy(['codigoProducto'=>$listadoProd->getId()],['id'=>'ASC']);
+                                array_push($listaT, $transaccion);
+                            }
+                        }
+                    }
+                }
+                return $this->json($listaT);
+            }else{
+                return $this->json(null);
+            }
+        }else{
+            return $this->json("Usuario no valido!");
+        }
+    }
     /**
      * @Route("/listarInmuebles", name="listarInmuebles")
      */
@@ -269,6 +314,30 @@ class InventoryController extends AbstractController
         }
     }
     /**
+     * @Route("/getAllAF", name="getAllAF")
+     */
+    public function getAllAF(EntityManagerInterface $em,CacheService $cache)
+    {
+        $usuario = $cache->get('usuario');
+        $listaT = [];
+        if($usuario->getIdRol()->getId() === 1){
+            $producto = $em->getRepository(Producto::class)->findBy(['idUnidad'=>3],['id'=>'ASC']);
+            if($producto){
+                /* foreach($producto as $listadoProd){
+                    $transaccion = $em->getRepository(Transaccion::class)->findBy(['codigoProducto'=>$listadoProd->getId()],['id'=>'ASC']);
+                    array_push($listaT, $transaccion);
+                } */
+                return $this->json($producto);
+                //return $this->json([$producto,$listaT]);
+            }else{
+                return $this->json("No se encontro productos");
+            }
+        }else{
+            return $this->json(null);
+        }
+    }
+
+    /**
      * @Route("/cacheGetProducto", name="cacheGetProducto")
      */
     public function cacheGetProducto(EntityManagerInterface $em, CacheService $cache)
@@ -400,6 +469,7 @@ class InventoryController extends AbstractController
     {
         return $this->json($cache->get('departamentoPE'));
     }
+
     /**
      * @Route("/deleteTypePoductoCache", name="deleteTypePoductoCache")
      */
@@ -407,6 +477,7 @@ class InventoryController extends AbstractController
     {
         return $this->json($cache->delete('departamentoPE'));
     }
+
     /**
      * @Route("/getProxCaducar", name="getProxCaducar")
      */

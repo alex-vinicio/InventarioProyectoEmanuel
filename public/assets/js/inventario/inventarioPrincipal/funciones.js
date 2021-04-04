@@ -354,7 +354,7 @@ async function addEventSearchActivosFijos2(){//buscador para inmuebles
 }
 
 //funciones para generacion de documento excel 
-async function generacionExporteExcel(){
+async function generacionExporteExcel(tipoReporte){
     //creacion libro de trabajo
     let activosFijos = null;
     var wb = XLSX.utils.book_new();
@@ -365,24 +365,29 @@ async function generacionExporteExcel(){
         Author: "Sistema web inventarios Proyectos Emanuel",
         CreatedDate: new Date()
     };
-    await casosGeneracionHojaTrabajo(activosFijos,wb,ws_data)
+    await casosGeneracionHojaTrabajo(activosFijos,wb,ws_data,tipoReporte)
     //function exportar libro xlms
     var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
     s2ab(wbout)//convertir de tipo binario a octeto
-    if(list[0] === 1){
-        saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'reporteVehiculos.xlsx');//guardar el archivo excel con libreria FIleSaver.js y blob
+    let fecha = new Date();
+    if(tipoReporte === "total"){
+        saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'ReporteGeneral-'+setDateString(fecha)+'.xlsx');
     }else{
-        if(list[0] === 2){
-            saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'reporteBienesMueblesGeneral.xlsx');
+        if(list[0] === 1){
+            saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'reporteVehiculos'+setDateString(fecha)+'.xlsx');//guardar el archivo excel con libreria FIleSaver.js y blob
         }else{
-            saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'reporteBienesInmueblesGeneral.xlsx');
-        }   
+            if(list[0] === 2){
+                saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'reporteBienesMueblesGeneral'+setDateString(fecha)+'.xlsx');
+            }else{
+                saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'reporteBienesInmueblesGeneral'+setDateString(fecha)+'.xlsx');
+            }   
+        }
     }
     alertify.success('!Se genero el reporte con exito!')
 }
-async function exportarExcel(){
+async function exportarExcel(tipoReporte){
     alertify.confirm('¿Desea continuar con la exportacion del reporte de activos fijos en excel?', function(e){
-        if(e){ generacionExporteExcel()}
+        if(e){ generacionExporteExcel(tipoReporte)}
     });
 }
 function s2ab(s) { 
@@ -400,44 +405,96 @@ function encabezadoExcelGeneral(date, user, title){
     ws_data.push(['']);
     return ws_data;
 }
-async function casosGeneracionHojaTrabajo(activosFijos,wb,ws_data){
+async function casosGeneracionHojaTrabajo(activosFijos,wb,ws_data,tipoReporte){
     var fechaActual = new Date()
     var userName = await getData('getUserData')
-    if(list[0] === 1){
-        const data = new URLSearchParams(`idInm=1`) 
-        const lista = await getDataPost('listarInmuebles',data)
-        activosFijos = lista
-        wb.SheetNames.push("Bienes muebles-vehiculo");
-        ws_data = encabezadoExcelGeneral(fechaActual,userName,'Reporte Bienes muebles-vehiculo')
-        ws_data.push(['','Placa','Motor','Cilindraje','Modelo','Marca','Color','Chasis','clase','Año modelo','Combustible','Ramv/cpn','Remarcado']);
+    if(tipoReporte === "total"){
+        const response = await getData('getAllAF')
+        activosFijos = response
+        wb.SheetNames.push("Activos fijos");
+        ws_data = encabezadoExcelGeneral(fechaActual,userName,'Reporte activos fijos')
+        ws_data.push(['','Bienes mueles'])
+        ws_data.push(['','Codigo','Descripcion','Cantidad','Marca','Modelo','Tamaño','Color','Estado','Forma','Observaciones','FechaIngreso']);
         activosFijos.forEach((activos)=>{
-            ws_data.push(['',activos.codigo, activos.motor, activos.cilindraje, activos.modelo, activos.marca, activos.color, activos.chasis, activos.tipoVehiculo,activos.anioModelo,activos.combustible, activos.ramvCpn,activos.remarcado]);
+            if((activos.chasis === "") && (activos.claveCatastral === ""))
+                ws_data.push(['',activos.codigo, activos.descripcionProducto, activos.cantidadProducto, activos.marca, activos.modelo, activos.tamanio, activos.color, activos.estado,activos.forma,activos.observaciones,activos.fechaIngreso]);
+        })
+        ws_data.push([''])
+        ws_data.push(['','Placa','Motor','Cilindraje','Modelo','Marca','Color','Chasis','clase','Año modelo','Combustible','Ramv/cpn','Remarcado','FechaIngreso']);
+        activosFijos.forEach((activos)=>{
+            if(activos.motor)
+                ws_data.push(['',activos.codigo, activos.motor, activos.cilindraje, activos.modelo, activos.marca, activos.color, activos.chasis, activos.tipoVehiculo,activos.anioModelo,activos.combustible, activos.ramvCpn,activos.remarcado,activos.fechaIngreso]);
+        })
+        ws_data.push([''])
+        ws_data.push(['','Bienes Inmuebles'])
+        ws_data.push(['','Codigo','Descripcion','Cantidad','Marca','Modelo','Tamaño','Color','Estado','Forma','Observaciones','Clave catastral','FechaIngreso']);
+        activosFijos.forEach((activos)=>{
+            if(activos.claveCatastral !== "")
+                ws_data.push(['',activos.codigo, activos.descripcionProducto, activos.cantidadProducto, activos.marca, activos.modelo, activos.tamanio, activos.color, activos.estado,activos.forma,activos.observaciones, activos.claveCatastral,activos.fechaIngreso]);
         })
         var ws = XLSX.utils.aoa_to_sheet(ws_data);
-        wb.Sheets["Bienes muebles-vehiculo"] = ws;
+        wb.Sheets["Activos fijos"] = ws;
     }else{
-        if(list[0] === 2){
-            const data = new URLSearchParams(`idInm=2`) 
+        if(list[0] === 1){
+            const data = new URLSearchParams(`idInm=1`) 
             const lista = await getDataPost('listarInmuebles',data)
+            const listaTrans = await getDataPost('listarTransaccionAF',data)
             activosFijos = lista
-            wb.SheetNames.push("Bienes muebles-general");
+            console.log(activosFijos)
+            wb.SheetNames.push("Bienes muebles-vehiculo");
+            ws_data = encabezadoExcelGeneral(fechaActual,userName,'Reporte Bienes muebles-vehiculo')
+            ws_data.push(['','Placa','Motor','Cilindraje','Modelo','Marca','Color','Chasis','clase','Año modelo','Combustible','Ramv/cpn','Remarcado']);
             activosFijos.forEach((activos)=>{
-                ws_data = [['mueble-general' , activos.codigo]];
+                ws_data.push(['',activos.codigo, activos.motor, activos.cilindraje, activos.modelo, activos.marca, activos.color, activos.chasis, activos.tipoVehiculo,activos.anioModelo,activos.combustible, activos.ramvCpn,activos.remarcado]);
+                generateReportModificationAF(ws_data,activos,listaTrans)
             })
             var ws = XLSX.utils.aoa_to_sheet(ws_data);
-            wb.Sheets["Bienes muebles-general"] = ws;
+            wb.Sheets["Bienes muebles-vehiculo"] = ws;
         }else{
-            const data = new URLSearchParams(`idInm=3`) 
-            const lista = await getDataPost('listarInmuebles',data)
-            activosFijos = lista
-            wb.SheetNames.push("Bienes inmuebles");
-            activosFijos.forEach((activos)=>{
-                ws_data = [['inmueble' , activos.codigo]];
-            })
-            var ws = XLSX.utils.aoa_to_sheet(ws_data);
-            wb.Sheets["Bienes inmuebles"] = ws;
+            if(list[0] === 2){
+                const data = new URLSearchParams(`idInm=2`) 
+                const lista = await getDataPost('listarInmuebles',data)
+                const listaTrans = await getDataPost('listarTransaccionAF',data)
+                activosFijos = lista
+                wb.SheetNames.push("Bienes muebles-general");
+                ws_data = encabezadoExcelGeneral(fechaActual,userName,'Reporte Bienes muebles-general')
+            
+                activosFijos.forEach((activos)=>{
+                    ws_data.push(['',activos.codigo, activos.descripcionProducto, activos.cantidadProducto, activos.marca, activos.modelo, activos.tamanio, activos.color, activos.estado,activos.forma,activos.observaciones]);
+                    generateReportModificationAF(ws_data,activos,listaTrans)
+                })
+                var ws = XLSX.utils.aoa_to_sheet(ws_data);
+                wb.Sheets["Bienes muebles-general"] = ws;
+            }else{               
+                    const data = new URLSearchParams(`idInm=3`) 
+                    const lista = await getDataPost('listarInmuebles',data)
+                    const listaTrans = await getDataPost('listarTransaccionAF',data)
+                    activosFijos = lista
+                    wb.SheetNames.push("Bienes inmuebles");
+                    ws_data = encabezadoExcelGeneral(fechaActual,userName,'Reporte Bienes inmuebles-general')
+                    ws_data.push(['','Codigo','Descripcion','Cantidad','Marca','Modelo','Tamaño','Color','Estado','Forma','Observaciones','Clave catastral']);
+                    activosFijos.forEach((activos)=>{
+                        ws_data.push(['',activos.codigo, activos.descripcionProducto, activos.cantidadProducto, activos.marca, activos.modelo, activos.tamanio, activos.color, activos.estado,activos.forma,activos.observaciones, activos.claveCatastral]);
+                        generateReportModificationAF(ws_data,activos,listaTrans)
+                    })
+                    var ws = XLSX.utils.aoa_to_sheet(ws_data);
+                    wb.Sheets["Bienes inmuebles"] = ws;
+            }
         }
     }
+}
+async function generateReportModificationAF(ws_data,activos,listaTrans){
+    ws_data.push(['']);
+    ws_data.push(['','Modificaciones realizadas a '+activos.codigo]);
+    ws_data.push(['','Observaciones','Fecha modificacion']);
+    listaTrans.forEach((transaccion)=>{
+        for (let i = 0; i < transaccion.length; i++) {
+            if(transaccion[i].codigoProducto.id === activos.id){
+                ws_data.push(['',transaccion[i].entradaProducto,setDateString(transaccion[i].fechaOperacion)]);
+            }  
+        }
+    })
+    ws_data.push(['']);
 }
 //direcionamiento a interfaz modificacion de activos fijos
 async function updateAF(id, tipo){

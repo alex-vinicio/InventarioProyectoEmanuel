@@ -155,7 +155,15 @@ class UserController extends AbstractController
      * @Route("/logOut", name="logOut")
      */
     public function limpiarCacheUser( CacheService $cache){
+        // limpieza cache usuario
         $cache->delete('usuario');
+        $cache->delete('idUserModifie');
+        //limpieza cache productos
+        $cache->delete('patrimonio');
+        $cache->delete('departamentoPE');
+        $cache->delete('viewProducto');
+        $cache->delete('patrimonioUpdate');
+        $cache->delete('transaccionProductoId');
         return $this->json(true);
     }
     //                  funciones privadas   
