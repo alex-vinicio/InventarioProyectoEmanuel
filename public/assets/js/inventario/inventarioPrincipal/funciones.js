@@ -408,6 +408,14 @@ function encabezadoExcelGeneral(date, user, title){
 async function casosGeneracionHojaTrabajo(activosFijos,wb,ws_data,tipoReporte){
     var fechaActual = new Date()
     var userName = await getData('getUserData')
+    let d1, d2, date1, date2 = "";
+    if($forDatesReport.elements.starDate.value){
+        console.log(d1)
+        d1 = $forDatesReport.elements.starDate.value + " "
+        d2 = $forDatesReport.elements.finishDate.value + " 23:59"
+        date1 = new Date(d1)
+        date2 = new Date(d2)
+    }
     if(tipoReporte === "total"){
         const response = await getData('getAllAF')
         activosFijos = response
@@ -415,23 +423,53 @@ async function casosGeneracionHojaTrabajo(activosFijos,wb,ws_data,tipoReporte){
         ws_data = encabezadoExcelGeneral(fechaActual,userName,'Reporte activos fijos')
         ws_data.push(['','Bienes mueles'])
         ws_data.push(['','Codigo','Descripcion','Cantidad','Marca','Modelo','Tamaño','Color','Estado','Forma','Observaciones','FechaIngreso']);
-        activosFijos.forEach((activos)=>{
-            if((activos.chasis === "") && (activos.claveCatastral === ""))
-                ws_data.push(['',activos.codigo, activos.descripcionProducto, activos.cantidadProducto, activos.marca, activos.modelo, activos.tamanio, activos.color, activos.estado,activos.forma,activos.observaciones,activos.fechaIngreso]);
-        })
+        if(d1){
+            activosFijos.forEach((activos)=>{
+                var auxDate = new Date(activos.fechaIngreso)
+                if((activos.chasis === "") && (activos.claveCatastral === "")){
+                    if((auxDate.getTime() >= date1.getTime()) && (auxDate.getTime() <= date2.getTime()))
+                        ws_data.push(['',activos.codigo, activos.descripcionProducto, activos.cantidadProducto, activos.marca, activos.modelo, activos.tamanio, activos.color, activos.estado,activos.forma,activos.observaciones,activos.fechaIngreso]);
+                }
+            })
+        }else{
+            activosFijos.forEach((activos)=>{
+                if((activos.chasis === "") && (activos.claveCatastral === ""))
+                    ws_data.push(['',activos.codigo, activos.descripcionProducto, activos.cantidadProducto, activos.marca, activos.modelo, activos.tamanio, activos.color, activos.estado,activos.forma,activos.observaciones,activos.fechaIngreso]);
+            })
+        }
         ws_data.push([''])
         ws_data.push(['','Placa','Motor','Cilindraje','Modelo','Marca','Color','Chasis','clase','Año modelo','Combustible','Ramv/cpn','Remarcado','FechaIngreso']);
-        activosFijos.forEach((activos)=>{
-            if(activos.motor)
-                ws_data.push(['',activos.codigo, activos.motor, activos.cilindraje, activos.modelo, activos.marca, activos.color, activos.chasis, activos.tipoVehiculo,activos.anioModelo,activos.combustible, activos.ramvCpn,activos.remarcado,activos.fechaIngreso]);
-        })
+        if(d1){
+            activosFijos.forEach((activos)=>{
+                var auxDate = new Date(activos.fechaIngreso)
+                if(activos.motor){
+                    if((auxDate.getTime() >= date1.getTime()) && (auxDate.getTime() <= date2.getTime()))
+                        ws_data.push(['',activos.codigo, activos.motor, activos.cilindraje, activos.modelo, activos.marca, activos.color, activos.chasis, activos.tipoVehiculo,activos.anioModelo,activos.combustible, activos.ramvCpn,activos.remarcado,activos.fechaIngreso]);
+                }
+            })
+        }else{
+            activosFijos.forEach((activos)=>{
+                if(activos.motor)
+                    ws_data.push(['',activos.codigo, activos.motor, activos.cilindraje, activos.modelo, activos.marca, activos.color, activos.chasis, activos.tipoVehiculo,activos.anioModelo,activos.combustible, activos.ramvCpn,activos.remarcado,activos.fechaIngreso]);
+            })
+        }
         ws_data.push([''])
         ws_data.push(['','Bienes Inmuebles'])
         ws_data.push(['','Codigo','Descripcion','Cantidad','Marca','Modelo','Tamaño','Color','Estado','Forma','Observaciones','Clave catastral','FechaIngreso']);
-        activosFijos.forEach((activos)=>{
-            if(activos.claveCatastral !== "")
-                ws_data.push(['',activos.codigo, activos.descripcionProducto, activos.cantidadProducto, activos.marca, activos.modelo, activos.tamanio, activos.color, activos.estado,activos.forma,activos.observaciones, activos.claveCatastral,activos.fechaIngreso]);
-        })
+        if(d1){
+            activosFijos.forEach((activos)=>{
+                var auxDate = new Date(activos.fechaIngreso)
+                if(activos.claveCatastral !== ""){
+                    if((auxDate.getTime() >= date1.getTime()) && (auxDate.getTime() <= date2.getTime()))
+                        ws_data.push(['',activos.codigo, activos.descripcionProducto, activos.cantidadProducto, activos.marca, activos.modelo, activos.tamanio, activos.color, activos.estado,activos.forma,activos.observaciones, activos.claveCatastral,activos.fechaIngreso]);
+                }
+            })
+        }else{
+            activosFijos.forEach((activos)=>{
+                if(activos.claveCatastral !== "")
+                    ws_data.push(['',activos.codigo, activos.descripcionProducto, activos.cantidadProducto, activos.marca, activos.modelo, activos.tamanio, activos.color, activos.estado,activos.forma,activos.observaciones, activos.claveCatastral,activos.fechaIngreso]);
+            })
+        }
         var ws = XLSX.utils.aoa_to_sheet(ws_data);
         wb.Sheets["Activos fijos"] = ws;
     }else{
@@ -440,7 +478,6 @@ async function casosGeneracionHojaTrabajo(activosFijos,wb,ws_data,tipoReporte){
             const lista = await getDataPost('listarInmuebles',data)
             const listaTrans = await getDataPost('listarTransaccionAF',data)
             activosFijos = lista
-            console.log(activosFijos)
             wb.SheetNames.push("Bienes muebles-vehiculo");
             ws_data = encabezadoExcelGeneral(fechaActual,userName,'Reporte Bienes muebles-vehiculo')
             ws_data.push(['','Placa','Motor','Cilindraje','Modelo','Marca','Color','Chasis','clase','Año modelo','Combustible','Ramv/cpn','Remarcado']);

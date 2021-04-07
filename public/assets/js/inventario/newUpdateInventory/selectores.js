@@ -5,7 +5,7 @@ const $fechaCaducidad = $formProducto.producto_fechaCaducidad;
 const $bottonCancelar = $formProducto.producto_cancelar;
 
 (async function load(){
-    cargarLote($divLote)
+    await cargarLote($divLote)
     const $data = await getData('cacheGetProducto')
     
     if($data){

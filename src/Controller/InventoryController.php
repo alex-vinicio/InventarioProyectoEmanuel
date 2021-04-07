@@ -65,7 +65,7 @@ class InventoryController extends AbstractController
                 $idP = intval($cachePatrimonio[0]);
                 $producto = $em->getRepository(Producto::class)->find($idP);
             }
-            $this->addProduct($producto, $listData, $em, $ip, $idUnidad);
+            $this->addProduct($producto, $listData, $em, $ip, $idUnidad, $cache);
             return $this->json(['actualizó',$idUnidad]);
         endif;
     }
@@ -291,6 +291,13 @@ class InventoryController extends AbstractController
         $idP = $request->request->get('id');
         $producto = $em->getRepository(Producto::class)->findOneBy(['id'=>$idP]);
         if($producto){
+            $transacciones = $em->getRepository(Transaccion::class)->findBy(['codigoProducto'=>$producto->getId()]);
+            if($transacciones){
+                foreach($transacciones as $data){//delete all transaccion of the product for delete de product
+                    $em->remove($data);
+                    $em->flush();
+                }
+            }
             $em->remove($producto);
             $em->flush();
             return $this->json(True);   
@@ -604,28 +611,35 @@ class InventoryController extends AbstractController
         ]);  
         return $lista;
     }
-    private function addProduct(Producto $producto, $data,EntityManagerInterface $em, $ip, $idUnidad){
+    private function addProduct(Producto $producto, $data,EntityManagerInterface $em, $ip, $idUnidad, CacheService $cache){
         
         $departamento = $em->getRepository(Unidad::class)->findOneBy(['id'=>$idUnidad]);
         $categoriaProducto = $em->getRepository(GrupoMaterial::class)->findOneBy(['id'=>$data[0]['idGrupo']]);
-        $producto = $this->setDataProduct($producto, $data, $ip, $departamento, $categoriaProducto);
+        $producto = $this->setDataProduct($producto, $data, $ip, $departamento, $categoriaProducto, $cache);
         $em->persist($producto);
         $em->flush();
     }
-    private function setDataProduct(Producto $producto, $data, $ip,Unidad $departamento,GrupoMaterial $grupo){
+    private function setDataProduct(Producto $producto, $data, $ip,Unidad $departamento,GrupoMaterial $grupo, CacheService $cache){
         $fechaCaducidad = $data[0]['fechaCaducidad'];
+        $cachePatrimonio = $cache->get('patrimonioUpdate');
         if($fechaCaducidad):
             $fechaCaducidad = \DateTime::createFromFormat('Y-m-d', $fechaCaducidad);
         else:   
             $fechaCaducidad = null;
         endif;
+
         $fechaIngreso = $data[0]['fechaIngreso'];
-        if($fechaIngreso):
-            $fechaIngreso = \DateTime::createFromFormat('Y-m-d', $fechaIngreso);
-        else:
-            $fechaActual = date('Y-m-d');
-            $fechaIngreso = \DateTime::createFromFormat('Y-m-d', $fechaActual);
-        endif;
+        if($cachePatrimonio){
+            $fechaIngreso = $producto->getFechaIngreso();
+        }else{
+            if($fechaIngreso):
+                $fechaIngreso = \DateTime::createFromFormat('Y-m-d', $fechaIngreso);
+            else:
+                $fechaActual = date('Y-m-d');
+                $fechaIngreso = \DateTime::createFromFormat('Y-m-d', $fechaActual);
+            endif;
+        }
+        
 
         if($data[0]['remarcado'] || $data[0]['remarcado']!= "no"){
             $valorBool = true;

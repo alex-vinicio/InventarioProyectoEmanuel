@@ -3,6 +3,7 @@ async function addProducto(form){ // prueba del paso del form
     const $lote = document.getElementById('lote').value
     const data = new FormData(form)  
     data.append('lote',$lote)
+    const deleteCache1 = await getData('limpiarCacheModifieAF')
     const deleteCache = await getData('deleteTipoPatrimonioCache')
     const response = await getDataPost('newProduct', data) //url es distinto ue nombre de la ruta
 

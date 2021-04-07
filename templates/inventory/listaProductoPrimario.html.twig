@@ -1,7 +1,5 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}Patrimonio{% endblock %}
-    
 
 {% block body %}
 <style>
@@ -20,6 +18,7 @@
     }
     
 </style>
+    
     <div id="inner">
         <div style="margin-left: 15%; font-family: 'Roboto', sans-serif; font-size: 18px;">
             <h2>Sistema de inventarios proyecto Emanuel</h2>
@@ -94,7 +93,15 @@
                 <input type="hidden" name="codInmueble" value="">
             </form>
             {# mostrar consultar segun eleccion #}
-            
+            <br>
+            <form action="" name="reporteFechas">
+                <label>Generar reporte excel por fechas</label><br>
+                <label>Fecha inicial</label>
+                <input type="date" name="starDate" required>
+                <label>Fecha final</label>
+                <input type="date" name="finishDate" required>
+                <button>Generar</button>
+            </form>
         </div>
         <div class="footer">
             <h3 style="text-align: center;">Sistema de inventarios "Proyecto Emanuel"</h3>
