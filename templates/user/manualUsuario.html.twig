@@ -29,13 +29,41 @@
             <big><b><h3><label>Manual de usuario del Sistema de inventario web</label></h3></b>
             <label>Inicio de sesion</label>
             <p>Unicamente los usuarios registrados en el sistema web de inventarios pueden acceder, este registro unicamente puede realizarlo los usuarios con rol Administrador del sistema. el inicio de sesion se realiza con el correo electronico registrado y la contraseña</p>
-            <video width="640" height="480">
-                <source src="video.mp4" type="video/mp4" />
-                <img src="imagen.png" alt="Video no soportado" />
-                Su navegador no soporta contenido multimedia.
+            <video width="440" height="280" controls >
+                <source src="{{ asset('assets/video/login.mp4') }}" type="video/mp4" />
+                <img src="{{ asset('assets/img/casa_hogar.png') }}" alt="Video no soportado" />
             </video><br>
-            <label>Modulo del proyecto Casa Hogar Emanuel</label>
-            <p>Unicamente los usuarios con rol tipo casa hogar y el administrador pueden acceder al modulo casa hogar</p>
+            <label>Gestion de productos al inventario casa hogar y centro medico</label>
+            <p>Unicamente los usuarios con rol tipo administrador pueden acceder al modulo casa hogar y centro medico para realziar las operaciones de modificacion, ingreso de nuevo producto y eliminacion. Se debe tomar en cuenta que debe llenar el formulario con los datos requeridos, donde unicamente al registrar nuevos productos la cantidad de productos se inicie con 0, esto incrementara en la gestion de transacciones.</p>
+            <video width="440" height="280" controls >
+                <source src="{{ asset('assets/video/gestionCM_CH.mp4') }}" type="video/mp4" />
+                <img src="{{ asset('assets/img/casa_hogar.png') }}" alt="Video no soportado" />
+            </video><br>
+             <label>Ingreso/salida de productos de transacciones constantes </label>
+            <p>Esta funcionaldiad esta centrada en registrar salida y entrada de productos, donde unicamente el usuario tipo casa hogar o centro medico pueden acceder a dichos modulos respectivamente, donde dependiendo dle producto a ingresar tambien permitira seleccionar el donante o beneficiario del producto. Al interactuar con el modulo de transaccion este permite registrar un nuevo donante o adquiriente del proucto en mercaderia, se registra su nombre, correo y contraseña y el tipo de usuario.</p>
+            <video width="440" height="280" controls >
+                <source src="{{ asset('assets/video/transacciones.mp4') }}" type="video/mp4" />
+                <img src="{{ asset('assets/img/casa_hogar.png') }}" alt="Video no soportado" />
+            </video><br>
+            <label>Gestion de usuario </label>
+            <p>Este modulo esta unicamente habilitado para los usuarios con rol Administrador, donde pueden registrar nuevos usuarios, modificar roles u datos de un usuario registrado, eliminar un usuario.</p>
+            <video width="440" height="280" controls >
+                <source src="{{ asset('assets/video/gestionUsuarios.mp4') }}" type="video/mp4" />
+                <img src="{{ asset('assets/img/casa_hogar.png') }}" alt="Video no soportado" />
+            </video><br>
+            <label>Gestion de patrimonio </label>
+            <p>Modulo que permite eliminar, registrar, modificar y buscar activos fijos clasificados en bienes muebles e inmuebles, unicamente el rol tipo administrador puede acceder a esta seccion, tambin en el video que se muestra a continuacion se realiza cada operacion antes mencionada paso a paso.</p>
+            <video width="440" height="280" controls >
+                <source src="{{ asset('assets/video/gestionPatrimonio.mp4') }}" type="video/mp4" />
+                <img src="{{ asset('assets/img/casa_hogar.png') }}" alt="Video no soportado" />
+            </video><br>
+            <label>Generacion reporte a excel u hoja de calculo </label>
+            <p>FUncionaldiad que permite generar un reporte general de activos fijos, reporte especificos de cada tipo de activos fijos y un reporte segun fecha de inicio y fecha final seleccionada. esta funcionalidad esta habilitada solo para usuarios con rol tipo administrador y se accede cuando se encuentra en el listado o gestion de activos fijos. En el isguinte video se explica a detalle cada funcionalidad.</p>
+            <video width="440" height="280" controls>
+                <source src="{{ asset('assets/video/reportesActivos.mp4') }}" type="video/mp4" />
+                <img src="{{ asset('assets/img/casa_hogar.png') }}" alt="Video no soportado" />
+            </video><br><br>
+            <label>¡Gracias por su atencion, un buen dia!</label>
             </big>
         </div>
         <div class="footer">
@@ -47,7 +75,5 @@
     </div>
 {% endblock %}
 {% block javascripts %} 
-    <script type="text/javascript" src="{{ asset('assets/js/usuario/funciones.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/usuario/selectores.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/usuario/login.js') }}"></script>
 {% endblock %} 
