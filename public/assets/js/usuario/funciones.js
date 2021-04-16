@@ -13,7 +13,7 @@ async function renderProductoProxCad(lista,$container){
             numero++
         })
     }else{
-        table += `<tr><td colspan="4">No hay Datos para mostrar</td></tr>`
+        table += `<tr><td colspan="10">No hay Datos para mostrar</td></tr>`
     }
     const element = createTemplate(table)
     $container.append(element)
@@ -31,14 +31,14 @@ function templateTitleProducCadu(table){
             <th>Caducidad</th>
             <th>Proyecto</th>
             <th>Grupo</th>
-            <th>Estado</th>
+            <th>Procedencia</th>
         </tr>
     </thead>`
     return table
 }
 function controlDates(table,producto){
     fechaCaducidad = setDateString(producto.fechaCaducidad)
-    let fechaIngreso = setDateString(producto.fechaIngreso)
+    let fechaIngreso = setDateString(producto.codigoProducto.fechaIngreso)
     table += `  <td >${fechaIngreso}</td>
                 <td style="color:red;">${fechaCaducidad}</td>`
     return table
@@ -46,14 +46,14 @@ function controlDates(table,producto){
 function templateProducCadu(table,producto,numero){
     table += `<tr>
             <td>${numero}</td>
-            <td>${producto.codigo}</td>
+            <td>${producto.codigoProducto.id}</td>
+            <td>${producto.codigoProducto.descripcionProducto}</td>
             <td>${producto.descripcionProducto}</td>
-            <td>${producto.cantidadProducto}</td>
-            <td>${producto.unidadMedida} </td>`
+            <td>${producto.codigoProducto.unidadMedida} </td>`
     table = controlDates(table,producto)
-    table += `<td>${producto.idUnidad.nombreUnidad}</td>
-            <td>${producto.idGrupo.nombreGrupoM}</td>`
-    table += `<td>${producto.estado}</td>`
+    table += `<td>${producto.codigoProducto.idUnidad.nombreUnidad}</td>
+            <td>${producto.codigoProducto.idGrupo.nombreGrupoM}</td>`
+    table += `<td>${producto.procedencia}</td>`
     table+=`</tr>`
     return table
 }

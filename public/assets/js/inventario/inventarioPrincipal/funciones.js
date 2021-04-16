@@ -371,15 +371,15 @@ async function generacionExporteExcel(tipoReporte){
     s2ab(wbout)//convertir de tipo binario a octeto
     let fecha = new Date();
     if(tipoReporte === "total"){
-        saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'ReporteGeneral-'+setDateString(fecha)+'.xlsx');
+        saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'ReporteGeneralInventarios-'+setDateString(fecha)+'.xlsx');
     }else{
         if(list[0] === 1){
-            saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'reporteVehiculos'+setDateString(fecha)+'.xlsx');//guardar el archivo excel con libreria FIleSaver.js y blob
+            saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'reporteInventarioVehiculos'+setDateString(fecha)+'.xlsx');//guardar el archivo excel con libreria FIleSaver.js y blob
         }else{
             if(list[0] === 2){
-                saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'reporteBienesMueblesGeneral'+setDateString(fecha)+'.xlsx');
+                saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'reporteInventarioBienesMueblesGeneral'+setDateString(fecha)+'.xlsx');
             }else{
-                saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'reporteBienesInmueblesGeneral'+setDateString(fecha)+'.xlsx');
+                saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'reporteInventarioBienesInmueblesGeneral'+setDateString(fecha)+'.xlsx');
             }   
         }
     }
@@ -400,7 +400,7 @@ function encabezadoExcelGeneral(date, user, title){
      // creacion hoja de trabajo y agregar al libro
     ws_data = [['','','', title]];
     ws_data.push(['']);
-    ws_data.push(['','fecha:', date.toUTCString()]);
+    ws_data.push(['','fecha de generacion:', date.toUTCString()]);
     ws_data.push(['','Usuario:', user[0]]);
     ws_data.push(['']);
     return ws_data;
@@ -421,6 +421,8 @@ async function casosGeneracionHojaTrabajo(activosFijos,wb,ws_data,tipoReporte){
         activosFijos = response
         wb.SheetNames.push("Activos fijos");
         ws_data = encabezadoExcelGeneral(fechaActual,userName,'Reporte activos fijos')
+        ws_data.push(['','Fecha inicial:',date1,'','Fecha final:',date2])
+        ws_data.push([''])
         ws_data.push(['','Bienes mueles'])
         ws_data.push(['','Codigo','Descripcion','Cantidad','Marca','Modelo','Tamaño','Color','Estado','Forma','Observaciones','FechaIngreso']);
         if(d1){

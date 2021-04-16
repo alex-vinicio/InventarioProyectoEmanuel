@@ -1,15 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Transacciones{% endblock %}
+{% block title %}ayuda{% endblock %}
     
 
 {% block body %}
-<style>
-   
-</style>
     <div id="inner">
         <div style="margin-left: 15%; font-family: 'Roboto', sans-serif; font-size: 18px;">
             <h2>Sistema de inventarios proyecto Emanuel</h2>
+            
         </div>
         <nav id="menu">
             <ul>
@@ -27,32 +25,29 @@
                 <li style="margin-left: 7%;"><a href="#" onclick="cerrarSesion()">Cerrar Sesion</a></li>
             </ul>
         </nav>
-        <br>
         <div class="clearfix">
-            <form name="hiddenProductosTransaccion">
-                <input type="hidden" name="ingreso" value="">
-                <input type="hidden" name="salida" value="">
-            </form>
-            <div>
-                <label style="margin-right: 45%;"><big><big><b>Listado de transacciones<b></big></big></label>
-                <button class="btn btn-primary" onclick="retornarLista()"> Regresar</button>
-            </div>
-            <br>
-            <div id="listarTransacciones"></div>  
-            <div id="modal"></div>          
+            <big><b><h3><label>Manual de usuario del Sistema de inventario web</label></h3></b>
+            <label>Inicio de sesion</label>
+            <p>Unicamente los usuarios registrados en el sistema web de inventarios pueden acceder, este registro unicamente puede realizarlo los usuarios con rol Administrador del sistema. el inicio de sesion se realiza con el correo electronico registrado y la contraseña</p>
+            <video width="640" height="480">
+                <source src="video.mp4" type="video/mp4" />
+                <img src="imagen.png" alt="Video no soportado" />
+                Su navegador no soporta contenido multimedia.
+            </video><br>
+            <label>Modulo del proyecto Casa Hogar Emanuel</label>
+            <p>Unicamente los usuarios con rol tipo casa hogar y el administrador pueden acceder al modulo casa hogar</p>
+            </big>
         </div>
         <div class="footer">
             <h3 style="text-align: center;">Sistema de inventarios "Proyecto Emanuel"</h3>
             <h4 style="text-align: center;"><a style="text-align: center;" href="{{path ('manualUsuario')}}" >Manual de usuario</a></h4>
             <h4 style="text-align: center;"><a style="text-align: center;" href="https://www.facebook.com/CEMCHEMANUEL/" target="_blank">¡Visitanos en Facebook!</a></h4>
-            <h4 style="text-align: center;"><a style="text-align: center;" href="https://www.twitter.com/" target="_blank">Visitanos en Twitter!</a></h4>
+            <h4 style="text-align: center;"><a style="text-align: center;" href="https://www.twitter.com/" target="_blank">¡Visitanos en Twitter!</a></h4>
         </div>
     </div>
 {% endblock %}
 {% block javascripts %} 
-		
-    <script type="text/javascript" src="{{ asset('assets/js/inventario/listaDetallada/funciones.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/inventario/listaDetallada/selector.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/usuario/funciones.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/usuario/selectores.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/usuario/login.js') }}"></script>
-    
 {% endblock %} 

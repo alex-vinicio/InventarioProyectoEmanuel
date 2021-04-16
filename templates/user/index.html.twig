@@ -80,9 +80,12 @@
         </nav>
         <div class="clearfix">
         <div id="navigateUser"></div>
+            <div style = " margin-left: 35%">
+                <img style=" padding-left: 25px; width: 25%; height: 25%;" src='assets/img/fundacion.png' >
+            </div>
             <div style="width: 40%; padding-left: 15px;float:median; margin-top: 2%;  margin-left: 30%">
                 <img href="#" onclick="listarInventario(1)" style=" padding-left: 25px; width: 30%; height: 30%;" src='assets/img/casa_hogar.png' >
-                <img href="#" onclick="listarInventario(2)" style=" padding-left: 25px; width: 30%; height: 30%;" src='assets/img/fundacion.png' >
+                <img href="#" onclick="listarInventario(2)" style=" padding-left: 25px; width: 35%; height: 30%;" src='assets/img/centro_medico.jpg' >
             </div>
             <div style="width: 30%; padding-left: 20px;float:center; margin-top: 6%;  margin: 15px;">
                 <h3>Inventario por caducar</h3>
@@ -92,8 +95,9 @@
         </div>
         <div class="footer">
             <h3 style="text-align: center;">Sistema de inventarios "Proyecto Emanuel"</h3>
-            <h4 style="text-align: center;"><a style="text-align: center;" href="https://www.facebook.com/" target="_blank">Visitanos en Facebook!</a></h4>
-            <h4 style="text-align: center;"><a style="text-align: center;" href="https://www.twitter.com/" target="_blank">Visitanos en Twitter!</a></h4>
+            <h4 style="text-align: center;"><a style="text-align: center;" href="{{path ('manualUsuario')}}" >Manual de usuario</a></h4>
+            <h4 style="text-align: center;"><a style="text-align: center;" href="https://www.facebook.com/CEMCHEMANUEL/" target="_blank">¡Visitanos en Facebook!</a></h4>
+            <h4 style="text-align: center;"><a style="text-align: center;" href="https://www.twitter.com/" target="_blank">¡Visitanos en Twitter!</a></h4>
         </div>
     </div>
 {% endblock %}

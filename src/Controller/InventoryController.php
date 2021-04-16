@@ -55,7 +55,7 @@ class InventoryController extends AbstractController
             if($productRepeat){
                 return $this->json(null);
             }else{
-                $aux = $this->addProduct($producto, $listData, $em, $ip, $idUnidad); 
+                $aux = $this->addProduct($producto, $listData, $em, $ip, $idUnidad, $cache); 
                 return $this->json(['agregado',$idUnidad]);
             }
         else:
@@ -329,13 +329,8 @@ class InventoryController extends AbstractController
         $listaT = [];
         if($usuario->getIdRol()->getId() === 1){
             $producto = $em->getRepository(Producto::class)->findBy(['idUnidad'=>3],['id'=>'ASC']);
-            if($producto){
-                /* foreach($producto as $listadoProd){
-                    $transaccion = $em->getRepository(Transaccion::class)->findBy(['codigoProducto'=>$listadoProd->getId()],['id'=>'ASC']);
-                    array_push($listaT, $transaccion);
-                } */
+            if($producto){    
                 return $this->json($producto);
-                //return $this->json([$producto,$listaT]);
             }else{
                 return $this->json("No se encontro productos");
             }
@@ -491,17 +486,19 @@ class InventoryController extends AbstractController
     public function getListProxCaducidad(EntityManagerInterface $em)
     {
         $newList = [];
-        $productos = $em->getRepository(Producto::class)->findBy([],['id'=>'ASC']);
+        $productos = $em->getRepository(Transaccion::class)->findBy([],['id'=>'ASC']);
         if($productos){
             foreach($productos as $listadoProd){
-                $dateFormat = $listadoProd->getFechaCaducidad();
-                $dateMod = new \DateTime('now');
-                if($dateFormat){
-                    $aux = $dateFormat;
-                    $aux->modify("-3 day");
-                    if(($dateMod >= $dateFormat) || ($dateMod >= $aux)){//|| ($dateFormat->modify("-3 day") <= $dateMod))){
-                        $aux->modify("+3 day");
-                        array_push($newList,$listadoProd);
+                if($listadoProd->getFechaCaducidad()){
+                    $dateFormat = $listadoProd->getFechaCaducidad();
+                    $dateMod = new \DateTime('now');
+                    if($dateFormat){
+                        $aux = $dateFormat;
+                        $aux->modify("-3 day");
+                        if(($dateMod >= $dateFormat) || ($dateMod >= $aux)){//|| ($dateFormat->modify("-3 day") <= $dateMod))){
+                            $aux->modify("+3 day");
+                            array_push($newList,$listadoProd);
+                        }
                     }
                 }
             }    
@@ -719,10 +716,10 @@ class InventoryController extends AbstractController
     private function seteoDataTransaccion($procedencia,Transaccion $transaccion,$accion,$cantidad,$fecha,Usuario $usuarioModificacion,Producto $producto,$usuarioExterno,$codP,$marca,$color){
         $entrada = $salida = "";
         $nombre = $producto->getDescripcionProducto();
-        if($fecha !== "null"):
+        if($fecha):
             $fechaCaducidad = \DateTime::createFromFormat('Y-m-d', $fecha);
         else:   
-            $fechaCaducidad = null;
+            $fechaCaducidad = $transaccion->getFechaCaducidad();
         endif;
         
         if(!$marca){$marca = "desconocida";}

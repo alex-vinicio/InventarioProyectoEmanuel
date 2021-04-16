@@ -175,11 +175,12 @@ async function validacionDatosTransaccionModal(valueCantidad,valuePersonExternal
 }
 async function registrarAccionesModal(cantidad,persona,producto){
     let accion = "salida"
-    let valueFecha = null
-    let marca = color = proceden= null
+    let valueFecha = setDateString(producto[0].fechaCaducidad)
+    let marca = producto[0].marca
+    let color = producto[0].color 
+    let proceden= producto[0].procedencia
     const data = new URLSearchParams(`idT=${producto[0].id}&action=${accion}&number=${cantidad}&date=${valueFecha}&person=${persona}&idP=${producto[0].codigoProducto.codigo}&marca=${marca}&color=${color}&proceden=${proceden}`)
     const response = await getDataPost('newTransaccionsProduct', data)
-    console.log(response)
     if(response){
         alertify.success('transaccion guardada!')
     }

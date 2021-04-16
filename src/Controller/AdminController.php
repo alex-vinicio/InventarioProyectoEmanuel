@@ -23,7 +23,13 @@ class AdminController extends AbstractController
         if(!$usuario):return $this->redirectToRoute('login');endif;
         return $this->render('user/index.html.twig');
     }
-
+    
+    public function manualUsuario(EntityManagerInterface $em ,CacheService $cache){
+        $usuario = $cache->get('usuario');
+        if(!$usuario):return $this->redirectToRoute('login');endif;
+        return $this->render('user/manualUsuario.html.twig');
+    }
+    
     public function controlPanel(EntityManagerInterface $em ,CacheService $cache){
         $usuario = $cache->get('usuario');
         if(!$usuario):return $this->redirectToRoute('login');endif;

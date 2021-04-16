@@ -37,3 +37,7 @@ patrimonio:
 gestionPatrimonio:
     path: /gestionPatrimonio
     controller: App\Controller\AdminController::gestionPatrimonio
+
+manualUsuario:
+    path: /manualUsuario
+    controller: App\Controller\AdminController::manualUsuario
