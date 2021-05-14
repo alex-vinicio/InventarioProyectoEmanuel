@@ -46,11 +46,9 @@ class ProductoType extends AbstractType
                     'Caducado' => 'Caducado',
                     'Mantenimiento' => 'Mantenimiento',
                     'Nuevo' => 'Nuevo',
-                    'Usado' => 'Usado',
-                    'Viejo' => 'Viejo',
                     'Suspendido' => 'Suspendido'
                 ),
-                'placeholder' => 'Estado producto',
+                'placeholder' => '-Estado producto-',
                 'required' => true,
                 'attr'=>['class'=>'form-control']
             ])

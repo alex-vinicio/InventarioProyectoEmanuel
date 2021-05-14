@@ -86,6 +86,20 @@ class Transaccion
     private $procedencia;
 
     /**
+     * @var string|null
+     *
+     * @ORM\Column(name="detalle_transaccion", type="string", length=2000, nullable=true)
+     */
+    private $detalleTransaccion;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="data_operacion", type="string", length=1000, nullable=true)
+     */
+    private $dataOperacion;
+
+    /**
      * @var \Usuario
      *
      * @ORM\ManyToOne(targetEntity="Usuario")
@@ -208,6 +222,30 @@ class Transaccion
     {
         $this->procedencia = $procedencia;
 
+        return $this;
+    }
+
+    public function getDetalleTransaccion(): ?string
+    {
+        return $this->detalleTransaccion;
+    }
+
+    public function setDetalleTransaccion(string $detalleTransaccion): self
+    {
+        $this->detalleTransaccion = $detalleTransaccion;
+        
+        return $this;
+    }
+
+    public function getDataOperacion(): ?string
+    {
+        return $this->dataOperacion;
+    }
+
+    public function setDataOperacion(string $dataOperacion): self
+    {
+        $this->dataOperacion = $dataOperacion;
+        
         return $this;
     }
 

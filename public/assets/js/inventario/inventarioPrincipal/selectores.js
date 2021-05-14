@@ -45,6 +45,7 @@ $spoiler2.addEventListener('click', async ()=>{
 
 async function getTablePatrimonio(list){
     $divListInventaryP.innerHTML=""
+    console.log(list)
     if($optionsForm.option.value == "vehiculos"){
         list.pop() 
         list.push(1)

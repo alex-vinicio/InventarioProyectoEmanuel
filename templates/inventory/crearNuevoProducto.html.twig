@@ -80,10 +80,13 @@
         </nav>
         <br>
         <div class="clearfix">
+            {# Estas aqui -> <label>Inicio\CentroMedico\NuevoInventario</label><br> #}
+            <div id="logoModulo"></div>
              <div>
                 <label><big><big><b>Registro de nuevo producto<b></big></big></label>
             </div>
             <br>
+            <div id="checkbockMedicina"></div>
             <div class="card-body">
                 {{ include('inventory/formProduct.html.twig') }}
             </div>

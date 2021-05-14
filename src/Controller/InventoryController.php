@@ -21,6 +21,7 @@ class InventoryController extends AbstractController
         $listData = [];
         $lote = "";
         $idProductoPatrimonio = $cache->get('patrimonio'); 
+
         if($idProductoPatrimonio){
             if($idProductoPatrimonio === "1"){//productos generales
                 $data = $request->request;
@@ -36,6 +37,7 @@ class InventoryController extends AbstractController
             $data = $request->request->get('producto');
             $listData = $this->cargaDatosProductosInsumosTrans($data,$lote);
         }
+        
         $idUnidad = $cache->get('departamentoPE');
         $cacheProducto = $cache->get('viewProducto');
         $cachePatrimonio = $cache->get('patrimonioUpdate');
@@ -75,43 +77,60 @@ class InventoryController extends AbstractController
      */
     public function newTransaccionsProduct(Request $request, EntityManagerInterface $em,CacheService $cache)//no asignar otra variable de entrada
     {  
-        $data1 = $request->request->get('action');
-        $cantidad = $request->request->get('number');
-        $fecha = $request->request->get('date');
-        $usuarioExterno = $request->request->get('person');
-        $codP = $request->request->get('idP');
-        $marca = $request->request->get('marca');
-        $color = $request->request->get('color');
-        $idT = $request->request->get('idT');
-        $procedencia = $request->request->get('proceden');
+        $dataTransaccion = $request->request;
+        if($dataTransaccion->get('idM') && $dataTransaccion->get('motivo') && $dataTransaccion->get('detalleM')){
+            return $this->json($dataTransaccion->get('detalleM'));
+        }else{
+            return $this->json("vacio");
+        }
+        //return $this->json($dataTransaccion->get('dataMotivo'));
+        $data1 = $dataTransaccion->get('action');
+        $cantidad = $dataTransaccion->get('number');
+        $fecha = $dataTransaccion->get('date');
+        $usuarioExterno = $rdataTransaccion->get('person');
+        $codP = $dataTransaccion->get('idP');
+        $marca = $dataTransaccion->get('marca');
+        $color = $dataTransaccion->get('color');
+        $idT = $dataTransaccion->get('idT');
+        $procedencia = $dataTransaccion->get('proceden');
 
+        
         $usuarioModificacion = $cache->get('usuario');
         $producto = $em->getRepository(Producto::class)->findOneBy(['codigo'=>$codP]);
         $usuario = $em->getRepository(Usuario::class)->findOneBy(['id'=>$usuarioModificacion->getId()]);
         
-        $operacion = 0;
-        if($data1 === 'salida'){
-            $transaccion = $em->getRepository(Transaccion::class)->findOneBy(['id'=>$idT]);
+        if($usuarioModificacion){
+            $detailTransaction = "";
+            $operacion = 0;
+            if($data1 === 'salida'){
+                $transaccion = $em->getRepository(Transaccion::class)->findOneBy(['id'=>$idT]);
+                
+                $operacion = $producto->getCantidadProducto() - $cantidad;
+                $operacionTransac = $transaccion->getDescripcionProducto() - $cantidad;
+                $detailTransaction = $transaccion->getDetalleTransaccion()."[".$cantidad.",".$fecha.",".$usuarioExterno."]";
+                $producto
+                        ->setCantidadProducto($operacion);
+                $transaccion
+                        ->setDetalleTransaccion($detailTransaction)
+                        ->setDescripcionProducto($operacionTransac);
+            }else{
+                $transaccion = new Transaccion();
+                $operacion = $producto->getCantidadProducto() + $cantidad;
+                $detailTransaction = "[".$cantidad.",".$fecha.",".$usuarioExterno."]"; //add . before = if concatenate a strings
+                $producto
+                        ->setCantidadProducto($operacion);
+                $transaccion
+                        ->setDetalleTransaccion($detailTransaction)
+                        ->setDescripcionProducto($cantidad);
+            }
             
-            $operacion = $producto->getCantidadProducto() - $cantidad;
-            $operacionTransac = $transaccion->getDescripcionProducto() - $cantidad;
-            $producto
-                    ->setCantidadProducto($operacion);
-            $transaccion
-                    ->setDescripcionProducto($operacionTransac);
-        }else{
-            $transaccion = new Transaccion();
-            $operacion = $producto->getCantidadProducto() + $cantidad;
-            $producto
-                    ->setCantidadProducto($operacion);
-            $transaccion
-                    ->setDescripcionProducto($cantidad);
-        }
-        
-        $transaccion = $this->seteoDataTransaccion($procedencia,$transaccion,$data1,$cantidad,$fecha,$usuario,$producto,$usuarioExterno,$codP,$marca,$color);
-        $aux = $this->envioDatosDB($transaccion,$producto,$em);
+            $transaccion = $this->seteoDataTransaccion($procedencia,$transaccion,$data1,$cantidad,$fecha,$usuario,$producto,$usuarioExterno,$codP,$marca,$color);
+            $aux = $this->envioDatosDB($transaccion,$producto,$em);
 
-        return $this->json($aux);
+            return $this->json($aux);
+        }else{
+            return $this->json("Usuario no permitido");
+        }
     }
     /**
      * @Route("/listTransaccion", name="listTransaccion")
@@ -262,16 +281,23 @@ class InventoryController extends AbstractController
     /**
      * @Route("/getTransaccionSalida", name="getTransaccionSalida")
      */
-    public function getTransaccionSalida(EntityManagerInterface $em, Request $request)
+    public function getTransaccionSalida(EntityManagerInterface $em, Request $request, CacheService $cache)
     {
-        $idP = $request->request->get('codigo');
-        $transaccion = $em->getRepository(Transaccion::class)->findOneBy(['id'=>$idP]);
-        $usuario = $em->getRepository(Usuario::class)->findAll();
-        $usuarioExternos = $this->filtroUsuariosExternos($usuario);
-        if($transaccion){
-            return $this->json([$transaccion,$usuarioExternos]);
+        $usuario = $cache->get('usuario');
+
+        if($usuario){
+            $idP = $request->request->get('codigo');
+            $transaccion = $em->getRepository(Transaccion::class)->findOneBy(['id'=>$idP]);
+            $usuario = $em->getRepository(Usuario::class)->findAll();
+            $usuarioExternos = $this->filtroUsuariosExternos($usuario);
+            $usuarioInterno = $this->filtroUsuariosInternos($usuario);
+            if($transaccion){
+                return $this->json([$transaccion,$usuarioExternos,$usuarioInterno]);
+            }else{
+                return $this->json(null);
+            }
         }else{
-            return $this->json(null);
+            return $this->json("No permitido!");
         }
     }
 
@@ -702,6 +728,21 @@ class InventoryController extends AbstractController
         foreach($usuario as $data){
             if($data->getIdRol()->getId() > 5)
                 array_push($lista,$data);
+        }
+        return $lista;
+    }
+    private function filtroUsuariosInternos($usuario){
+        $lista =[];
+        foreach($usuario as $data){
+            if($data->getIdRol()->getId() <= 5)
+                if($data->getEstado()){
+                    array_push($lista,[
+                        'nombre'=> $data->getNombre(),
+                        'mail'=>$data->getUsuario(),
+                        'id'=>$data->getId()
+                    ]);
+                }
+                
         }
         return $lista;
     }

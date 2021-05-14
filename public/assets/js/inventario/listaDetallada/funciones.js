@@ -24,8 +24,6 @@ async function renderTransaccion(lista,$container){
     
     const element = createTemplate(table)
     $container.append(element)
-    
-    
 }
 function templateTitleProducTransaccion(table){
     table += `
@@ -120,7 +118,7 @@ async function salidaRegistro(idTransaccion){
     createTemplateModal(idTransaccion,$divModalUpdate,productoTransaccion)
     
     var span = document.getElementsByClassName("close")[0];
-    var modal = document.getElementById("modalEdit");
+    var modal = document.getElementById('modalEdit');
     var bttonCancel = document.getElementById('closeModal');
     var bttonGuardar = document.getElementById('registrar_edicion');
     var bttCreateUserExternl = document.getElementById('nuevoDonante');
@@ -133,7 +131,90 @@ async function createTemplateModal(id,$divModalUpdate,producto){
 
     const element = createTemplate(modal)
     $divModalUpdate.append(element)
+    //divs para desplegar informacion segun seleccion 
+    var formSelectACtion = document.forms.selectOptions;
+    var divContainCM = document.getElementById('containDivsMedicCenter')
+    if(formSelectACtion && divContainCM){
+        var buttonSelectCH = document.getElementById('salidaMedicamento')
+        buttonSelectCH.addEventListener('change', async (event)=>{
+            divContainCM.innerHTML =""
+            let container = ""
+            switch (buttonSelectCH.value) {
+                case "Entrega consumo":
+                    container = entregaConsumoDiv(container, producto)
+                    break;
+                case "Baja por caducidad":
+                    container = bajaCaducidadDiv(container, producto)
+                    break;
+                case "Venta":
+                    container = ventaDiv(container, producto)
+                    break;
+                case "Traspaso":
+                    container = traspasoDiv(container, producto)
+                    break
+                default:
+                    container = errorDiv(container)
+                    break;
+            }
+            container += `<br><br>`
+            const element = createTemplate(container)
+            divContainCM.append(element)
+        })
+    }   
 }
+function errorDiv(data){
+    data += `<p><letter>¡Seleccione campo correcto!</letter></p>`
+    return data;
+}
+function entregaConsumoDiv(data, producto){
+    data += `<p>
+            Seleccione al personal autorizado: <select id="usuariosExternos" name="usuariosExternos">`
+            producto[2].forEach( funcionario => {
+                data += `<option value="${funcionario.nombre}">${funcionario.nombre} (${funcionario.mail})</option>`
+            });
+            data+=`</select><p>`
+    return data;
+}
+function bajaCaducidadDiv(data, producto){
+
+    data += `<p><letter>Proceso de baja por caducidad </letter>
+                <br><br>Personal encargado de autirozar: <select id="usuariosExternos" name="usuariosExternos">
+            `
+            producto[2].forEach( funcionario => {
+                data += `<option value="${funcionario.nombre}">${funcionario.nombre} (${funcionario.mail})</option>`
+            });
+            data+=`</select><br><br>
+            Motivo o detalle: <select id="motivoBaja">
+                                <option value="Desecho">Por desecho</option>
+                                <option value="Incineración">Por Incineración</option>
+                                <option value="otro">Otros motivos</option></select>                                
+                                <p>`
+    return data;
+}
+function ventaDiv(data){
+    data += `<p><letter>Informacion del cliente</letter><br>
+                <letter>*N° cedula:</letter>
+                <input type="text" id="civenta" name="civenta" placeholder="065231665-7" required="required">
+                <br><br><letter>*Nombre:</letter>
+                <input type="text" id="usuariosExternos" name="usuariosExternos" placeholder="Julio Roca" required="required">
+                <br><br><letter>*Precio:</letter>
+                <input type="number" id="presio" name="presio" min=0 placeholder="30" required="required">
+                <br><br><letter>*N° Recibo:</letter>
+                <input type="text" id="reciboventa" name="reciboventa" placeholder="NUM12" required="required"><p>`
+    return data;
+}
+function traspasoDiv(data, producto){
+    data += `<p> <letter>Informacion de traspaso</letter>
+                <br><br>Persona encargada traspaso: <select id="usuariosExternos" name="usuariosExternos">`
+                producto[2].forEach( funcionario => {
+                    data += `<option value="${funcionario.nombre}">${funcionario.nombre} (${funcionario.mail})</option>`
+                });
+            data += `</select>
+                    <br><br><letter>*Detalle traspaso: </letter><br>
+                    <textarea id="detalleTraspaso" name="detalleTraspaso" required="required" placeholder="Detalle el traspaso..."></textarea><p>`
+    return data;
+}
+
 async function activationModal(span,modal,bttonCancel,bttonGuardar,producto,bttCreateUserExternl){
     modal.style.display = "block";
     span.onclick = function() {
@@ -146,57 +227,106 @@ async function activationModal(span,modal,bttonCancel,bttonGuardar,producto,bttC
     }
     bottonsEvents(bttonCancel, bttonGuardar,producto,modal,bttCreateUserExternl)
 }
+function asignarDataOperacion(listDataOperacion){
+    let valueMotivoSalida = document.getElementById('salidaMedicamento')
+    if(valueMotivoSalida){
+        if(valueMotivoSalida.value == "Entrega consumo"){
+            listDataOperacion.push(1)
+            listDataOperacion.push("Entrega consumo")
+            listDataOperacion.push("personal")
+        }else{
+            if( valueMotivoSalida.value == "Baja por caducidad"){
+                var motivoBaja = document.getElementById('motivoBaja').value
+                listDataOperacion.push(2)
+                listDataOperacion.push("Caducidad")
+                listDataOperacion.push(motivoBaja)
+            }else{
+                if(valueMotivoSalida.value == "Venta"){
+                    var precioCompra = document.getElementById('presio').value
+                    var numCaja = document.getElementById('reciboventa').value
+                    listDataOperacion.push(3)
+                    listDataOperacion.push("Venta")
+                    listDataOperacion.push(`valor=${precioCompra} caja=${numCaja}`)
+                }else{
+                    if(valueMotivoSalida.value == "Traspaso"){
+                        var detalleTraspaso = document.getElementById('detalleTraspaso').value
+                        listDataOperacion.push(4)
+                        listDataOperacion.push("Traspaso")
+                        listDataOperacion.push(detalleTraspaso)
+                    }
+                }
+            }
+        }
+    }
+}
+
 async function bottonsEvents(bttonCancel, bttonGuardar, producto,modal,bttCreateUserExternl){
     bttonCancel.onclick = function(){
         modal.style.display = "none";
     }
-    bttonGuardar.onclick = async function(){
+    bttonGuardar.onclick = async function(event){
+        event.preventDefault()
+        let valuePersonExternal = null
+        var listDataOperacion = [];
+        asignarDataOperacion(listDataOperacion)
         let valueCantidad = document.getElementById('cantidadP').value;
-        let valuePersonExternal = document.getElementById('usuariosExternos').value
-        await validacionDatosTransaccionModal(valueCantidad,valuePersonExternal,producto)
+        if(document.getElementById('usuariosExternos')){
+            valuePersonExternal = document.getElementById('usuariosExternos').value
+        }
+        await validacionDatosTransaccionModal(valueCantidad,valuePersonExternal,producto, listDataOperacion)
         modal.style.display = "none";
         getTableTransaccion($divListInventary)
     }
-    bttCreateUserExternl.onclick = async function(){
-        location.href="usuariosGestion";
+    if(bttCreateUserExternl){
+        bttCreateUserExternl.onclick = async function(){
+            location.href="usuariosGestion";
+        }
     }
 }
-async function validacionDatosTransaccionModal(valueCantidad,valuePersonExternal,producto){
+async function validacionDatosTransaccionModal(valueCantidad,valuePersonExternal,producto, forData){
     if(valueCantidad){
-        console.log(valueCantidad)
         if((valueCantidad > 0) && (valueCantidad <= producto[0].descripcionProducto)){
-            
-            await registrarAccionesModal(valueCantidad,valuePersonExternal,producto)
+            if(valuePersonExternal && forData[0] && forData[1] && forData[2])
+                await registrarAccionesModal(valueCantidad,valuePersonExternal,producto, forData)
+            else{
+                alertify.error('Ingrese valores!')
+            }
         }else{
             alertify.error('Valor incorrecto!')
         }        
     }else
-        alertify.error('Ingrese un valido!')
+        alertify.error('Ingrese un valor valido!')
 }
-async function registrarAccionesModal(cantidad,persona,producto){
+async function registrarAccionesModal(cantidad,persona,producto, forData){
     let accion = "salida"
     let valueFecha = setDateString(producto[0].fechaCaducidad)
     let marca = producto[0].marca
     let color = producto[0].color 
     let proceden= producto[0].procedencia
-    const data = new URLSearchParams(`idT=${producto[0].id}&action=${accion}&number=${cantidad}&date=${valueFecha}&person=${persona}&idP=${producto[0].codigoProducto.codigo}&marca=${marca}&color=${color}&proceden=${proceden}`)
+    var exp = new FormData()
+    exp.append('id',forData[0])
+    exp.append('motivo',forData[1])
+    exp.append('detalle',forData[2])
+    const data = new URLSearchParams(`idT=${producto[0].id}&action=${accion}&number=${cantidad}&date=${valueFecha}&person=${persona}&idP=${producto[0].codigoProducto.codigo}&marca=${marca}&color=${color}&proceden=${proceden}&idM=${forData[0]}&motivo=${forData[1]}&detalleM=${forData[2]}`)
     const response = await getDataPost('newTransaccionsProduct', data)
-    if(response){
+    console.log(response)
+    /* if(response){
         alertify.success('transaccion guardada!')
-    }
+    } */
 }
 function templateModalDialogo(modal,producto){
-    modal +=`<div class="modal-posision"><div class="modal-header">
-                <span class="close">&times;</span>
-                <h4 align="center">Salida de producto</h4>
-            </div>
-            <div class="modal-body"><br>
+    modal +=`<div class="modal-posision">
+                <div class="modal-header">
+                    <span class="close">&times;</span>
+                    <h4 align="center">Salida de producto</h4>
+                </div>
+                <div class="modal-body"><br>
                 <pre>            <black>Producto:</black>          ${producto[0].codigoProducto.descripcionProducto}           
-            <b>Procedencia:</b>        ${producto[0].procedencia}
-            <b>Cantidad:</b>        ${producto[0].descripcionProducto}          
-            <b>Unidad:</b>          ${producto[0].codigoProducto.unidadMedida}
-            <b>Marca:</b>          ${producto[0].marca}
-            <b>Color:</b>          ${producto[0].color}`
+                <b>Procedencia:</b>        ${producto[0].procedencia}
+                <b>Cantidad:</b>        ${producto[0].descripcionProducto}          
+                <b>Unidad:</b>          ${producto[0].codigoProducto.unidadMedida}
+                <b>Marca:</b>          ${producto[0].marca}
+                <b>Color:</b>          ${producto[0].color}`
         if(producto[0].codigoProducto.lote){   
             modal += `<br><b>            Lote:</b>            ${producto[0].codigoProducto.lote}`
         }
@@ -205,19 +335,40 @@ function templateModalDialogo(modal,producto){
                 <br>
                 <br>Cantidad: 
                 <input type="number" id="cantidadP" placeholder="ejemplo: 3">
-                <br><br>Adquirien:<select id="usuariosExternos" name="usuariosExternos">`
-    producto[1].forEach((userExternal)=>{
-        modal+=`    <option value="${userExternal.nombre}">${userExternal.nombre}</option>`
-    })
-    modal +=`       </select> <a href="#" id="nuevoDonante" onclick="nuevoDonante('usuarioExterno')">nuevo donante</a><br><br>
-                    <button id="registrar_edicion" name="registrar_edicion" value="Guardar cambios">Guardar</button>
-                            <button id="closeModal" >Cancelar</button>
+                <br><br> `
+        modal = changueModal(modal, producto)
+        
+        modal +=       `<button id="registrar_edicion" name="registrar_edicion" value="Guardar cambios">Guardar</button>
+                        <button id="closeModal" >Cancelar</button>
                     <br><br></div>
                     <div class="modal-footer"><h4 align="center">Llene todos los datos!<h4></div>
                 </div>
             </div>`
     return modal
 }
+
+function changueModal(modal, producto){
+
+    if(producto[0].codigoProducto.idUnidad.id === 2){
+        modal += `Motivo salida: <select style="margin-ledt: 5px;" id="salidaMedicamento" name="salidaMedicamento">
+                    <option selected>-Seleccione-</option>
+                    <option value="Entrega consumo">Entrega para consumo</option>
+                    <option value="Baja por caducidad">Baja por caducidad</option>
+                    <option value="Venta">Venta</option>
+                    <option value="Traspaso">Traspaso</option></select><br><br>
+                <form action="" name="selectOptions">
+                    <div id="containDivsMedicCenter"></div>
+                </form>`
+    }else{
+        modal +=`Beneficiario: <select id="usuariosExternos" name="usuariosExternos">`
+        producto[1].forEach((userExternal)=>{
+            modal+=`<option value="${userExternal.nombre}">${userExternal.nombre}</option>`
+        })
+        modal +=`</select>  <a style="margin-left:15px;" href="#" id="nuevoDonante" onclick="nuevoDonante('usuarioExterno')">nuevo beneficiario</a><br><br>`    
+    }
+    return modal;
+}
+
 //buscadores             
 async function addEventSearchTransaccion(){
     const formSalida = document.searchSalida
