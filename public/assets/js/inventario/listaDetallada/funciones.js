@@ -227,8 +227,7 @@ async function activationModal(span,modal,bttonCancel,bttonGuardar,producto,bttC
     }
     bottonsEvents(bttonCancel, bttonGuardar,producto,modal,bttCreateUserExternl)
 }
-function asignarDataOperacion(listDataOperacion){
-    let valueMotivoSalida = document.getElementById('salidaMedicamento')
+function asignarDataOperacion(listDataOperacion,valueMotivoSalida){
     if(valueMotivoSalida){
         if(valueMotivoSalida.value == "Entrega consumo"){
             listDataOperacion.push(1)
@@ -244,9 +243,11 @@ function asignarDataOperacion(listDataOperacion){
                 if(valueMotivoSalida.value == "Venta"){
                     var precioCompra = document.getElementById('presio').value
                     var numCaja = document.getElementById('reciboventa').value
-                    listDataOperacion.push(3)
-                    listDataOperacion.push("Venta")
-                    listDataOperacion.push(`valor=${precioCompra} caja=${numCaja}`)
+                    if(precioCompra && numCaja){
+                        listDataOperacion.push(3)
+                        listDataOperacion.push("Venta")
+                        listDataOperacion.push(`valor=${precioCompra} caja=${numCaja}`)
+                    }
                 }else{
                     if(valueMotivoSalida.value == "Traspaso"){
                         var detalleTraspaso = document.getElementById('detalleTraspaso').value
@@ -268,7 +269,10 @@ async function bottonsEvents(bttonCancel, bttonGuardar, producto,modal,bttCreate
         event.preventDefault()
         let valuePersonExternal = null
         var listDataOperacion = [];
-        asignarDataOperacion(listDataOperacion)
+        let valueMotivoSalida = document.getElementById('salidaMedicamento')
+        if(valueMotivoSalida){
+            asignarDataOperacion(listDataOperacion,valueMotivoSalida)
+        }else{listDataOperacion = null}
         let valueCantidad = document.getElementById('cantidadP').value;
         if(document.getElementById('usuariosExternos')){
             valuePersonExternal = document.getElementById('usuariosExternos').value
@@ -286,14 +290,18 @@ async function bottonsEvents(bttonCancel, bttonGuardar, producto,modal,bttCreate
 async function validacionDatosTransaccionModal(valueCantidad,valuePersonExternal,producto, forData){
     if(valueCantidad){
         if((valueCantidad > 0) && (valueCantidad <= producto[0].descripcionProducto)){
-            if(valuePersonExternal && forData[0] && forData[1] && forData[2])
-                await registrarAccionesModal(valueCantidad,valuePersonExternal,producto, forData)
-            else{
-                alertify.error('Ingrese valores!')
-            }
-        }else{
-            alertify.error('Valor incorrecto!')
-        }        
+            if(valuePersonExternal){
+                if(forData){
+                    if(forData[0] && forData[1] && forData[2]){
+                        await registrarAccionesModal(valueCantidad,valuePersonExternal,producto, forData)
+                    }else{
+                        alertify.error('Complete campos vacios!')
+                    }
+                }else{
+                    await registrarAccionesModal(valueCantidad,valuePersonExternal,producto, forData)
+                }
+            }else{alertify.error('Ingrese valores!')}
+        }else{alertify.error('Valor incorrecto!')}        
     }else
         alertify.error('Ingrese un valor valido!')
 }
@@ -303,16 +311,20 @@ async function registrarAccionesModal(cantidad,persona,producto, forData){
     let marca = producto[0].marca
     let color = producto[0].color 
     let proceden= producto[0].procedencia
-    var exp = new FormData()
-    exp.append('id',forData[0])
-    exp.append('motivo',forData[1])
-    exp.append('detalle',forData[2])
-    const data = new URLSearchParams(`idT=${producto[0].id}&action=${accion}&number=${cantidad}&date=${valueFecha}&person=${persona}&idP=${producto[0].codigoProducto.codigo}&marca=${marca}&color=${color}&proceden=${proceden}&idM=${forData[0]}&motivo=${forData[1]}&detalleM=${forData[2]}`)
+    if(forData){
+        var $dataMotivo1=forData[0]
+        var $dataMotivo2=forData[1]
+        var $dataMotivo3=forData[2]
+    }else{
+        var $dataMotivo1=null
+        var $dataMotivo2=null
+        var $dataMotivo3=null
+    }
+    const data = new URLSearchParams(`idT=${producto[0].id}&action=${accion}&number=${cantidad}&date=${valueFecha}&person=${persona}&idP=${producto[0].codigoProducto.codigo}&marca=${marca}&color=${color}&proceden=${proceden}&idM=${$dataMotivo1}&motivo=${$dataMotivo2}&detalleM=${$dataMotivo3}`)
     const response = await getDataPost('newTransaccionsProduct', data)
-    console.log(response)
-    /* if(response){
+    if(response){
         alertify.success('transaccion guardada!')
-    } */
+    }
 }
 function templateModalDialogo(modal,producto){
     modal +=`<div class="modal-posision">

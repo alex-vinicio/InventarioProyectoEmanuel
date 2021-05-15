@@ -78,33 +78,30 @@ class InventoryController extends AbstractController
     public function newTransaccionsProduct(Request $request, EntityManagerInterface $em,CacheService $cache)//no asignar otra variable de entrada
     {  
         $dataTransaccion = $request->request;
-        if($dataTransaccion->get('idM') && $dataTransaccion->get('motivo') && $dataTransaccion->get('detalleM')){
-            return $this->json($dataTransaccion->get('detalleM'));
-        }else{
-            return $this->json("vacio");
-        }
         //return $this->json($dataTransaccion->get('dataMotivo'));
         $data1 = $dataTransaccion->get('action');
         $cantidad = $dataTransaccion->get('number');
         $fecha = $dataTransaccion->get('date');
-        $usuarioExterno = $rdataTransaccion->get('person');
+        $usuarioExterno = $dataTransaccion->get('person');
         $codP = $dataTransaccion->get('idP');
         $marca = $dataTransaccion->get('marca');
         $color = $dataTransaccion->get('color');
         $idT = $dataTransaccion->get('idT');
         $procedencia = $dataTransaccion->get('proceden');
 
-        
         $usuarioModificacion = $cache->get('usuario');
         $producto = $em->getRepository(Producto::class)->findOneBy(['codigo'=>$codP]);
         $usuario = $em->getRepository(Usuario::class)->findOneBy(['id'=>$usuarioModificacion->getId()]);
         
-        if($usuarioModificacion){
-            $detailTransaction = "";
+        if($usuarioModificacion){;
             $operacion = 0;
             if($data1 === 'salida'){
                 $transaccion = $em->getRepository(Transaccion::class)->findOneBy(['id'=>$idT]);
-                
+                if($dataTransaccion->get('idM') !== "null"){
+                    $extraDetalleT = $transaccion->getDataOperacion(). "[".$dataTransaccion->get('motivo').",".$dataTransaccion->get('detalleM')."]";
+                }else{
+                    $extraDetalleT = "[salida casa hogar]";
+                }
                 $operacion = $producto->getCantidadProducto() - $cantidad;
                 $operacionTransac = $transaccion->getDescripcionProducto() - $cantidad;
                 $detailTransaction = $transaccion->getDetalleTransaccion()."[".$cantidad.",".$fecha.",".$usuarioExterno."]";
@@ -112,15 +109,18 @@ class InventoryController extends AbstractController
                         ->setCantidadProducto($operacion);
                 $transaccion
                         ->setDetalleTransaccion($detailTransaction)
+                        ->setDataOperacion($extraDetalleT)
                         ->setDescripcionProducto($operacionTransac);
             }else{
                 $transaccion = new Transaccion();
                 $operacion = $producto->getCantidadProducto() + $cantidad;
                 $detailTransaction = "[".$cantidad.",".$fecha.",".$usuarioExterno."]"; //add . before = if concatenate a strings
+                $extraDetalleT = "nada";
                 $producto
                         ->setCantidadProducto($operacion);
                 $transaccion
                         ->setDetalleTransaccion($detailTransaction)
+                        ->setDataOperacion($extraDetalleT)
                         ->setDescripcionProducto($cantidad);
             }
             
