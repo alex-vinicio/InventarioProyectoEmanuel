@@ -216,6 +216,9 @@ async function createTemplateModal(id,$divModalUpdate,producto){
 
     const element = createTemplate(modal)
     $divModalUpdate.append(element)
+
+    //llamar div contenido procedencia
+    informacionProcedencia(producto)
 }
 async function activationModal(span,modal,bttonCancel,bttonGuardar,producto,bttCreateUserExternl){
     modal.style.display = "block";
@@ -245,9 +248,55 @@ async function bottonsEvents(bttonCancel, bttonGuardar, producto,modal,bttCreate
         modal.style.display = "none";
         await getTableCasaHogar($divListInventary)
     }
-    bttCreateUserExternl.onclick = async function(){
-        location.href="usuariosGestion";
+    if(bttCreateUserExternl){
+        bttCreateUserExternl.onclick = async function(){
+            location.href="usuariosGestion";
+        }
     }
+}
+function nuevoDonante(){
+    location.href="usuariosGestion";
+}
+function informacionProcedencia(producto){
+    const tipoProcedencia = document.getElementById('procedenciaT');
+    const divProcedencia = document.getElementById('divTransferencia')
+    tipoProcedencia.addEventListener('change', async (event)=>{
+        divProcedencia.innerHTML = ""
+        let bodyDiv = ""
+        console.log(producto)
+        if(tipoProcedencia.value == "donacion"){
+            bodyDiv += `<p><br>Donante:  <select id="usuariosExternos" name="usuariosExternos">`
+            producto[1].forEach((userExternal)=>{
+                bodyDiv+=`<option value="${userExternal.nombre}">${userExternal.nombre}</option>`
+            })
+            bodyDiv +=`</select> <br><a href="#" id="nuevoDonante" onclick="nuevoDonante('usuarioExterno')">nuevo donante</a></p>`  
+        }else{
+            if(tipoProcedencia.value == "compra"){
+                bodyDiv += `<p><br>Donante:  <select id="usuariosExternos" name="usuariosExternos">`
+                producto[1].forEach((userExternal)=>{
+                    bodyDiv+=`<option value="${userExternal.nombre}">${userExternal.nombre}</option>`
+                })
+                bodyDiv +=`</select> <a href="#" id="nuevoDonante" onclick="nuevoDonante('usuarioExterno')">nuevo donante</a>`  
+                bodyDiv += `<br><letter>*N° Ruc</letter>
+                            <input type="number" id="rucCliente"  min="0" placeholder="060606054001" ><br>
+                            <letter>*Subtotal</letter>
+                            <input type="number" id="subtotal"  min="0" placeholder="400" ><br>
+                            <letter>*Iva</letter>
+                            <input type="number" id="iva" min="0" placeholder="12" ><br>
+                            <letter>*Valor total</letter>
+                            <input type="number" id="valorTotal" min="0" placeholder="123" ><br>
+                            </p>`
+            }else{
+                bodyDiv += `<p><br>Responsable:  <select id="usuariosExternos" name="usuariosExternos">`
+                producto[2].forEach((userExternal)=>{
+                    bodyDiv+=`    <option value="${userExternal.nombre}">${userExternal.mail}(${userExternal.nombre})</option>`
+                })
+                bodyDiv += `</p>`
+            }
+        }
+        const element = createTemplate(bodyDiv)
+        divProcedencia.append(element)
+    })
 }
 async function validacionDatosTransaccionModal(valueProcedencia,valueCantidad,valueFecha,valuePersonExternal,producto){
     if(valueCantidad && (valueCantidad > 0)){
@@ -303,14 +352,14 @@ function templateModalDialogo(modal,producto){
     modal +=`   <br><br>Marca: <input type="text" id="marcaT" placeholder="ejemplo: Nike">
                 <br><br>Color: <input type="text" id="colorT" placeholder="ejemplo: Rojo">
                 <br><br>Procedencia:<select id="procedenciaT" name="procedenciaT">
+                <option selected>-Seleccione opcion-</option>
                 <option value="donacion">Donacion</option>
                 <option value="compra">Compra</option>
+                <option value="Transferencia">Transferencia</option>
                 <select>
-                <br><br>Donante:<select id="usuariosExternos" name="usuariosExternos">`
-    producto[1].forEach((userExternal)=>{
-        modal+=`    <option value="${userExternal.nombre}">${userExternal.nombre}</option>`
-    })
-    modal +=`       </select> <a href="#" id="nuevoDonante" onclick="nuevoDonante('usuarioExterno')">nuevo donante</a><br><br>
+                <br>
+                <div id="divTransferencia"></div>
+                <br>
                     <button id="registrar_edicion" name="registrar_edicion" value="Guardar cambios">Guardar</button>
                             <button id="closeModal" >Cancelar</button>
                     <br><br></div>

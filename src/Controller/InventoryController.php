@@ -340,8 +340,9 @@ class InventoryController extends AbstractController
         $producto = $em->getRepository(Producto::class)->findOneBy(['codigo'=>$idP]);
         $usuario = $em->getRepository(Usuario::class)->findAll();
         $usuarioExternos = $this->filtroUsuariosExternos($usuario);
+        $usuarioInterno = $this->filtroUsuariosInternos($usuario);
         if($producto){
-            return $this->json([$producto,$usuarioExternos]);   
+            return $this->json([$producto,$usuarioExternos, $usuarioInterno]);   
         }else{
             return $this->json(null);
         }
