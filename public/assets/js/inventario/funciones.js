@@ -272,18 +272,18 @@ function informacionProcedencia(producto){
             bodyDiv +=`</select> <br><a href="#" id="nuevoDonante" onclick="nuevoDonante('usuarioExterno')">nuevo donante</a></p>`  
         }else{
             if(tipoProcedencia.value == "compra"){
-                bodyDiv += `<p><br>Donante:  <select id="usuariosExternos" name="usuariosExternos">`
+                bodyDiv += `<p><br>Proveedor:  <select id="usuariosExternos" name="usuariosExternos">`
                 producto[1].forEach((userExternal)=>{
                     bodyDiv+=`<option value="${userExternal.nombre}">${userExternal.nombre}</option>`
                 })
-                bodyDiv +=`</select> <a href="#" id="nuevoDonante" onclick="nuevoDonante('usuarioExterno')">nuevo donante</a>`  
-                bodyDiv += `<br><letter>*N° Ruc</letter>
+                bodyDiv +=`</select> <a href="#" id="nuevoDonante" onclick="nuevoDonante('usuarioExterno')">nuevo donante</a><br>`  
+                bodyDiv += `<br><letter>*N° Ruc</letter><br>
                             <input type="number" id="rucCliente"  min="0" placeholder="060606054001" ><br>
-                            <letter>*Subtotal</letter>
+                            <letter>*Subtotal</letter><br>
                             <input type="number" id="subtotal"  min="0" placeholder="400" ><br>
-                            <letter>*Iva</letter>
+                            <letter>*Iva</letter><br>
                             <input type="number" id="iva" min="0" placeholder="12" ><br>
-                            <letter>*Valor total</letter>
+                            <letter>*Valor total</letter><br>
                             <input type="number" id="valorTotal" min="0" placeholder="123" ><br>
                             </p>`
             }else{

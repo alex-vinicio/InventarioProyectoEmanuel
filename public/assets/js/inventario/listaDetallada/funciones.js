@@ -187,7 +187,7 @@ function bajaCaducidadDiv(data, producto){
             Motivo o detalle: <select id="motivoBaja">
                                 <option value="Desecho">Por desecho</option>
                                 <option value="Incineración">Por Incineración</option>
-                                <option value="otro">Otros motivos</option></select>                                
+                                <option value="otroMotivo">Otros motivos</option></select>                                
                                 <p>`
     return data;
 }
@@ -205,7 +205,7 @@ function ventaDiv(data){
 }
 function traspasoDiv(data, producto){
     data += `<p> <letter>Informacion de traspaso</letter>
-                <br><br>Persona encargada traspaso: <select id="usuariosExternos" name="usuariosExternos">`
+                <br><br>Persona encargada del traspaso: <select id="usuariosExternos" name="usuariosExternos">`
                 producto[2].forEach( funcionario => {
                     data += `<option value="${funcionario.nombre}">${funcionario.nombre} (${funcionario.mail})</option>`
                 });
@@ -320,12 +320,65 @@ async function registrarAccionesModal(cantidad,persona,producto, forData){
         var $dataMotivo2=null
         var $dataMotivo3=null
     }
+    if($dataMotivo1 ==2){
+        generatePDF(persona,marca,color,producto[0].id,cantidad,valueFecha,producto[0].codigoProducto.codigo,$dataMotivo3);
+    }
+    console.log(producto)
     const data = new URLSearchParams(`idT=${producto[0].id}&action=${accion}&number=${cantidad}&date=${valueFecha}&person=${persona}&idP=${producto[0].codigoProducto.codigo}&marca=${marca}&color=${color}&proceden=${proceden}&idM=${$dataMotivo1}&motivo=${$dataMotivo2}&detalleM=${$dataMotivo3}`)
     const response = await getDataPost('newTransaccionsProduct', data)
     if(response){
         alertify.success('transaccion guardada!')
     }
 }
+function generatePDF(personaA,marca,color,idT,cantidad,valueFecha,idP, motivo){
+    let fecha = new Date();
+    var dd = {
+        content: [
+            {
+                text: 'Autorizacion de la baja del producto\n\n',
+                style: 'header',
+                alignment: 'center'
+            },
+            {
+                text: [
+                    '\n Fecha: '+setDateString(fecha)+'\n',
+                    'Encargado autorizar: '+personaA+'\n',
+                    'Codigo transaccion: '+idT+'\n',
+                    'Codigo Producto: '+idP+'\n',
+                    'Marca: '+marca+'\n',
+                    'Color: '+color+'\n',
+                    'Cantidad: '+cantidad+'\n',
+                    'Fecha caducidad:'+valueFecha+'\n\n',
+                    ],
+                style: 'header',
+                bold: false
+            },
+            {
+                text: ['\n',
+                    'Motivo de baja por caducidad: Por '+motivo+'\n\n\n\n\n'],
+                style: 'subheader'
+            },
+            {
+                text: ['........................\n',
+                        personaA+'\n'],
+                style: 'subheader'
+            },
+        ],
+        styles: {
+            header: {
+                fontSize: 18,
+                bold: true,
+                alignment: 'justify'
+            },
+            subheader: {
+                fontSize: 15,
+                bold: true
+            }
+        }
+    }
+
+    pdfMake.createPdf(dd).download();
+} 
 function templateModalDialogo(modal,producto){
     modal +=`<div class="modal-posision">
                 <div class="modal-header">

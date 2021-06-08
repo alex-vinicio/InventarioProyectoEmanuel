@@ -36,6 +36,10 @@
             <script type="text/javascript" src="{{ asset('assets/js/globalFunctions/functionsTemplates.js') }}"></script>
 			<script type="text/javascript" src="{{ asset('assets/library/generateExcel/xlsx.full.min.js') }}"></script>
 			<script type="text/javascript" src="{{ asset('assets/library/generateExcel/FileSaver.js') }}"></script>
+			{# pdf document #}
+			<script type="text/javascript" src="{{ asset('assets/library/pdf/build/pdfmake.js') }}"></script>
+			<script type="text/javascript" src="{{ asset('assets/library/pdf/build/pdfmake.min.js') }}"></script>
+			<script type="text/javascript" src="{{ asset('assets/library/pdf/build/vfs_fonts.js') }}"></script>
         {% block javascripts %}{% endblock %}
     </body>
 </html>
