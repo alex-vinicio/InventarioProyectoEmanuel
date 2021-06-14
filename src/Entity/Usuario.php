@@ -72,6 +72,21 @@ class Usuario
     private $ipModificacion;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="telefono", type="string", length=50, nullable=true)
+     */
+    private $telefono;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="detalle_usuario", type="string", length=1000, nullable=true)
+     */
+    private $detalle;
+
+
+    /**
      * @var \Rol
      *
      * @ORM\ManyToOne(targetEntity="Rol")
@@ -166,6 +181,30 @@ class Usuario
     public function setIpModificacion(string $ipModificacion): self
     {
         $this->ipModificacion = $ipModificacion;
+
+        return $this;
+    }
+
+    public function getTelefono(): ?string
+    {
+        return $this->telefono;
+    }
+
+    public function setTelefono(string $telefono): self
+    {
+        $this->telefono = $telefono;
+
+        return $this;
+    }
+
+    public function getDetalle(): ?string
+    {
+        return $this->detalle;
+    }
+
+    public function setDetalle(string $detalle): self
+    {
+        $this->detalle = $detalle;
 
         return $this;
     }

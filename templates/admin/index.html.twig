@@ -14,11 +14,10 @@
         flex-direction: column;
         margin: 15px;
     }
-    .inner {
+    .inner1 {
       position: absolute;
       width: 100%;
-      height: 100%;
-      background-color:#f1f1f1; 
+      height:100%; 
     }
     .responsive {
         width: 85%;
@@ -26,11 +25,11 @@
     }
 </style>
 
-<div class="inner">
+<div class="inner1">
     <div class="example-wrapper">
         <div id="imagen" style="width: 60%; padding-left: 15px;float:left; margin-top: 6%; padding-bottom: auto;">
-            
             <img  class="responsive" src='assets/img/inventario.jpg' >
+            <br><br><br><br><br>
         </div>
         <div id="general" style="width: 35%; float:right; border-style: solid; margin-top: 5%; background: #EDFCF2;">
             <div id="titulo" class="padre">
@@ -42,15 +41,34 @@
             <div id="cuadro_login" style="margin: 15px;">
                 <form name="login" >
                     <label>Correo</label><br>
-                    <input type="text" name="correo_u" value="" placeholder="ejemplo@hotmail.com .."><br>
+                    <input class="form-control"  type="text" name="correo_u" value="" placeholder="ejemplo@hotmail.com .."><br>
                     <label>contraseña</label><br>
-                    <input type="password" name="contrasenia_u" value="" placeholder="Contraseña.."><br><br>
+                    <input class="form-control" type="password" name="contrasenia_u" value="" placeholder="Contraseña.."><br><br>
                     <button class="btn btn-primary">Iniciar Sesion</button>
                 </form>
             </div>
         </div>
+        <div class="footer">
+            <div class="row">
+                <div class="column" style="background-color: #b3dce6e6;">
+                    <h4><b>Redes sociales</b></h4>
+                    <p>
+                        <h5 style="text-align: weight;"><a style="text-align: center;" href="{{path ('manualUsuario')}}" >Manual de usuario</a></h5>
+                        <h5 style="text-align: weight;"><a style="text-align: center;" href="https://www.facebook.com/CEMCHEMANUEL/" target="_blank">¡Visitanos en Facebook!</a></h5>
+                        <h5 style="text-align: weight;"><a style="text-align: center;" href="https://www.twitter.com/" target="_blank">¡Visitanos en Twitter!</a></h5>
+                    </p>
+                </div>
+                <div class="column" style="background-color: #b3dce6e6;">
+                    <h4><b>Soporte técnico</b></h4>
+                    <p>e-mail: alexandino2011@gmail.com<br>
+                        N° celular: 0997765061
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
 {% endblock %}
 {% block javascripts %} 
     <script type="text/javascript" src="{{ asset('assets/js/usuario/index.js') }}"></script>

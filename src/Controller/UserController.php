@@ -60,18 +60,25 @@ class UserController extends AbstractController
         $id = $request->request->get('id');
         $ipC = $request->getClientIp();
         $userLogin = $cache->get('usuario');
+        $telefono = $request->request->get('telefono');
+        $organizacion = $request->request->get('organizacion');
         $rol = $em->getRepository(Rol::class)->findOneBy(['id'=>$tipo]);
-        if(!$id){
-            $usuario = new Usuario;
-            $aux = "creado";
+        if($userLogin){
+            if(!$id){
+                $usuario = new Usuario;
+                $aux = "creado";
+            }else{
+                $usuario = $em->getRepository(Usuario::class)->findOneBy(['id'=>$id]);
+                $aux = "modificado";
+            }
+            $usuario = $this->setUser($rol,$nombre,$pws,$correo,$usuario,$ipC, $telefono,$organizacion);
+            $this->flushUser($usuario,$em);
+        
+            return $this->json([$aux,$userLogin->getIdRol()->getId()]);
         }else{
-            $usuario = $em->getRepository(Usuario::class)->findOneBy(['id'=>$id]);
-            $aux = "modificado";
+            return $this->json("Usuario no permitido");
         }
-        $usuario = $this->setUser($rol,$nombre,$pws,$correo,$usuario,$ipC);
-        $this->flushUser($usuario,$em);
-
-        return $this->json([$aux,$userLogin->getIdRol()->getId()]);
+        
     }
 
     /**
@@ -167,7 +174,7 @@ class UserController extends AbstractController
         return $this->json(true);
     }
     //                  funciones privadas   
-    private function setUser(Rol $rol, $nombre, $pws, $correo,Usuario $usuario,$ipC){
+    private function setUser(Rol $rol, $nombre, $pws, $correo,Usuario $usuario,$ipC, $telefono, $organizacion){
         $fechaActual = date('Y-m-d');
         $fechaOperacion = \DateTime::createFromFormat('Y-m-d', $fechaActual);
 
@@ -179,6 +186,8 @@ class UserController extends AbstractController
                 ->setNuevaClave(false)
                 ->setFechaModificacion($fechaOperacion)
                 ->setIpModificacion($ipC)
+                ->setTelefono($telefono)
+                ->setDetalle($organizacion)
                 ->setIdRol($rol)
                 ;
         return $usuario;

@@ -8,11 +8,14 @@ const $pwd = document.getElementById('passUserInter');
 (async function load(){
     await generalSelector($divPwd,$divTipoU)
     const request = await getData('getUserModifie'); //verifica si se redirecciono para modificar usuario
-    if(request[1]=== true){
-        await getDatosupdate(request[0],$form)
-    }else{
-        $form.reset();
+    if(request){
+        if(request[1]=== true){
+            await getDatosupdate(request[0],$form)
+        }else{
+            $form.reset();
+        }
     }
+    
 })()
 
 $buttonCancel.addEventListener('click', async (event)=>{
@@ -37,6 +40,8 @@ $form.addEventListener('submit', async (event)=>{
     data.append('passw', $form.elements.passUserInter.value)
     data.append('correo', $form.elements.correoU.value)
     data.append('tipoU', $form.elements.tipoU.value) //añadir un elemento en el formdata
+    data.append('telefono', $form.elements.telefono.value)
+    data.append('organizacion', $form.elements.organizacion.value)
     const response = await getDataPost('addUser',data)
     const clearCache = await getData('limpiarCacheModifie')
     if(response[0]){

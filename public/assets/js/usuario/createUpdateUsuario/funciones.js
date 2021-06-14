@@ -31,6 +31,7 @@ function templateTipoU(containerTipoU,codU){
         select += `<option value="1">Administrador</option>
                     <option value="2">Casa Hogar</option>
                     <option value="3">Centro Medico</option>
+                    <option value="4">personal laboral</option>
                     <option value="8">Empresa</option>
                     <option value="9">Persona natural</option>`
     }else{
@@ -49,4 +50,6 @@ async function getDatosupdate(data,form){
     form.elements.correoU.value = data.usuario
     form.elements.passUserInter.value = data.password
     form.elements.tipoU.value = data.idRol.id
+    form.elements.organizacion.value = data.detalle
+    form.elements.telefono.value = data.telefono
 }

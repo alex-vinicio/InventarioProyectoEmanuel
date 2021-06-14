@@ -376,7 +376,6 @@ function generatePDF(personaA,marca,color,idT,cantidad,valueFecha,idP, motivo){
             }
         }
     }
-
     pdfMake.createPdf(dd).download();
 } 
 function templateModalDialogo(modal,producto){
