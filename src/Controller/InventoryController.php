@@ -104,7 +104,7 @@ class InventoryController extends AbstractController
                 }
                 $operacion = $producto->getCantidadProducto() - $cantidad;
                 $operacionTransac = $transaccion->getDescripcionProducto() - $cantidad;
-                $detailTransaction = $transaccion->getDetalleTransaccion()."[".$cantidad.",".$fecha.",".$usuarioExterno."]";
+                $detailTransaction = $transaccion->getDetalleTransaccion()."[".$cantidad.",".$fecha.",".$usuarioExterno.",S]";
                 $producto
                         ->setCantidadProducto($operacion);
                 $transaccion
@@ -114,8 +114,8 @@ class InventoryController extends AbstractController
             }else{
                 $transaccion = new Transaccion();
                 $operacion = $producto->getCantidadProducto() + $cantidad;
-                $detailTransaction = "[".$cantidad.",".$fecha.",".$usuarioExterno."]"; //add . before = if concatenate a strings
-                $extraDetalleT = "nada";
+                $detailTransaction = "[".$cantidad.",".$fecha.",".$usuarioExterno.",E]"; //add . before = if concatenate a strings
+                $extraDetalleT = "[".$dataTransaccion->get('motivo').",".$dataTransaccion->get('detalleM')."]";
                 $producto
                         ->setCantidadProducto($operacion);
                 $transaccion

@@ -263,7 +263,6 @@ function informacionProcedencia(producto){
     tipoProcedencia.addEventListener('change', async (event)=>{
         divProcedencia.innerHTML = ""
         let bodyDiv = ""
-        console.log(producto)
         if(tipoProcedencia.value == "donacion"){
             bodyDiv += `<p><br>Donante:  <select id="usuariosExternos" name="usuariosExternos">`
             producto[1].forEach((userExternal)=>{
@@ -283,8 +282,6 @@ function informacionProcedencia(producto){
                             <input type="number" id="subtotal"  min="0" placeholder="400" ><br>
                             <letter>*Iva</letter><br>
                             <input type="number" id="iva" min="0" placeholder="12" ><br>
-                            <letter>*Valor total</letter><br>
-                            <input type="number" id="valorTotal" min="0" placeholder="123" ><br>
                             </p>`
             }else{
                 bodyDiv += `<p><br>Responsable:  <select id="usuariosExternos" name="usuariosExternos">`
@@ -318,14 +315,42 @@ async function registrarAccionesModal(procedencia,cantidad,valueFecha,persona,pr
     let accion = "entrada"
     var marca = document.getElementById('marcaT').value
     var color = document.getElementById('colorT').value
- 
-    const data = new URLSearchParams(`action=${accion}&number=${cantidad}&date=${valueFecha}&person=${persona}&idP=${producto[0].codigo}&marca=${marca}&color=${color}&proceden=${procedencia}`)
-    const response = await getDataPost('newTransaccionsProduct', data)
+    var motivo = null
+    motivo = dataDetalles()
+    if(motivo[0] && motivo[1]){
+        const data = new URLSearchParams(`action=${accion}&number=${cantidad}&date=${valueFecha}&person=${persona}&idP=${producto[0].codigo}&marca=${marca}&color=${color}&proceden=${procedencia}&motivo=${motivo[0]}&detalleM=${motivo[1]}`)
+        const response = await getDataPost('newTransaccionsProduct', data)
 
-    if(response){
-        alertify.success('transaccion guardada!')
+        if(response){
+            alertify.success('transaccion guardada!')
+        }
+    }else{
+        alertify.error('Llene campos vacios!') 
     }
 }
+
+function dataDetalles(){
+    var motivo, detalle = null;
+    var procedencia = document.getElementById('procedenciaT')
+    if(procedencia.value === "donacion"){
+        motivo = "Donacion";
+        detalle = "Externo"
+    }else{ if(procedencia.value === "compra"){
+            if(document.getElementById('iva').value && document.getElementById('subtotal').value){
+                var iva = parseInt(document.getElementById('iva').value)
+                var subtotal = parseInt(document.getElementById('subtotal').value)
+                motivo = "Compra";
+                detalle = `Ruc:${document.getElementById('rucCliente').value},Subtotal${subtotal} + ${iva}%=${(subtotal+((subtotal/100)*iva))}`
+            }
+        }else{ if(procedencia.value === "Transferencia"){
+                motivo = "Transferencia";
+                detalle = "Interno"
+            }
+        }
+    }
+    return [motivo, detalle];
+}
+
 function templateModalDialogo(modal,producto){
     modal +=`<div class="modal-posision"><div class="modal-header">
                 <span class="close">&times;</span>

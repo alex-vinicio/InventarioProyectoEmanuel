@@ -363,6 +363,11 @@ function generatePDF(personaA,marca,color,idT,cantidad,valueFecha,idP, motivo){
                         personaA+'\n'],
                 style: 'subheader'
             },
+            {
+                text: ['\n\n\n\n\n\n\n\n\n\n         ........................                                   ........................\n',
+                        '                 Entregado                                            Recibido\n'],
+                style: 'subheader'
+            },
         ],
         styles: {
             header: {
@@ -428,7 +433,7 @@ function changueModal(modal, producto){
         producto[1].forEach((userExternal)=>{
             modal+=`<option value="${userExternal.nombre}">${userExternal.nombre}</option>`
         })
-        modal +=`</select>  <a style="margin-left:15px;" href="#" id="nuevoDonante" onclick="nuevoDonante('usuarioExterno')">nuevo beneficiario</a><br><br>`    
+        modal +=`</select><br><a style="margin-left:15px;" href="#" id="nuevoDonante" onclick="nuevoDonante('usuarioExterno')">nuevo beneficiario</a><br><br>`    
     }
     return modal;
 }
