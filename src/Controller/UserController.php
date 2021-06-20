@@ -117,6 +117,49 @@ class UserController extends AbstractController
             return $this->json("Usuario no permitido");
         }
     }
+    //custodio cache
+    /**
+     * @Route("/cacheCustodioAsignacion", name="cacheCustodioAsignacion")
+     */
+    public function cacheCustodioAsignacion(Request $request, EntityManagerInterface $em,CacheService $cache){
+        $usuario = $cache->get('usuario');
+        $idU = $request->request->get('idU');
+        $tipoRol = $usuario->getIdRol()->getId();
+        if($tipoRol === 1){
+            $userModifie = $em->getRepository(Usuario::class)->findOneBy(['id'=>$idU]);
+            if($userModifie){
+                $cache->add('idUserCustodio',$idU);
+                return $this->json(true);
+            }else{
+                return $this->json(null);
+            }
+        }else{
+            return $this->json("Usuario no permitido");
+        }
+    }
+    /**
+     * @Route("/getUserCustodio", name="getUserCustodio")
+     */
+    public function getUserCustodio( CacheService $cache, EntityManagerInterface $em){
+        $idU = $cache->get('idUserCustodio');
+        if($idU){
+            $usuario = $em->getRepository(Usuario::class)->findOneBy(['id'=>$idU]);
+            return $this->json([$usuario->getNombre(),$usuario->getId(), $usuario->getDetalle()]);
+        }else{
+            return $this->json(null);
+        }
+    }
+    /**
+     * @Route("/limpiarCacheCustodioU", name="limpiarCacheCustodioU")
+     */
+    public function limpiarCacheCustodioU( CacheService $cache){
+        $cache->delete('idUserCustodio');
+        if($cache->get('idUserCustodio')){
+            return $this->json(false);
+        }else{
+            return $this->json(true);
+        }
+    }
     /**
      * @Route("/getUserModifie", name="getUserModifie")
      */
@@ -148,10 +191,11 @@ class UserController extends AbstractController
     /**
      * @Route("/getUserData", name="getUserData")
      */
-    public function getUserData( CacheService $cache){
+    public function getUserData( CacheService $cache, EntityManagerInterface $em){
         $usuario = $cache->get('usuario');
         if($usuario){
-            return $this->json([$usuario->getNombre(),$usuario->getIdRol()->getId()]);
+            $user = $em->getRepository(Usuario::class)->findOneBy(['id'=>$usuario->getId()]);
+            return $this->json([$user->getNombre(),$user->getIdRol()->getId(), $user->getDetalle()]);
         }else{
             return $this->json(null);
         }
@@ -165,6 +209,7 @@ class UserController extends AbstractController
         // limpieza cache usuario
         $cache->delete('usuario');
         $cache->delete('idUserModifie');
+        $cache->delete('idUserCustodio');
         //limpieza cache productos
         $cache->delete('patrimonio');
         $cache->delete('departamentoPE');

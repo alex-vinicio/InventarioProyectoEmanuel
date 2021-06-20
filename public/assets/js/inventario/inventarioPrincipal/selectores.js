@@ -5,6 +5,9 @@ const $spoiler1 = document.getElementById('spoiler1')
 const $spoiler2 = document.getElementById('spoiler2')
 const $formHidden = document.forms.hiddenvehiInm
 const $forDatesReport = document.forms.reporteFechas
+const $divTemplate = document.getElementById('firstAsignation');
+const $divUserCustodio = document.getElementById('userCustodioAsignation');
+const $divButonAsignation = document.getElementById('buttonAsignationC');
 let list = [];
 const $divListInventoryInmueble = document.getElementById('tablaProductoPatrimInmueble');
 const $divListInventaryP = document.getElementById('tablaProductoPatrim');
@@ -13,7 +16,14 @@ const $divListInventaryP = document.getElementById('tablaProductoPatrim');
     await getTablePatrimonio(list)
     $forDatesReport.elements.starDate.max = new Date().toISOString().split("T")[0];//controlar fecha ingreso hasta hoy
     $forDatesReport.elements.finishDate.max = new Date().toISOString().split("T")[0];
-    //await numeroReportes()
+    //carga custodio
+    const custodio = await getData('getUserCustodio')
+    await getData('deleteSelectCustodio')
+    if(custodio){
+        await getTableCustodioDesign(custodio, $divTemplate,$divUserCustodio,$divButonAsignation);
+    }else{
+        await getTableCustodioDesign(null, $divTemplate, $divUserCustodio, $divButonAsignation);
+    }
 })()
 
 $forDatesReport.addEventListener('submit', async (event)=>{
@@ -27,7 +37,6 @@ $forDatesReport.addEventListener('submit', async (event)=>{
     }else{
         await exportarExcel('total')
     }
-    
 })
 
 $optionsForm.addEventListener('change', async ()=>{
@@ -45,7 +54,6 @@ $spoiler2.addEventListener('click', async ()=>{
 
 async function getTablePatrimonio(list){
     $divListInventaryP.innerHTML=""
-    console.log(list)
     if($optionsForm.option.value == "vehiculos"){
         list.pop() 
         list.push(1)

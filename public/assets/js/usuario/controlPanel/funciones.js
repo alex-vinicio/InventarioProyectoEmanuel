@@ -58,6 +58,7 @@ function templateTitleProducCadu(table){
                     </form>
                 </div>
             </th>
+            <th>Asignar \ncustodio</th>
             <th>Accion</th>
         </tr>
     </thead>`
@@ -79,10 +80,31 @@ function templateUsuario(table,usuario,numero){
         table += `<td>Suspendido</td>`
     }
     table = controlDates(table,usuario)
-    table += `<td>${usuario.idRol.nombreRol}</td>
-    <td class="text-center"><i class="text-danger fa fa-trash" onclick="confirmDeleteCur(${usuario.id})"></i></td>`
+    table += `<td>${usuario.idRol.nombreRol}</td>`
+    if(usuario.idRol.id >=1 && usuario.idRol.id <= 5){
+        table += `<td class="text-center" onclick="confirmCustodio(${usuario.id})" ><a href="#"><img width="25px" src="assets/img/asignar_tarea.png"></a></td>`
+    }else{
+        table += `<td class="text-center"> --- </td>`
+    }
+    table +=`<td class="text-center"><i class="text-danger fa fa-trash" onclick="confirmDeleteCur(${usuario.id})"></i></td>`
     table+=`</tr>`
     return table
+}
+//asignar custodio a cache
+function confirmCustodio(idU){
+    alertify.confirm('¿Desea continuar con la asignacion de custodio al usuario seleccionado?', function(e){
+        if(e){ cacheAsignacion(idU)}
+    });
+}
+async function cacheAsignacion(idU){
+    const data = new URLSearchParams(`idU=${idU}`)
+    const clearCache = await getData('limpiarCacheCustodioU')
+    const response = await getDataPost('cacheCustodioAsignacion',data)
+    if(response === true){
+        location.href="patrimonio";
+    }else{
+        alertify.error("Accion no permitida")
+    }
 }
 //eliminar un usuario
 function confirmDeleteCur(id){

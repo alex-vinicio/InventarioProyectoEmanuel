@@ -5,5 +5,6 @@ const $divTableU = document.getElementById('tablaUsuarios');
 (async function load(){
     await userNavigation($divNameUser)
     await getTableUsers($divTableU)
+    const request = await getData('limpiarCacheCustodioU')
 })()
 

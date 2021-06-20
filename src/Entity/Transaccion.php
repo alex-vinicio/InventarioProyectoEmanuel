@@ -88,14 +88,14 @@ class Transaccion
     /**
      * @var string|null
      *
-     * @ORM\Column(name="detalle_transaccion", type="string", length=2000, nullable=true)
+     * @ORM\Column(name="detalle_transaccion", type="string", length=4000, nullable=true)
      */
     private $detalleTransaccion;
 
     /**
      * @var string|null
      *
-     * @ORM\Column(name="data_operacion", type="string", length=1000, nullable=true)
+     * @ORM\Column(name="data_operacion", type="string", length=4000, nullable=true)
      */
     private $dataOperacion;
 

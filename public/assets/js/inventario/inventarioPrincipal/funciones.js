@@ -548,3 +548,196 @@ async function updateAF(id, tipo){
     }
    
 }
+//seccion custodio
+async function getTableCustodioDesign(verifyUser, divTempalte, divUserC, divButton){
+    divTempalte.innerHTML = "";
+    divUserC.innerHTML = "";
+    divButton.innerHTML = "";
+    let dataTable = ``
+    let dataUserC = ``
+    let dataButtonC = ``
+    if(verifyUser){
+        const productNoCustodio = await getData('productNoCustodio');
+        dataUserC += `<p><label> <b>Custodia:</b></label> ${verifyUser[0]} </p><br>`
+        renderTableDesign( dataTable,productNoCustodio, divTempalte)
+        dataButtonC += `<button class="btn btn-primary" onclick="asignarCustodio(${verifyUser[1]},'${verifyUser[0]}','${verifyUser[2]}')">Asignar</button>`
+    }else{
+        dataUserC += `<label>--</label>`
+        renderTableDesign( dataTable, null, divTempalte) 
+        dataButtonC += ``
+    }
+    const element = createTemplate(dataUserC)
+    divUserC.append(element)
+
+    const element1 = createTemplate(dataButtonC)
+    divButton.append(element1)
+}
+function renderTableDesign(table, lista, $container){
+    let numero = 1
+    if(lista){
+
+        table +=`<table id="custodioTable" class="table table-responsive table-striped table-hover table-condensed table-bordered">`
+        table = templateTitleCustodio(table)
+        if(lista.length != 0){
+            lista.forEach((productos)=>{
+                table = templateProducCustodio(table,productos,numero)
+                numero++
+            })
+        }else{
+            table += `<tr><td colspan="6">No hay Datos para mostrar</td></tr>`
+        }
+    }else{
+        table += `<p>¡Seleccione un usuario a asignar, en la lista de usuarios del sistema o pestaña (Panel de control).!<p>`
+    }
+    const element = createTemplate(table)
+    $container.append(element)
+}
+function templateTitleCustodio(table){
+    table += `
+    <thead> 
+        <tr>
+            <th>N°</th>
+            <th>Codigo</th>
+            <th>Descripcion</th>
+            <th>Estado</th>
+            <th>Observacion</th>
+            <th>Accion</th>
+        </tr>
+    </thead>`
+    return table
+}
+function templateProducCustodio(table,producto,numero){
+    table += `<tr>
+            <td>${numero}</td>
+            <td>${producto.codigo}</td>
+            <td>${producto.nombre}: Marca ${producto.marca}, color ${producto.color}, \ncantidad ${producto.cantidad}, pertenece a ${producto.departamento}</td>
+            <td>${producto.estado}</td>
+            <td>${producto.observaciones} </td>`
+    table += `<td><input type="checkbox" name="${producto.id}" onclick="cargarCheck(${producto.id})" value="${producto.id}"></td>`
+    table+=`</tr>`
+    return table;
+}
+async function cargarCheck(idCheck){
+    const data = new URLSearchParams(`id=${idCheck}`)
+    const response = await getDataPost('estadoSelectCustodio',data)
+}
+async function asignarCustodio(idU, nombreU, nombreOrg){
+    alertify.confirm('¿Desea continuar con la asignacion de custodio a '+nombreU+'?', function(e){
+        if(e){generatePDFCustodio(idU, nombreU, nombreOrg)}
+    });
+}
+async function generatePDFCustodio(idUserSelected,nombreU,nombreOrg){
+    let fecha = new Date();
+    let mes = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre","Octubre", "Noviembre", "Diciembre"]
+    const userD = await getData('getUserData')
+    const custodioP = await getData('productNoCustodioMarcado');
+    var objetos = []
+    var objetosArray = []
+    var count = 1;
+    objetosArray.push([{text: 'N°', style: 'tableHeader',bold: true},{text: 'Codigo', style: 'tableHeader',bold: true},{ text: 'Descripcion', style: 'tableHeader',bold: true},{text: 'Estado', style: 'tableHeader',bold: true},{text:'Observaciones', style: 'tableHeader',bold: true}])
+    custodioP.forEach((rowsData)=>{
+        objetos.push({
+            0 : count,
+            1 : rowsData.codigo,
+            2: `${rowsData.nombre}: Marca ${rowsData.marca}, color ${rowsData.color}, \ncantidad ${rowsData.cantidad}, pertenece a ${rowsData.departamento}`,
+            3 : rowsData.estado,
+            4 : rowsData.observaciones
+        });
+    
+        count++;
+    })
+    objetos.forEach((rowsData)=>{
+        objetosArray.push([rowsData[0], rowsData[1],rowsData[2],rowsData[3],rowsData[4]])
+    })
+
+    var dd = {
+        content: [
+            {
+                stack: [
+                    'Cayambe, '+fecha.getDate()+' de '+ mes[fecha.getMonth()]+' del '+fecha.getFullYear(),
+                ],
+                style: 'subheader',
+                alignment: 'left'
+            },
+            {
+                text: '\nACTA DE ENTREGA - RECEPCION\n',
+                style: 'header',
+                alignment: 'center'
+            },
+            {
+                text: [
+                    '\n Por medio del presente dejo constancia de la entrega de los siguientes Bienes Muebles y/o Equipos/Productos que se detallan a continuación: \n\n',
+                    ],
+                style: 'subheader',
+                bold: false
+            },//desarrollo de la tabla
+            {
+                style: 'tableExample',
+                table: {
+                    body:
+                        objetosArray
+                }
+            },
+            {
+                text: ['\n',
+                    'En acuerdo de lo expresado en este documento las partes que intervienen firman de común acuerdo para fines de control interno, archivo y custodia de bienes.\n\n'],
+                style: 'subheader',
+                bold: false
+            },
+            {
+                alignment: 'justify',
+                bold: false,
+                columns: [
+                    {
+                        text: ['ENTREGADO POR: \n\n',
+                        '\n'+userD[0]+'\n',
+                        userD[2]],
+                        style: 'subheader',
+                        bold: false
+                    },
+                    {
+                        text: ['\tRECIBIDO POR: \n\n',
+                        '\n\t'+nombreU+'\n',
+                        '\t'+nombreOrg],
+                        style: 'subheader',
+                        bold: false
+                    }
+                ]
+            },
+            {
+                text: ['\n\n\nAUTORIZADO POR:\n',
+                        '\n\nIng. Rolando Escola',
+                    '\nDirector Proyectos Emanuel'],
+                style: 'subheader',
+                alignment: 'center'
+            },
+        ],
+        styles: {
+            header: {
+                fontSize: 18,
+                bold: true,
+                alignment: 'justify'
+            },
+            subheader: {
+                fontSize: 15,
+                bold: true
+            }
+        }
+    }
+    pdfMake.createPdf(dd).download('Asignacion_inicial_activos.pdf')
+    //idUserSelected
+    const data = new URLSearchParams(`idUC=${idUserSelected}&tipoAccionC=0`)
+    const response = await getDataPost('modificarProductoCustodio',data)
+    if(response){
+        alertify.success("Custodio inicial asignado correctamente!")
+        setTimeout(function(){
+            console.log("I am the third log after 5 seconds");
+        },3000);
+        location.href="controlPanel";
+    }else{
+        alertify.error("Accion no permitida!");
+    }
+} 
+function retornarPC(){
+    location.href="controlPanel";
+}

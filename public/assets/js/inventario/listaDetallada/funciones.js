@@ -323,7 +323,6 @@ async function registrarAccionesModal(cantidad,persona,producto, forData){
     if($dataMotivo1 ==2){
         generatePDF(persona,marca,color,producto[0].id,cantidad,valueFecha,producto[0].codigoProducto.codigo,$dataMotivo3);
     }
-    console.log(producto)
     const data = new URLSearchParams(`idT=${producto[0].id}&action=${accion}&number=${cantidad}&date=${valueFecha}&person=${persona}&idP=${producto[0].codigoProducto.codigo}&marca=${marca}&color=${color}&proceden=${proceden}&idM=${$dataMotivo1}&motivo=${$dataMotivo2}&detalleM=${$dataMotivo3}`)
     const response = await getDataPost('newTransaccionsProduct', data)
     if(response){

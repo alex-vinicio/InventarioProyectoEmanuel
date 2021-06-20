@@ -213,6 +213,13 @@ class Producto
     private $lote;
 
     /**
+     * @var string|null
+     *
+     * @ORM\Column(name="custodio_usuario", type="integer", nullable=true)
+     */
+    private $custodio;
+
+    /**
      * @var \Unidad
      *
      * @ORM\ManyToOne(targetEntity="Unidad")
@@ -557,6 +564,18 @@ class Producto
     public function setForma(string $forma): self
     {
         $this->forma = $forma;
+
+        return $this;
+    }
+
+    public function getCustodio(): ?string
+    {
+        return $this->custodio;
+    }
+
+    public function setCustodio(string $custodio): self
+    {
+        $this->custodio = $custodio;
 
         return $this;
     }

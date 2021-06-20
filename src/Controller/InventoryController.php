@@ -132,6 +132,171 @@ class InventoryController extends AbstractController
             return $this->json("Usuario no permitido");
         }
     }
+    //seccion asignacion custodio
+    /**
+     * @Route("/productNoCustodio", name="productNoCustodio")
+     */
+    public function productNoCustodio(EntityManagerInterface $em, CacheService $cache)
+    {
+        $listaT = [];
+        $usuario = $cache->get('usuario');
+        if($usuario->getIdRol()->getId() === 1){
+            $productos = $em->getRepository(Producto::class)->findAll();
+            if($productos){
+                foreach($productos as $producto){
+                    if(!$producto->getCustodio()){
+                        array_push($listaT,[
+                            'id'=> $producto->getId(),
+                            'codigo'=> $producto->getCodigo(),
+                            'nombre'=> $producto->getDescripcionProducto(),
+                            'cantidad'=> $producto->getCantidadProducto(),
+                            'marca'=> $producto->getMarca(),
+                            'color'=> $producto->getColor(),
+                            'estado'=> $producto->getEstado(),
+                            'departamento'=> $producto->getIdUnidad()->getNombreUnidad(),
+                            'observaciones'=> $producto->getObservaciones()
+                        ]);
+                    }
+                }
+                return $this->json($listaT);
+            }else{
+                return $this->json(null);
+            }
+        }else{
+            return $this->json("Usuario no permitido");
+        }
+    }
+    //get listado checks de tablas
+    /**
+     * @Route("/productNoCustodioMarcado", name="productNoCustodioMarcado")
+     */
+    public function productNoCustodioMarcado(EntityManagerInterface $em, CacheService $cache)
+    {
+        $listaT = [];
+        $usuario = $cache->get('usuario');
+        if($usuario->getIdRol()->getId() === 1){
+            $selectC = $cache->get('selectCustodio');
+            if($selectC){
+                foreach($selectC as $check){
+                        if( $check['estado'] == 1){
+                            $producto = $em->getRepository(Producto::class)->findOneBy(['id'=>$check['id']]);
+                            array_push($listaT,[
+                                'id'=> $producto->getId(),
+                                'codigo'=> $producto->getCodigo(),
+                                'nombre'=> $producto->getDescripcionProducto(),
+                                'cantidad'=> $producto->getCantidadProducto(),
+                                'marca'=> $producto->getMarca(),
+                                'color'=> $producto->getColor(),
+                                'estado'=> $producto->getEstado(),
+                                'departamento'=> $producto->getIdUnidad()->getNombreUnidad(),
+                                'observaciones'=> $producto->getObservaciones()
+                            ]);
+                        }
+                }
+                return $this->json($listaT);
+            }else{
+                return $this->json(null);
+            }
+        }else{
+            return $this->json("Usuario no permitido");
+        }
+    }
+    //modificar producto por cutodio
+    /**
+     * @Route("/modificarProductoCustodio", name="modificarProductoCustodio")
+     */
+    public function modificarProductoCustodio(EntityManagerInterface $em, Request $request,CacheService $cache)
+    {
+        $idPT = $request->request->get('idUC');
+        $tipoAccion = $request->request->get('tipoAccionC');
+        $usuario = $em->getRepository(Usuario::class)->findOneBy(['id'=>$idPT]);
+        if($usuario){
+            $selectC = $cache->get('selectCustodio');
+            if($selectC){
+                if($tipoAccion == 0){
+                    foreach($selectC as $check){
+                        if( $check['estado'] == 1){
+                            $producto = $em->getRepository(Producto::class)->findOneBy(['id'=>$check['id']]);
+                            $producto->setCustodio($check['id']); 
+
+                            $em->persist($producto);
+                            $em->flush();
+                        }
+                    }
+                }
+                return $this->json("Ok");
+            }else{
+                return $this->json(null);
+            }
+        }else{
+            return $this->json(null);
+        }
+    }
+    //estado check
+    /**
+     * @Route("/deleteSelectCustodio", name="deleteSelectCustodio")
+     */
+    public function deleteSelectCustodio( CacheService $cache)
+    {
+        $cache->delete('selectCustodio');
+        return $this->json(true);
+    }
+    /**
+     * @Route("/estadoSelectCustodio", name="estadoSelectCustodio")
+     */
+    public function estadoSelectCustodio(EntityManagerInterface $em, CacheService $cache, Request $request)
+    {
+        $listaT = [];
+        $selectC = [];
+        $idPC = intval($request->request->get('id'));
+        $selectC = $cache->get('selectCustodio');
+        //return $this->json($idPC);
+        if($selectC){
+            $listaT = $selectC;
+            $cache->delete('selectCustodio');
+            $valueExist = false;
+            foreach($selectC as $object){
+                if(intval($object['id']) === $idPC){
+                    $valueExist = true;
+                }
+            }
+            if($valueExist !== true){
+                array_push($listaT, [
+                    'id'=> $idPC,
+                    'estado'=> 1
+                ]);
+            }else{
+                $listaT = [];
+                foreach($selectC as $object){
+                    if(intval($object['id']) === $idPC){
+                        if($object['estado'] === 0){
+                            array_push($listaT, [
+                                'id'=> $idPC,
+                                'estado'=> 1
+                            ]);
+                        }else{
+                            array_push($listaT, [
+                                'id'=> $idPC,
+                                'estado'=> 0
+                            ]);
+                        }
+                    }else{
+                        array_push($listaT,$object);
+                    }
+                }
+            }
+            $cache->add('selectCustodio', $listaT);
+            return $this->json($cache->get('selectCustodio'));
+        }else{
+            array_push($listaT, [
+                'id'=> $idPC,
+                'estado'=> 1
+            ]);
+            $cache->add('selectCustodio', $listaT);
+            return $this->json($cache->get('selectCustodio'));
+        }
+    }
+    //seccion transaccion
     /**
      * @Route("/listTransaccion", name="listTransaccion")
      */
@@ -435,7 +600,7 @@ class InventoryController extends AbstractController
         $cache->add('patrimonio', $departamento);
         return $this->json($departamento);
     }
-    //cache para matrimonio
+    //cache para patrimonio
     /**
      * @Route("/cacheUpdateAF", name="cacheUpdateAF")
      */
@@ -574,8 +739,8 @@ class InventoryController extends AbstractController
         array_push($lista,[
             'idGrupo'=>"2",
             'codigo'=>$data->get('placa'),
-            'descripcionProducto'=>"",
-            'cantidad'=>0,
+            'descripcionProducto'=>"Vehiculo",
+            'cantidad'=>1,
             'unidadMedida'=>"",
             'estado'=> "activo",
             'procedencia'=> "donaciones",

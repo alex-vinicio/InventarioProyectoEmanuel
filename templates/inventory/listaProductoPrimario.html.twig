@@ -45,6 +45,9 @@
                 <input type="hidden" name="codigoProduct" value="">
                 <input type="hidden" name="procedencia" value="">
             </form>
+            <div class="derecha" style="margin-left: 5px;">
+                <button id="nuevoInmueble" onclick="retornarPC()" class="btn btn-primary">Regresar</button>
+            </div>
             <div class="derecha">
                 <button id="nuevoInmueble" onclick="nuevoProducto()" class="btn btn-primary">Nuevo activo fijo</button>
             </div>
@@ -101,6 +104,12 @@
                 <input type="date" name="finishDate" required>
                 <button>Generar</button>
             </form>
+            <br><br>
+            <h4><b>Custodio de activos</b></h4>
+            <h5><b>Asignacion inicial de activos</b></h5>
+            <div id="userCustodioAsignation"></div>
+            <div id="firstAsignation"> </div>
+            <div id="buttonAsignationC"></div>
         </div>
         <div class="footer">
             <div class="row" style="margin: 15px;">
