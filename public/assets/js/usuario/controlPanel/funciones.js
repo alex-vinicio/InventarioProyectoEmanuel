@@ -58,7 +58,7 @@ function templateTitleProducCadu(table){
                     </form>
                 </div>
             </th>
-            <th>Asignar \ncustodio</th>
+            <th>Asignar nuevo custodio</th>
             <th>Accion</th>
         </tr>
     </thead>`
@@ -204,4 +204,7 @@ async function modificarUsuario(id){
     }else{
         alertify.error("Accion no permitida")
     }
+}
+function rediriguirCustodioGenral(){
+    location.href="asignarCustodio";
 }

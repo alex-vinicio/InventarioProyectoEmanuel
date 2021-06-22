@@ -217,7 +217,7 @@ class InventoryController extends AbstractController
                     foreach($selectC as $check){
                         if( $check['estado'] == 1){
                             $producto = $em->getRepository(Producto::class)->findOneBy(['id'=>$check['id']]);
-                            $producto->setCustodio($check['id']); 
+                            $producto->setCustodio($idPT); 
 
                             $em->persist($producto);
                             $em->flush();
@@ -228,6 +228,27 @@ class InventoryController extends AbstractController
             }else{
                 return $this->json(null);
             }
+        }else{
+            return $this->json(null);
+        }
+    }
+    /**
+     * @Route("/modificarCustodioExistente", name="modificarCustodioExistente")
+     */
+    public function modificarCustodioExistente(EntityManagerInterface $em, Request $request,CacheService $cache)
+    {
+        $idUE = $request->request->get('idUE');
+        $idUR = $request->request->get('idUR');
+        $productos = $em->getRepository(Producto::class)->findBy(['custodio'=>$idUE]);
+        //return $this->json($productos);
+        if($productos){
+            foreach($productos as $producto){
+                $producto->setCustodio($idUR); 
+
+                $em->persist($producto);
+                $em->flush();
+            }
+            return $this->json("ok");
         }else{
             return $this->json(null);
         }
@@ -580,7 +601,41 @@ class InventoryController extends AbstractController
         }
         
     }
-
+    /**
+     * @Route("/getProductUserCustodio", name="getProductUserCustodio")
+     */
+    public function getProductUserCustodio(EntityManagerInterface $em, CacheService $cache)
+    {
+        $listaT = [];
+        $listaUserCheck = $cache->get('seleccionCustodios');
+        if($listaUserCheck == false || $listaUserCheck[0]['id']=="---" || count($listaUserCheck)<=1 ){
+            return $this->json(null);
+        }
+        if($listaUserCheck[1]['id']=="---"){
+            return $this->json(null);
+        }
+        $idUCustodio = $listaUserCheck[0]['id'];
+        $productos = $em->getRepository(Producto::class)->findBy(['custodio'=>$idUCustodio],['id'=>'ASC']);
+        //return $this->json(count($productos));
+        if($productos){
+            foreach($productos as $producto){
+                array_push($listaT,[
+                    'id'=> $producto->getId(),
+                    'codigo'=> $producto->getCodigo(),
+                    'nombre'=> $producto->getDescripcionProducto(),
+                    'cantidad'=> $producto->getCantidadProducto(),
+                    'marca'=> $producto->getMarca(),
+                    'color'=> $producto->getColor(),
+                    'estado'=> $producto->getEstado(),
+                    'departamento'=> $producto->getIdUnidad()->getNombreUnidad(),
+                    'observaciones'=> $producto->getObservaciones()
+                ]);
+            }
+            return $this->json($listaT);
+        }else{
+            return $this->json([]);
+        }
+    }
     /**
      * @Route("/typePoductoCache", name="typePoductoCache")
      */
@@ -599,6 +654,105 @@ class InventoryController extends AbstractController
         $departamento = $request->request->get('id');
         $cache->add('patrimonio', $departamento);
         return $this->json($departamento);
+    }
+    //cache seleccion 2 usuarios
+     /**
+     * @Route("/deleteCacheUsersCustodio", name="deleteCacheUsersCustodio")
+     */
+    public function deleteCacheUsersCustodio(CacheService $cache)
+    {
+        $cache->delete('seleccionCustodios');
+        return $this->json(true);
+    }
+    /**
+     * @Route("/cacheDosUsuarios", name="cacheDosUsuarios")
+     */
+    public function cacheDosUsuarios(EntityManagerInterface $em, Request $request,CacheService $cache)
+    {
+        $lista = [];
+        $idU = $request->request->get('id');
+        $nombreU = $request->request->get('nombre');
+        $listaSelect = $cache->get('seleccionCustodios');
+
+        if($listaSelect){
+            if(count($listaSelect) == 1){
+                if($listaSelect[0]['id'] !== $idU){
+                    array_push($listaSelect,[
+                        'id'=> $idU,
+                        'nombre'=>$nombreU,
+                        'renovar'=>2
+                    ]);
+                    $cache->add('seleccionCustodios',$listaSelect);
+                }else{
+                    $cache->delete('seleccionCustodios');
+                }
+            }else{
+                $boolMoreCheck = false;
+                foreach($listaSelect as $user){
+                    if($user['id'] == $idU || $user['id'] == "---"){
+                        $boolMoreCheck = true;
+                        break;
+                    }
+                }
+                if(!$boolMoreCheck){
+                    return $this->json("morecheck");
+                }
+                $boolRepeat = false;
+                $boolDoubleDesmark = false;
+                $countPosition = 0;
+                foreach($listaSelect as $user){
+                    if($user['id'] === $idU){
+                        $boolRepeat = true;
+                        $listaSelect[$countPosition]['id'] = "---";
+                        $listaSelect[$countPosition]['nombre'] = "---";
+                        break;
+                    }
+                    $countPosition++;
+                }
+                if($boolRepeat == false){
+                    $countPosition = 0;
+                    foreach($listaSelect as $user){
+                        if($user['id']=="---"){
+                            $listaSelect[$countPosition]['id'] = $idU;
+                            $listaSelect[$countPosition]['nombre'] = $nombreU;
+                        }
+                        $countPosition++;
+                    }
+                }
+                $cache->add('seleccionCustodios',$listaSelect);
+            }
+        }else{
+            array_push($lista,[
+                'id'=>$idU,
+                'nombre'=>$nombreU,
+                'renovar'=>1
+            ]);
+            $cache->add('seleccionCustodios',$lista);
+        }
+        return $this->json($cache->get('seleccionCustodios'));
+    }
+    /**
+     * @Route("/UsersForPdf", name="UsersForPdf")
+     */
+    public function UsersForPdf(EntityManagerInterface $em, CacheService $cache)
+    {
+        $listaU = [];
+        $usuariosPdf = $cache->get('seleccionCustodios');
+        if($usuariosPdf){
+            foreach($usuariosPdf as $user){
+                $dataUser =  $em->getRepository(Usuario::class)->findOneBy(['id'=>$user['id']]);
+                array_push($listaU,[
+                    'id'=>$dataUser->getId(),
+                    'nombre'=>$dataUser->getNombre(),
+                    'organizacion'=>$dataUser->getDetalle()
+                ]);
+            }
+            $cache->delete('seleccionCustodios');
+            return $this->json($listaU);
+        }else{
+            return $this->json(null);
+        }
+        
     }
     //cache para patrimonio
     /**

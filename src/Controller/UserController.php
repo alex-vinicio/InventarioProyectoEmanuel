@@ -19,20 +19,61 @@ class UserController extends AbstractController
     {  
         $mail = $request->request->get('correo_u');
         $passw = $request->request->get('contrasenia_u');
+        $ip = $request->getClientIp();
+        $listaU = [];
         if($mail && $passw){
-            //return $this->json([$mail,$passw]);
             $usuario = $em->getRepository(Usuario::class)->findOneBy(['usuario'=>$mail,'password'=>$passw]);
         }else{
             return $this->json(false);
         }
 
         if($usuario){
-            $cache->add('usuario',$usuario);
+            $listaU = $cache->get('usuario');
+            if($listaU){
+                $boolrepetido = false;
+                foreach($listaU as $user){
+                    if($user->getIpModificacion() == $ip){
+                        $boolrepetido = true;
+                        break;
+                    }
+                }
+                if($boolrepetido == false){
+                    array_push($listaU, $usuario);
+                    $cache->add('usuario',$listaU);
+                }
+            }else{
+                $cache->add('usuario',[$usuario]);
+            }
             return $this->json(true);
         }else{
             return $this->json(false);
         }
-        
+    }
+    /**
+     * @Route("/verificacionIpCliente", name="verificacionIpCliente")
+     */
+    public function prueba(Request $request, EntityManagerInterface $em, CacheService $cache)//no asignar otra variable de entrada
+    {  
+        $ip = $request->getClientIp();
+        $users = $cache->get('usuario');
+        return $this->json([$users, $ip]);
+        if($users){ 
+            $boolCheckIp = false;
+            foreach($users as $user){
+                if($user->getIpModificacion() == $ip){
+                    $boolCheckIp = true;
+                    break;
+                }
+            }
+            //return $this->json($boolCheckIp);
+            if($boolCheckIp){
+                return $this->json("ok");
+            }else{
+                return $this->json(false);
+            }
+        }else{
+            return $this->json(null);
+        }
     }
 
     /**
@@ -40,9 +81,47 @@ class UserController extends AbstractController
      */
     public function getAllUsers( Request $request, EntityManagerInterface $em, CacheService $cache){
         $usuario = $cache->get('usuario');
+        $ip = $request->getClientIp();
         if($usuario){
+            $boolCheckIp = false;
+            foreach($usuario as $user){
+                if($user->getIpModificacion() == $ip){
+                    $boolCheckIp = true;
+                    break;
+                }
+            }
+            if($boolCheckIp){
+                $usuarios = $em->getRepository(Usuario::class)->findAll(['nombre'=>'ASC']);
+                return $this->json($usuarios);
+            }else{
+                return $this->json(false);
+            }
+        }else{
+            return $this->json(null);
+        }
+        
+    }
+    /**
+     * @Route("/getAllUsersCustodio", name="getAllUsersCustodio")
+     */
+    public function getAllUsersCustodio( Request $request, EntityManagerInterface $em, CacheService $cache){
+        $usuario = $cache->get('usuario');
+        if($usuario){
+            $listaUser = [];
             $usuarios = $em->getRepository(Usuario::class)->findAll(['nombre'=>'ASC']);
-            return $this->json($usuarios);
+            foreach($usuarios as $user){
+                if($user->getIdRol()->getId()>=1 && $user->getIdRol()->getId()<=5 ){
+                    if($user->getEstado() == true){
+                        array_push($listaUser,[
+                            'id'=> $user->getId(),
+                            'nombre'=>$user->getNombre(),
+                            'mail'=>$user->getUsuario(),
+                            'cargo'=> $user->getIdRol()->getNombreRol()
+                        ]);
+                    }
+                }
+            }
+            return $this->json($listaUser);
         }else{
             return $this->json(null);
         }
@@ -216,6 +295,8 @@ class UserController extends AbstractController
         $cache->delete('viewProducto');
         $cache->delete('patrimonioUpdate');
         $cache->delete('transaccionProductoId');
+        $cache->delete('seleccionCustodios');
+        $cache->delete('selectCustodio');
         return $this->json(true);
     }
     //                  funciones privadas   

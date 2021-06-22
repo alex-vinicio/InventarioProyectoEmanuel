@@ -18,10 +18,25 @@ class AdminController extends AbstractController
         return $this->render('admin/index.html.twig');
     }
 
-    public function viewAdmin(EntityManagerInterface $em ,CacheService $cache){
+    public function viewAdmin(EntityManagerInterface $em ,CacheService $cache,Request $request){
+        $ip = $request->getClientIp();
         $usuario = $cache->get('usuario');
-        if(!$usuario):return $this->redirectToRoute('login');endif;
-        return $this->render('user/index.html.twig');
+        if($usuario){
+            $boolCheckIp = false;
+            foreach($usuario as $user){
+                if($user->getIpModificacion() == $ip){
+                    $boolCheckIp = true;
+                    break;
+                }
+            }
+            if(!$boolCheckIp){
+                return $this->redirectToRoute('login');
+            }else{
+                return $this->render('user/index.html.twig');
+            }
+        }else{
+            return $this->redirectToRoute('login');
+        };
     }
     
     public function manualUsuario(EntityManagerInterface $em ,CacheService $cache){
@@ -130,6 +145,20 @@ class AdminController extends AbstractController
             $idRol = $usuario->getIdRol()->getId();
             if($idRol === 1){
                 return $this->render('inventory/listaProductoPrimario.html.twig');
+            }else{
+                return $this->redirectToRoute('viewAdmin');
+            }
+        }
+    }//asignarCustodio
+    public function asignarCustodio(EntityManagerInterface $em ,CacheService $cache){
+        $usuario = $cache->get('usuario');
+       
+        if(!$usuario){
+            return $this->redirectToRoute('login');
+        }else{
+            $idRol = $usuario->getIdRol()->getId();
+            if($idRol === 1){
+                return $this->render('inventory/cambiarCustodio.html.twig');
             }else{
                 return $this->redirectToRoute('viewAdmin');
             }

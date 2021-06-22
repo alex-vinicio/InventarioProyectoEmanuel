@@ -41,3 +41,7 @@ gestionPatrimonio:
 manualUsuario:
     path: /manualUsuario
     controller: App\Controller\AdminController::manualUsuario
+
+asignarCustodio:
+    path: /asignarCustodio
+    controller: App\Controller\AdminController::asignarCustodio

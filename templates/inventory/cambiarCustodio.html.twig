@@ -43,30 +43,26 @@
         <div class="clearfix">
             <div id="navigateUser"></div>
             <br>
-            <div class="row">
-                <div class="col-xl-9 col-lg-11 col-md-10 col-sm-12">
-                    <div class="form-row">
-                        <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-4">
-                            <label> <a href="#" onclick="listarInventario(7)"> Nuevo usuario </a></laber><br>
-                            <img href="#" onclick="listarInventario(7)" style=" padding-left: 0px; width: 40%; height: 40%;" src='assets/img/user.png' >
-                        </div>
-                        <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-4">
-                            <label>  <a href="#" onclick="listarPatrimonio()">Gestion patrimonio </a></label><br>
-                            <img href="#" onclick="listarPatrimonio()" style=" padding-left: 0px; width: 70%; height: 70%;" src='assets/img/patrimonio.png' >
-                        </div>
-                        <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-4">
-                            <label>  <a href="#" onclick="rediriguirCustodioGenral()">Cambiar custodio de activos</a></label><br>
-                            <img href="#" onclick="rediriguirCustodioGenral()" style=" padding-left: 0px; width: 34%; height: 70%;" src='assets/img/intercambio.png' >
-                        </div>
-                    </div>
-                </div>
-            </div>
             <form name="hiddenUsers">
                 <input type="hidden" name="nombreUser" value="">
                 <input type="hidden" name="rolUser" value="">
             </form>
-            <h4><b>Listado de usuario</b></h4>
-            <div id="tablaUsuarios"></div>
+            <h4><b>Listado de usuarios activos</b></h4>
+            <button style="margin:5px;" id="nuevoInmueble" onclick="retornarPC()" class="btn btn-primary">Regresar</button>
+            <button style="margin:5px;" onclick="generarCuadro()" class="btn btn-primary">Visualizar activos</button>
+            <div class="row">
+                <div class="col-6 col-sm-6">
+                    <div id="tablaUsuarios"></div>
+                </div>
+                <div class="col-6 col-sm-6">
+                    <label>Entrega   ->     Recepcion</label>
+                    <p><b><input type="text" id="usuarioEntrega" placeholder="---" disabled="on"> -> <input disabled="on" id="usuarioRecibe" tupe="text" placeholder="---">
+                    </b></p>
+                    <button style="margin:5px;" onclick="generarReportePdf()" class="btn btn-primary">Cambiar custodio activo</button><br>
+                    <div id="productosSegunUsuario"></div>
+                </div>
+            </div>
+            
         </div>
         <div class="footer">
             <div class="row" style="margin: 15px;">
@@ -89,7 +85,7 @@
     </div>
 {% endblock %}
 {% block javascripts %} 
-    <script type="text/javascript" src="{{ asset('assets/js/usuario/controlPanel/funciones.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/usuario/controlPanel/selectores.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/inventario/custodio/funciones.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/inventario/custodio/selectores.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/usuario/login.js') }}"></script>
 {% endblock %} 
