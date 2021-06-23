@@ -56,7 +56,6 @@ class UserController extends AbstractController
     {  
         $ip = $request->getClientIp();
         $users = $cache->get('usuario');
-        return $this->json([$users, $ip]);
         if($users){ 
             $boolCheckIp = false;
             foreach($users as $user){
@@ -99,14 +98,24 @@ class UserController extends AbstractController
         }else{
             return $this->json(null);
         }
-        
     }
     /**
      * @Route("/getAllUsersCustodio", name="getAllUsersCustodio")
      */
     public function getAllUsersCustodio( Request $request, EntityManagerInterface $em, CacheService $cache){
         $usuario = $cache->get('usuario');
+        $ip = $request->getClientIp();
         if($usuario){
+            $boolCheckIp = false;
+            foreach($usuario as $user){
+                if($user->getIpModificacion() == $ip){
+                    $boolCheckIp = true;
+                    break;
+                }
+            }
+            if(!$boolCheckIp){
+                return $this->json(null);
+            }
             $listaUser = [];
             $usuarios = $em->getRepository(Usuario::class)->findAll(['nombre'=>'ASC']);
             foreach($usuarios as $user){
@@ -125,7 +134,6 @@ class UserController extends AbstractController
         }else{
             return $this->json(null);
         }
-        
     }
 
     /**
@@ -143,6 +151,18 @@ class UserController extends AbstractController
         $organizacion = $request->request->get('organizacion');
         $rol = $em->getRepository(Rol::class)->findOneBy(['id'=>$tipo]);
         if($userLogin){
+            $boolCheckIp = false;
+            $idRol = null;
+            foreach($userLogin as $user){
+                if($user->getIpModificacion() == $ipC){
+                    $boolCheckIp = true;
+                    $idRol = $user->getIdRol()->getId();
+                    break;
+                }
+            }
+            if(!$boolCheckIp && $idRol){
+                return $this->json(null);
+            }
             if(!$id){
                 $usuario = new Usuario;
                 $aux = "creado";
@@ -153,11 +173,10 @@ class UserController extends AbstractController
             $usuario = $this->setUser($rol,$nombre,$pws,$correo,$usuario,$ipC, $telefono,$organizacion);
             $this->flushUser($usuario,$em);
         
-            return $this->json([$aux,$userLogin->getIdRol()->getId()]);
+            return $this->json([$aux,$idRol]);
         }else{
             return $this->json("Usuario no permitido");
         }
-        
     }
 
     /**
@@ -166,8 +185,25 @@ class UserController extends AbstractController
     public function deleteUser(Request $request, EntityManagerInterface $em,CacheService $cache){
         $usuario = $cache->get('usuario');
         $idU = $request->request->get('id');
-        $tipoRol = $usuario->getIdRol()->getId();
-        if($tipoRol === 1){
+        $ip = $request->getClientIp();
+        $boolCheckIp = false;
+        $boolId = false;
+        if(!$usuario){
+            return $this->json(null);
+        }
+        foreach($usuario as $user){
+            if($user->getIpModificacion() == $ip){
+                $boolCheckIp = true;
+                if($user->getIdRol()->getId() == 1){
+                    $boolId = true;
+                }
+                break;
+            }
+        }
+        if(!$boolCheckIp){
+            return $this->json(null);
+        }
+        if($boolId == true){
             $userD = $em->getRepository(Usuario::class)->findOneBy(['id'=>$idU]);
             $em->remove($userD);
             $em->flush();
@@ -183,8 +219,25 @@ class UserController extends AbstractController
     public function cacheUpdateUser(Request $request, EntityManagerInterface $em,CacheService $cache){
         $usuario = $cache->get('usuario');
         $idU = $request->request->get('idU');
-        $tipoRol = $usuario->getIdRol()->getId();
-        if($tipoRol === 1){
+        $ip = $request->getClientIp();
+        $boolCheckIp = false;
+        $boolId = false;
+        if(!$usuario){
+            return $this->json(null);
+        }
+        foreach($usuario as $user){
+            if($user->getIpModificacion() == $ip){
+                $boolCheckIp = true;
+                if($user->getIdRol()->getId() == 1){
+                    $boolId = true;
+                }
+                break;
+            }
+        }
+        if(!$boolCheckIp){
+            return $this->json(null);
+        }
+        if($boolId == true){
             $userModifie = $em->getRepository(Usuario::class)->findOneBy(['id'=>$idU]);
             if($userModifie){
                 $cache->add('idUserModifie',$idU);
@@ -203,8 +256,25 @@ class UserController extends AbstractController
     public function cacheCustodioAsignacion(Request $request, EntityManagerInterface $em,CacheService $cache){
         $usuario = $cache->get('usuario');
         $idU = $request->request->get('idU');
-        $tipoRol = $usuario->getIdRol()->getId();
-        if($tipoRol === 1){
+        $ip = $request->getClientIp();
+        $boolCheckIp = false;
+        $boolId = false;
+        if(!$usuario){
+            return $this->json(null);
+        }
+        foreach($usuario as $user){
+            if($user->getIpModificacion() == $ip){
+                $boolCheckIp = true;
+                if($user->getIdRol()->getId() == 1){
+                    $boolId = true;
+                }
+                break;
+            }
+        }
+        if(!$boolCheckIp){
+            return $this->json(null);
+        }
+        if($boolId == true){
             $userModifie = $em->getRepository(Usuario::class)->findOneBy(['id'=>$idU]);
             if($userModifie){
                 $cache->add('idUserCustodio',$idU);
@@ -219,7 +289,7 @@ class UserController extends AbstractController
     /**
      * @Route("/getUserCustodio", name="getUserCustodio")
      */
-    public function getUserCustodio( CacheService $cache, EntityManagerInterface $em){
+    public function getUserCustodio(Request $request, CacheService $cache, EntityManagerInterface $em){
         $idU = $cache->get('idUserCustodio');
         if($idU){
             $usuario = $em->getRepository(Usuario::class)->findOneBy(['id'=>$idU]);
@@ -242,11 +312,28 @@ class UserController extends AbstractController
     /**
      * @Route("/getUserModifie", name="getUserModifie")
      */
-    public function getUserModifie( CacheService $cache, EntityManagerInterface $em){
+    public function getUserModifie(Request $request, CacheService $cache, EntityManagerInterface $em){
         $usuario = $cache->get('usuario');
-        $tipoRol = $usuario->getIdRol()->getId();
         $id = $cache->get('idUserModifie');
-        if($tipoRol === 1){
+        $ip = $request->getClientIp();
+        $boolCheckIp = false;
+        $boolId = false;
+        if(!$usuario){
+            return $this->json(null);
+        }
+        foreach($usuario as $user){
+            if($user->getIpModificacion() == $ip){
+                $boolCheckIp = true;
+                if($user->getIdRol()->getId() == 1){
+                    $boolId = true;
+                }
+                break;
+            }
+        }
+        if(!$boolCheckIp){
+            return $this->json(null);
+        }
+        if($boolId == true){
             $userModifie = $em->getRepository(Usuario::class)->findOneBy(['id'=>$id]);
             if($userModifie){
                 return $this->json([$userModifie,true]);
@@ -256,7 +343,6 @@ class UserController extends AbstractController
         }else{
             return $this->json("usuario no permitido!");
         }
-        
     }
 
     /**
@@ -270,10 +356,26 @@ class UserController extends AbstractController
     /**
      * @Route("/getUserData", name="getUserData")
      */
-    public function getUserData( CacheService $cache, EntityManagerInterface $em){
+    public function getUserData(Request $request, CacheService $cache, EntityManagerInterface $em){
         $usuario = $cache->get('usuario');
-        if($usuario){
-            $user = $em->getRepository(Usuario::class)->findOneBy(['id'=>$usuario->getId()]);
+        $ip = $request->getClientIp();
+        $boolCheckIp = false;
+        $idU = null;
+        if(!$usuario){
+            return $this->json(null);
+        }
+        foreach($usuario as $user){
+            if($user->getIpModificacion() == $ip){
+                $boolCheckIp = true;
+                $idU = $user->getId();
+                break;
+            }
+        }
+        if(!$boolCheckIp){
+            return $this->json(null);
+        }
+        if($idU){
+            $user = $em->getRepository(Usuario::class)->findOneBy(['id'=>$idU]);
             return $this->json([$user->getNombre(),$user->getIdRol()->getId(), $user->getDetalle()]);
         }else{
             return $this->json(null);
@@ -284,9 +386,28 @@ class UserController extends AbstractController
     /**
      * @Route("/logOut", name="logOut")
      */
-    public function limpiarCacheUser( CacheService $cache){
+    public function limpiarCacheUser(Request $request, CacheService $cache){
+        $usuario = $cache->get('usuario');
+        $listaU = [];
+        $ip = $request->getClientIp();
+        $boolCheckIp = false;
+        if(!$usuario){
+            return $this->json(false);
+        }
+        foreach($usuario as $user){
+            if($user->getIpModificacion() == $ip){
+                $boolCheckIp = true;
+            }else{
+                $listaU = $user;
+            }
+        }
+        if($boolCheckIp){
+            $cache->delete('usuario');
+            $cache->add('usuario',$listaU);
+        }else{
+            return $this->json(false);
+        }   
         // limpieza cache usuario
-        $cache->delete('usuario');
         $cache->delete('idUserModifie');
         $cache->delete('idUserCustodio');
         //limpieza cache productos

@@ -45,8 +45,20 @@ class InventoryController extends AbstractController
         if($cachePatrimonio){
             $codP = intval($cachePatrimonio[0]);
             $usuarioModificacion = $cache->get('usuario');
+            $boolCheckIp = false;
+            $idRol = null;
+            foreach($usuarioModificacion as $user){
+                if($user->getIpModificacion() == $ip){
+                    $boolCheckIp = true;
+                    $idRol = $user->getIdRol()->getId();
+                    break;
+                }
+            }
+            if($boolCheckIp == false && !$idRol ){
+                return $this->json(null);
+            }
             $producto = $em->getRepository(Producto::class)->find($codP);
-            $usuario = $em->getRepository(Usuario::class)->findOneBy(['id'=>$usuarioModificacion->getId()]);
+            $usuario = $em->getRepository(Usuario::class)->findOneBy(['id'=>$idRol]);
             $transaccion = new Transaccion();
             $transaccion = $this->flushDataTransac($em, $transaccion, $producto, $usuario, $listData);
         }
@@ -88,12 +100,24 @@ class InventoryController extends AbstractController
         $color = $dataTransaccion->get('color');
         $idT = $dataTransaccion->get('idT');
         $procedencia = $dataTransaccion->get('proceden');
-
+        $ip = $request->getClientIp();
         $usuarioModificacion = $cache->get('usuario');
+        $boolCheckIp = false;
+        $idU = null;
+        foreach($usuarioModificacion as $user){
+            if($user->getIpModificacion() == $ip){
+                $boolCheckIp = true;
+                $idU = $user->getId();
+                break;
+            }
+        }
+        if($boolCheckIp == false ){
+            return $this->json(null);
+        }
         $producto = $em->getRepository(Producto::class)->findOneBy(['codigo'=>$codP]);
-        $usuario = $em->getRepository(Usuario::class)->findOneBy(['id'=>$usuarioModificacion->getId()]);
+        $usuario = $em->getRepository(Usuario::class)->findOneBy(['id'=>$idU]);
         
-        if($usuarioModificacion){;
+        if($boolCheckIp){;
             $operacion = 0;
             if($data1 === 'salida'){
                 $transaccion = $em->getRepository(Transaccion::class)->findOneBy(['id'=>$idT]);
@@ -136,11 +160,24 @@ class InventoryController extends AbstractController
     /**
      * @Route("/productNoCustodio", name="productNoCustodio")
      */
-    public function productNoCustodio(EntityManagerInterface $em, CacheService $cache)
+    public function productNoCustodio(Request $request, EntityManagerInterface $em, CacheService $cache)
     {
         $listaT = [];
+        $ip = $request->getClientIp();
         $usuario = $cache->get('usuario');
-        if($usuario->getIdRol()->getId() === 1){
+        $idRol = null;
+        $boolCheckIp = false;
+        foreach($usuario as $user){
+            if($user->getIpModificacion() == $ip){
+                $boolCheckIp = true;
+                $idRol = $user->getIdRol()->getId();
+                break;
+            }
+        }
+        if($boolCheckIp == false ){
+            return $this->json(null);
+        }
+        if($idRol === 1){
             $productos = $em->getRepository(Producto::class)->findAll();
             if($productos){
                 foreach($productos as $producto){
@@ -170,11 +207,24 @@ class InventoryController extends AbstractController
     /**
      * @Route("/productNoCustodioMarcado", name="productNoCustodioMarcado")
      */
-    public function productNoCustodioMarcado(EntityManagerInterface $em, CacheService $cache)
+    public function productNoCustodioMarcado(Request $request, EntityManagerInterface $em, CacheService $cache)
     {
         $listaT = [];
+        $ip = $request->getClientIp();
         $usuario = $cache->get('usuario');
-        if($usuario->getIdRol()->getId() === 1){
+        $idRol = null;
+        $boolCheckIp = false;
+        foreach($usuario as $user){
+            if($user->getIpModificacion() == $ip){
+                $boolCheckIp = true;
+                $idRol = $user->getIdRol()->getId();
+                break;
+            }
+        }
+        if($boolCheckIp == false ){
+            return $this->json(null);
+        }
+        if($idRol === 1){
             $selectC = $cache->get('selectCustodio');
             if($selectC){
                 foreach($selectC as $check){
@@ -346,7 +396,20 @@ class InventoryController extends AbstractController
         $idInm = $request->request->get('idInm');
         $id = intval($idInm);
         $usuario = $cache->get('usuario');
-        if($usuario->getIdRol()->getId() === 1){
+        $ip = $request->getClientIp();
+        $boolCheckIp = false;
+        $idRol = null;
+        foreach($usuario as $user){
+            if($user->getIpModificacion() == $ip){
+                $boolCheckIp = true;
+                $idRol = $user->getIdRol()->getId();
+                break;
+            }
+        }
+        if($boolCheckIp == false ){
+            return $this->json(null);
+        }
+        if($idRol === 1){
             $productos = $em->getRepository(Producto::class)->findBy(['idUnidad'=>3],['id'=>'ASC']);
             if($productos){
                 $listaT = [];
@@ -390,7 +453,20 @@ class InventoryController extends AbstractController
         $idInm = $request->request->get('idInm');
         $id = intval($idInm);
         $usuario = $cache->get('usuario');
-        if($usuario->getIdRol()->getId() === 1){
+        $ip = $request->getClientIp();
+        $boolCheckIp = false;
+        $idRol = null;
+        foreach($usuario as $user){
+            if($user->getIpModificacion() == $ip){
+                $boolCheckIp = true;
+                $idRol = $user->getIdRol()->getId();
+                break;
+            }
+        }
+        if($boolCheckIp == false && !$idRol ){
+            return $this->json(null);
+        }
+        if($idRol === 1){
             $departamento = $cache->get('departamentoPE');
             $productos = $em->getRepository(Producto::class)->findBy(['idUnidad'=>$departamento],['id'=>'ASC']);
             if($productos){
@@ -482,7 +558,7 @@ class InventoryController extends AbstractController
             }else{
                 return $this->json(null);
             }
-        }else{
+        }else{      
             return $this->json("No permitido!");
         }
     }
@@ -536,11 +612,24 @@ class InventoryController extends AbstractController
     /**
      * @Route("/getAllAF", name="getAllAF")
      */
-    public function getAllAF(EntityManagerInterface $em,CacheService $cache)
+    public function getAllAF(EntityManagerInterface $em,CacheService $cache, Request $request)
     {
         $usuario = $cache->get('usuario');
         $listaT = [];
-        if($usuario->getIdRol()->getId() === 1){
+        $ip = $request->getClientIp();
+        $boolCheckIp = false;
+        $idRol = null;
+        foreach($usuario as $user){
+            if($user->getIpModificacion() == $ip){
+                $boolCheckIp = true;
+                $idRol = $user->getIdRol()->getId();
+                break;
+            }
+        }
+        if($boolCheckIp == false ){
+            return $this->json(null);
+        }
+        if($idRol === 1){
             $producto = $em->getRepository(Producto::class)->findBy(['idUnidad'=>3],['id'=>'ASC']);
             if($producto){    
                 return $this->json($producto);
@@ -761,7 +850,16 @@ class InventoryController extends AbstractController
     public function cacheUpdateAF(EntityManagerInterface $em, Request $request,CacheService $cache)
     {
         $usuario = $cache->get('usuario');
-        $tipoRol = $usuario->getIdRol()->getId();
+        $ip = $request->getClientIp();
+        $boolCheckIp = false;
+        $tipoRol = null;
+        foreach($usuario as $user){
+            if($user->getIpModificacion() == $ip){
+                $boolCheckIp = true;
+                $tipoRol = $user->getIdRol()->getId();
+                break;
+            }
+        }
         
         $id = $request->request->get('id');
         $tipo = $request->request->get('tipo');

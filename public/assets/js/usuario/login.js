@@ -8,14 +8,14 @@ async function cerrarSesion(){
 async function listarInventario(val){
     const data = new URLSearchParams(`id=${val}`)
     const response = await getDataPost('typePoductoCache', data)
-    setSelectMenu(val)
+    await setSelectMenu(val)
 }
 
 function homaPage(){
     location.href="viewAdmin";  
 }
 //recoguer el id del menu
-function setSelectMenu(nameSelect){
+async function setSelectMenu(nameSelect){
     console.log(nameSelect)
     switch(nameSelect){
         case 1:
@@ -25,13 +25,14 @@ function setSelectMenu(nameSelect){
             redictCentroMedico()
             break;
         case 7:
-            redictNewUser()
+            await redictNewUser()
             break;
         default:
             redictHomeMenu()    
     }
 }
-function redictNewUser(){
+async function redictNewUser(){
+    await getData('limpiarCacheModifie')
     location.href="usuariosGestion";
 }
 function redictCasaHogar(){

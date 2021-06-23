@@ -15,7 +15,6 @@ const $pwd = document.getElementById('passUserInter');
             $form.reset();
         }
     }
-    
 })()
 
 $buttonCancel.addEventListener('click', async (event)=>{
