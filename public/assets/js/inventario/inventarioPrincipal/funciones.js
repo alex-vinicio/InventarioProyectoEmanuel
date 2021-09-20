@@ -170,7 +170,6 @@ function getAccionsInmueble(table, inventario){
 }
 //eliminar produto//
 async function confirmDeleteProducto(codProd){
-    console.log(codProd)
     alertify.confirm('¿Estás seguro de Eliminar el producto?', function(e){
         if(e){ deleteProducto(codProd)}
     });
@@ -270,7 +269,6 @@ async function nuevoProducto(){
 }
 //eliminar produto//
 async function confirmDeleteProductoInm(codProd){
-    console.log(codProd)
     alertify.confirm('¿Estás seguro de Eliminar el producto?', function(e){
         if(e){ deleteProductoInm(codProd)}
     });
@@ -410,7 +408,6 @@ async function casosGeneracionHojaTrabajo(activosFijos,wb,ws_data,tipoReporte){
     var userName = await getData('getUserData')
     let d1, d2, date1, date2 = "";
     if($forDatesReport.elements.starDate.value){
-        console.log(d1)
         d1 = $forDatesReport.elements.starDate.value + " "
         d2 = $forDatesReport.elements.finishDate.value + " 23:59"
         date1 = new Date(d1)
@@ -430,15 +427,25 @@ async function casosGeneracionHojaTrabajo(activosFijos,wb,ws_data,tipoReporte){
                 var auxDate = new Date(activos.fechaIngreso)
                 if((activos.chasis === "") && (activos.claveCatastral === "")){
                     if((auxDate.getTime() >= date1.getTime()) && (auxDate.getTime() <= date2.getTime()))
-                        ws_data.push(['',activos.codigo, activos.descripcionProducto, activos.cantidadProducto, activos.marca, activos.modelo, activos.tamanio, activos.color, activos.estado,activos.forma,activos.observaciones,activos.fechaIngreso]);
+                        if(activos.idUnidad.id == 3)
+                            ws_data.push(['',activos.codigo, activos.descripcionProducto, activos.cantidadProducto, activos.marca, activos.modelo, activos.tamanio, activos.color, activos.estado,activos.forma,activos.observaciones,activos.fechaIngreso]);
                 }
             })
         }else{
             activosFijos.forEach((activos)=>{
                 if((activos.chasis === "") && (activos.claveCatastral === ""))
-                    ws_data.push(['',activos.codigo, activos.descripcionProducto, activos.cantidadProducto, activos.marca, activos.modelo, activos.tamanio, activos.color, activos.estado,activos.forma,activos.observaciones,activos.fechaIngreso]);
+                    if(activos.idUnidad.id == 3)
+                        ws_data.push(['',activos.codigo, activos.descripcionProducto, activos.cantidadProducto, activos.marca, activos.modelo, activos.tamanio, activos.color, activos.estado,activos.forma,activos.observaciones,activos.fechaIngreso]);
             })
         }
+        ws_data.push([''])
+        ws_data.push(['','Productos casa hogar y centro medico'])
+        ws_data.push(['','Codigo','Descripcion','Cantidad','Marca','Unidad Medida','Grupo ','Color','Estado','Departamento','Observaciones','FechaIngreso']);
+        activosFijos.forEach((activos)=>{
+            if((activos.chasis === "") && (activos.claveCatastral === ""))
+                if(activos.idUnidad.id < 3 && activos.idUnidad.id > 0)
+                    ws_data.push(['',activos.codigo, activos.descripcionProducto, activos.cantidadProducto, activos.marca, activos.unidadMedida, activos.idGrupo.nombreGrupoM, activos.color, activos.estado,activos.idUnidad.nombreUnidad,activos.observaciones,activos.fechaIngreso]);
+        })
         ws_data.push([''])
         ws_data.push(['','Placa','Motor','Cilindraje','Modelo','Marca','Color','Chasis','clase','Año modelo','Combustible','Ramv/cpn','Remarcado','FechaIngreso']);
         if(d1){

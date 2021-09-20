@@ -630,7 +630,7 @@ class InventoryController extends AbstractController
             return $this->json(null);
         }
         if($idRol === 1){
-            $producto = $em->getRepository(Producto::class)->findBy(['idUnidad'=>3],['id'=>'ASC']);
+            $producto = $em->getRepository(Producto::class)->findAll(['id'=>'ASC']);
             if($producto){    
                 return $this->json($producto);
             }else{
