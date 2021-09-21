@@ -28,6 +28,7 @@ class UserController extends AbstractController
         }
 
         if($usuario){
+            $usuari ->setIpModificacion($ip);
             $listaU = $cache->get('usuario');
             if($listaU){
                 $boolrepetido = false;
