@@ -929,8 +929,7 @@ class InventoryController extends AbstractController
      */
     public function testCache(CacheService $cache)
     {
-        $cache->add('prueba11','hola mundo cache');
-        return $this->json($cache->get('prueba11'));
+        return $this->json($cache->get('usuario'));
     }
 
     /**

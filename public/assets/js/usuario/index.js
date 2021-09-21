@@ -9,7 +9,6 @@ $formLogin.addEventListener('submit', async (event)=>{
 async function sendLogin(form){
     const data = new FormData(form)  
     const response = await getDataPost('findUser', data)
-    
     if(response == true){
         alertify.success('usuario correcto')
     }else{
