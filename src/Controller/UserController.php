@@ -38,11 +38,27 @@ class UserController extends AbstractController
                     }
                 }
                 if($boolrepetido == false){
+                    $cache->delete('usuario');
                     array_push($listaU, $usuario);
                     $cache->add('usuario',$listaU);
+                }else{
+                    $listaTemporal = [];
+                    if($boolrepetido == true){
+                        foreach($listaU as $user){
+                            if($user->getIpModificacion() != $ip){
+                                array_push($listaTemporal, $user);
+                            }
+                        } 
+                        $cache->delete('usuario');
+                        array_push($listaTemporal, $usuario);
+                        $cache->add('usuario',$listaTemporal);
+                    }
                 }
             }else{
-                $cache->add('usuario',[$usuario]);
+                $listaUAux = [];
+                $cache->delete('usuario');
+                array_push($listaUAux, $usuario);
+                $cache->add('usuario',$listaUAux);
             }
             return $this->json(true);
         }else{
