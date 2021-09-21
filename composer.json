@@ -5,10 +5,10 @@
     "prefer-stable": true,
     "require": {
         "php": ">=7.2.5",
-        "ext-ctype": "*",
-        "ext-xml": "*",
         "ext-apcu": "5.1.*",
+        "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-xml": "*",
         "composer/package-versions-deprecated": "1.11.99.1",
         "doctrine/annotations": "^1.0",
         "doctrine/doctrine-bundle": "^2.2",
