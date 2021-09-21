@@ -3,7 +3,7 @@ const $formLogin = document.forms.login
 $formLogin.addEventListener('submit', async (event)=>{
     event.preventDefault()
     await sendLogin($formLogin)
-    location.href="viewAdmin";
+    
 })
 
 async function sendLogin(form){
@@ -11,7 +11,9 @@ async function sendLogin(form){
     const response = await getDataPost('findUser', data)
     if(response == true){
         alertify.success('usuario correcto')
+        location.href="viewAdmin";
     }else{
         alertify.error('credenciales invalidas')
+        location.href="/";
     }
 }
