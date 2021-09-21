@@ -925,14 +925,6 @@ class InventoryController extends AbstractController
     }
 
     /**
-     * @Route("/testCache", name="testCache")
-     */
-    public function testCache(CacheService $cache)
-    {
-        return $this->json($cache->get('usuario'));
-    }
-
-    /**
      * @Route("/getProxCaducar", name="getProxCaducar")
      */
     public function getListProxCaducidad(EntityManagerInterface $em)
