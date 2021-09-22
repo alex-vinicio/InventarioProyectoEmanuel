@@ -8,7 +8,7 @@ const $divProxCad = document.getElementById('productos_proximos_caducar');
     const response = await getDataPost('verificacionIpCliente', data)
     console.log(response)
     if(response !== "ok"){
-        location.href="login";
+        location.href="/";
     }
     await getTableProxCaducar($divProxCad)
     await userNavigation($divNameUser)
