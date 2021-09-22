@@ -923,6 +923,13 @@ class InventoryController extends AbstractController
     {
         return $this->json($cache->delete('departamentoPE'));
     }
+    /**
+     * @Route("/testCache", name="testCache")
+     */
+    public function testCache(EntityManagerInterface $em, Request $request,CacheService $cache)
+    {
+        return $this->json([$cache->get('usuario'),$request->getClientIp()]);
+    }
 
     /**
      * @Route("/getProxCaducar", name="getProxCaducar")

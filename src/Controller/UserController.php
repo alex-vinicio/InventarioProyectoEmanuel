@@ -45,7 +45,6 @@ class UserController extends AbstractController
                     $cache->add('usuario',$listaU);
                 }else{
                     $listaTemporal = [];
-                    if($boolrepetido == true){
                         foreach($listaU as $user){
                             if($user->getIpModificacion() != $ip){
                                 array_push($listaTemporal, $user);
@@ -54,7 +53,6 @@ class UserController extends AbstractController
                         $cache->delete('usuario');
                         array_push($listaTemporal, $usuario);
                         $cache->add('usuario',$listaTemporal);
-                    }
                 }
             }else{
                 $listaUAux = [];
