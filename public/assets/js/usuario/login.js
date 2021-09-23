@@ -2,9 +2,17 @@ async function cerrarSesion(){
     await getData('deleteTypePoductoCache')
     await getData('deleteCacheProducto')
     const response = await getData('logOut')
+    deleteAllCookies();
     location.href="viewAdmin";
 }
-
+const deleteAllCookies = () => {
+    const cookies = document.cookie.split(";");
+    for (const cookie of cookies) {
+      const eqPos = cookie.indexOf("=");
+      const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+      document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    }
+}
 async function listarInventario(val){
     const data = new URLSearchParams(`id=${val}`)
     const response = await getDataPost('typePoductoCache', data)
@@ -16,7 +24,6 @@ function homaPage(){
 }
 //recoguer el id del menu
 async function setSelectMenu(nameSelect){
-    console.log(nameSelect)
     switch(nameSelect){
         case 1:
             redictCasaHogar()

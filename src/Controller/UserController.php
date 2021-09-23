@@ -12,6 +12,7 @@ use App\Entity\{Rol,Usuario};
 
 class UserController extends AbstractController
 {
+    
     /**
      * @Route("/findUser", name="findUser")
      */
@@ -19,7 +20,7 @@ class UserController extends AbstractController
     {  
         $mail = $request->request->get('correo_u');
         $passw = $request->request->get('contrasenia_u');
-        $ip = $request->getClientIp();
+        
         $listaU = [];
         if($mail && $passw){
             $usuario = $em->getRepository(Usuario::class)->findOneBy(['usuario'=>$mail,'password'=>$passw]);
@@ -28,31 +29,45 @@ class UserController extends AbstractController
         }
 
         if($usuario){
-            $usuario 
-                    ->setIpModificacion($ip);
+            
+            $textHash = password_hash($usuario->getId()."2".$usuario->getNombre(), PASSWORD_BCRYPT);
             $listaU = $cache->get('usuario');
             if($listaU){
+                if(!password_verify($usuario->getId()."2".$usuario->getNombre(), $textHash)){// return null or false if decrypt don't return value valid
+                    return $this->json(false);
+                }
+                
+                if($request->cookies->get('hash')){//check if login usin a existential cache in browsers
+                    $idUserHash = $request->cookies->get('hash');
+                    $listaTemporalCheck = [];
+                    foreach($listaU as $user){
+                        if(!password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
+                            array_push($listaTemporalCheck, $user);//add value in list aux if id encryoted is diferent or don't exist that user in cache    
+                        }
+                    } 
+                    $listaU = $listaTemporalCheck;
+                }
                 $boolrepetido = false;
                 foreach($listaU as $user){
-                    if($user->getIpModificacion() == $ip){
+                    if($user->getId() == $usuario->getId()){//compara if request of the client is in cache users
                         $boolrepetido = true;
                         break;
                     }
                 }
                 if($boolrepetido == false){
                     $cache->delete('usuario');
-                    array_push($listaU, $usuario);
+                    array_push($listaU,$usuario);
                     $cache->add('usuario',$listaU);
                 }else{
                     $listaTemporal = [];
-                        foreach($listaU as $user){
-                            if($user->getIpModificacion() != $ip){
-                                array_push($listaTemporal, $user);
-                            }
-                        } 
-                        $cache->delete('usuario');
-                        array_push($listaTemporal, $usuario);
-                        $cache->add('usuario',$listaTemporal);
+                    foreach($listaU as $user){
+                        if($user->getId() != $usuario->getId()){
+                            array_push($listaTemporal, $user);
+                        }
+                    } 
+                    $cache->delete('usuario');
+                    array_push($listaTemporal, $usuario);
+                    $cache->add('usuario',$listaTemporal);
                 }
             }else{
                 $listaUAux = [];
@@ -60,7 +75,8 @@ class UserController extends AbstractController
                 array_push($listaUAux, $usuario);
                 $cache->add('usuario',$listaUAux);
             }
-            return $this->json(true);
+
+            return $this->json([true,$usuario->getNombre(),$textHash]);
         }else{
             return $this->json(false);
         }
@@ -70,12 +86,12 @@ class UserController extends AbstractController
      */
     public function prueba(Request $request, EntityManagerInterface $em, CacheService $cache)//no asignar otra variable de entrada
     {  
-        $ip = $request->getClientIp();
+        $idUserHash = $request->cookies->get('hash');
         $users = $cache->get('usuario');
         if($users){ 
             $boolCheckIp = false;
             foreach($users as $user){
-                if($user->getIpModificacion() == $ip){
+                if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                     $boolCheckIp = true;
                     break;
                 }
@@ -96,11 +112,11 @@ class UserController extends AbstractController
      */
     public function getAllUsers( Request $request, EntityManagerInterface $em, CacheService $cache){
         $usuario = $cache->get('usuario');
-        $ip = $request->getClientIp();
+        $idUserHash = $request->cookies->get('hash');
         if($usuario){
             $boolCheckIp = false;
             foreach($usuario as $user){
-                if($user->getIpModificacion() == $ip){
+                if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                     $boolCheckIp = true;
                     break;
                 }
@@ -120,11 +136,11 @@ class UserController extends AbstractController
      */
     public function getAllUsersCustodio( Request $request, EntityManagerInterface $em, CacheService $cache){
         $usuario = $cache->get('usuario');
-        $ip = $request->getClientIp();
+        $idUserHash = $request->cookies->get('hash');
         if($usuario){
             $boolCheckIp = false;
             foreach($usuario as $user){
-                if($user->getIpModificacion() == $ip){
+                if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                     $boolCheckIp = true;
                     break;
                 }
@@ -161,6 +177,7 @@ class UserController extends AbstractController
         $correo = $request->request->get('correo');
         $tipo = $request->request->get('tipoU');
         $id = $request->request->get('id');
+        $idUserHash = $request->cookies->get('hash');
         $ipC = $request->getClientIp();
         $userLogin = $cache->get('usuario');
         $telefono = $request->request->get('telefono');
@@ -170,13 +187,13 @@ class UserController extends AbstractController
             $boolCheckIp = false;
             $idRol = null;
             foreach($userLogin as $user){
-                if($user->getIpModificacion() == $ipC){
+                if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                     $boolCheckIp = true;
                     $idRol = $user->getIdRol()->getId();
                     break;
                 }
             }
-            if(!$boolCheckIp && $idRol){
+            if(!$boolCheckIp && ($idRol==null)){
                 return $this->json(null);
             }
             if(!$id){
@@ -201,14 +218,14 @@ class UserController extends AbstractController
     public function deleteUser(Request $request, EntityManagerInterface $em,CacheService $cache){
         $usuario = $cache->get('usuario');
         $idU = $request->request->get('id');
-        $ip = $request->getClientIp();
+        $idUserHash = $request->cookies->get('hash');
         $boolCheckIp = false;
         $boolId = false;
         if(!$usuario){
             return $this->json(null);
         }
         foreach($usuario as $user){
-            if($user->getIpModificacion() == $ip){
+            if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                 $boolCheckIp = true;
                 if($user->getIdRol()->getId() == 1){
                     $boolId = true;
@@ -235,14 +252,14 @@ class UserController extends AbstractController
     public function cacheUpdateUser(Request $request, EntityManagerInterface $em,CacheService $cache){
         $usuario = $cache->get('usuario');
         $idU = $request->request->get('idU');
-        $ip = $request->getClientIp();
+        $idUserHash = $request->cookies->get('hash');
         $boolCheckIp = false;
         $boolId = false;
         if(!$usuario){
             return $this->json(null);
         }
         foreach($usuario as $user){
-            if($user->getIpModificacion() == $ip){
+            if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                 $boolCheckIp = true;
                 if($user->getIdRol()->getId() == 1){
                     $boolId = true;
@@ -272,14 +289,14 @@ class UserController extends AbstractController
     public function cacheCustodioAsignacion(Request $request, EntityManagerInterface $em,CacheService $cache){
         $usuario = $cache->get('usuario');
         $idU = $request->request->get('idU');
-        $ip = $request->getClientIp();
+        $idUserHash = $request->cookies->get('hash');
         $boolCheckIp = false;
         $boolId = false;
         if(!$usuario){
             return $this->json(null);
         }
         foreach($usuario as $user){
-            if($user->getIpModificacion() == $ip){
+            if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                 $boolCheckIp = true;
                 if($user->getIdRol()->getId() == 1){
                     $boolId = true;
@@ -331,14 +348,14 @@ class UserController extends AbstractController
     public function getUserModifie(Request $request, CacheService $cache, EntityManagerInterface $em){
         $usuario = $cache->get('usuario');
         $id = $cache->get('idUserModifie');
-        $ip = $request->getClientIp();
+        $idUserHash = $request->cookies->get('hash');
         $boolCheckIp = false;
         $boolId = false;
         if(!$usuario){
             return $this->json(null);
         }
         foreach($usuario as $user){
-            if($user->getIpModificacion() == $ip){
+            if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                 $boolCheckIp = true;
                 if($user->getIdRol()->getId() == 1){
                     $boolId = true;
@@ -374,14 +391,14 @@ class UserController extends AbstractController
      */
     public function getUserData(Request $request, CacheService $cache, EntityManagerInterface $em){
         $usuario = $cache->get('usuario');
-        $ip = $request->getClientIp();
+        $idUserHash = $request->cookies->get('hash');
         $boolCheckIp = false;
         $idU = null;
         if(!$usuario){
             return $this->json(null);
         }
         foreach($usuario as $user){
-            if($user->getIpModificacion() == $ip){
+            if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                 $boolCheckIp = true;
                 $idU = $user->getId();
                 break;
@@ -396,7 +413,6 @@ class UserController extends AbstractController
         }else{
             return $this->json(null);
         }
-        
     }
     
     /**
@@ -405,16 +421,17 @@ class UserController extends AbstractController
     public function limpiarCacheUser(Request $request, CacheService $cache){
         $usuario = $cache->get('usuario');
         $listaU = [];
+        $idUserHash = $request->cookies->get('hash');
         $ip = $request->getClientIp();
         $boolCheckIp = false;
         if(!$usuario){
             return $this->json(false);
         }
         foreach($usuario as $user){
-            if($user->getIpModificacion() == $ip){
+            if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                 $boolCheckIp = true;
             }else{
-                $listaU = $user;
+                array_push($listaU, $user);
             }
         }
         if($boolCheckIp){

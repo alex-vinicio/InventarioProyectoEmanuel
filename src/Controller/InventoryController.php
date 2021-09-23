@@ -42,13 +42,14 @@ class InventoryController extends AbstractController
         $cacheProducto = $cache->get('viewProducto');
         $cachePatrimonio = $cache->get('patrimonioUpdate');
         $ip = $request->getClientIp();
+        $idUserHash = $request->cookies->get('hash');
         if($cachePatrimonio){
             $codP = intval($cachePatrimonio[0]);
             $usuarioModificacion = $cache->get('usuario');
             $boolCheckIp = false;
             $idRol = null;
             foreach($usuarioModificacion as $user){
-                if($user->getIpModificacion() == $ip){
+                if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                     $boolCheckIp = true;
                     $idRol = $user->getIdRol()->getId();
                     break;
@@ -101,11 +102,12 @@ class InventoryController extends AbstractController
         $idT = $dataTransaccion->get('idT');
         $procedencia = $dataTransaccion->get('proceden');
         $ip = $request->getClientIp();
+        $idUserHash = $request->cookies->get('hash');
         $usuarioModificacion = $cache->get('usuario');
         $boolCheckIp = false;
         $idU = null;
         foreach($usuarioModificacion as $user){
-            if($user->getIpModificacion() == $ip){
+            if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                 $boolCheckIp = true;
                 $idU = $user->getId();
                 break;
@@ -163,12 +165,12 @@ class InventoryController extends AbstractController
     public function productNoCustodio(Request $request, EntityManagerInterface $em, CacheService $cache)
     {
         $listaT = [];
-        $ip = $request->getClientIp();
         $usuario = $cache->get('usuario');
         $idRol = null;
         $boolCheckIp = false;
+        $idUserHash = $request->cookies->get('hash');
         foreach($usuario as $user){
-            if($user->getIpModificacion() == $ip){
+            if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                 $boolCheckIp = true;
                 $idRol = $user->getIdRol()->getId();
                 break;
@@ -210,12 +212,12 @@ class InventoryController extends AbstractController
     public function productNoCustodioMarcado(Request $request, EntityManagerInterface $em, CacheService $cache)
     {
         $listaT = [];
-        $ip = $request->getClientIp();
         $usuario = $cache->get('usuario');
         $idRol = null;
         $boolCheckIp = false;
+        $idUserHash = $request->cookies->get('hash');
         foreach($usuario as $user){
-            if($user->getIpModificacion() == $ip){
+            if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                 $boolCheckIp = true;
                 $idRol = $user->getIdRol()->getId();
                 break;
@@ -396,11 +398,11 @@ class InventoryController extends AbstractController
         $idInm = $request->request->get('idInm');
         $id = intval($idInm);
         $usuario = $cache->get('usuario');
-        $ip = $request->getClientIp();
         $boolCheckIp = false;
         $idRol = null;
+        $idUserHash = $request->cookies->get('hash');
         foreach($usuario as $user){
-            if($user->getIpModificacion() == $ip){
+            if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                 $boolCheckIp = true;
                 $idRol = $user->getIdRol()->getId();
                 break;
@@ -453,11 +455,11 @@ class InventoryController extends AbstractController
         $idInm = $request->request->get('idInm');
         $id = intval($idInm);
         $usuario = $cache->get('usuario');
-        $ip = $request->getClientIp();
         $boolCheckIp = false;
         $idRol = null;
+        $idUserHash = $request->cookies->get('hash');
         foreach($usuario as $user){
-            if($user->getIpModificacion() == $ip){
+            if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                 $boolCheckIp = true;
                 $idRol = $user->getIdRol()->getId();
                 break;
@@ -616,11 +618,11 @@ class InventoryController extends AbstractController
     {
         $usuario = $cache->get('usuario');
         $listaT = [];
-        $ip = $request->getClientIp();
         $boolCheckIp = false;
         $idRol = null;
+        $idUserHash = $request->cookies->get('hash');
         foreach($usuario as $user){
-            if($user->getIpModificacion() == $ip){
+            if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                 $boolCheckIp = true;
                 $idRol = $user->getIdRol()->getId();
                 break;
@@ -850,11 +852,11 @@ class InventoryController extends AbstractController
     public function cacheUpdateAF(EntityManagerInterface $em, Request $request,CacheService $cache)
     {
         $usuario = $cache->get('usuario');
-        $ip = $request->getClientIp();
         $boolCheckIp = false;
         $tipoRol = null;
+        $idUserHash = $request->cookies->get('hash');
         foreach($usuario as $user){
-            if($user->getIpModificacion() == $ip){
+            if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                 $boolCheckIp = true;
                 $tipoRol = $user->getIdRol()->getId();
                 break;
@@ -922,13 +924,6 @@ class InventoryController extends AbstractController
     public function deleteTypePoductoCache(EntityManagerInterface $em, Request $request,CacheService $cache)
     {
         return $this->json($cache->delete('departamentoPE'));
-    }
-    /**
-     * @Route("/testCache", name="testCache")
-     */
-    public function testCache(EntityManagerInterface $em, Request $request,CacheService $cache)
-    {
-        return $this->json([$cache->get('usuario'),$request->getClientIp()]);
     }
 
     /**

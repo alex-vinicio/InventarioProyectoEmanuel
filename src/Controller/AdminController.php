@@ -19,12 +19,12 @@ class AdminController extends AbstractController
     }
 
     public function viewAdmin(EntityManagerInterface $em ,CacheService $cache,Request $request){
-        $ip = $request->getClientIp();
+        $idUserHash = $request->cookies->get('hash');
         $usuario = $cache->get('usuario');
         if($usuario){
             $boolCheckIp = false;
             foreach($usuario as $user){
-                if($user->getIpModificacion() == $ip){
+                if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                     $boolCheckIp = true;
                     break;
                 }
@@ -47,14 +47,14 @@ class AdminController extends AbstractController
     
     public function controlPanel(Request $request, EntityManagerInterface $em ,CacheService $cache){
         $usuario = $cache->get('usuario');
-        $ip = $request->getClientIp();
+        $idUserHash = $request->cookies->get('hash');
         if(!$usuario){
             return $this->redirectToRoute('login');
         }else{
             $boolCheckIp = false;
             $idRol = null;
             foreach($usuario as $user){
-                if($user->getIpModificacion() == $ip){
+                if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                     $boolCheckIp = true;
                     $idRol = $user->getIdRol()->getId();
                     break;
@@ -70,14 +70,14 @@ class AdminController extends AbstractController
 
     public function listCasaHogar(Request $request, EntityManagerInterface $em ,CacheService $cache){
         $usuario = $cache->get('usuario');
-        $ip = $request->getClientIp();
+        $idUserHash = $request->cookies->get('hash');
         if(!$usuario){
             return $this->redirectToRoute('login');
         }else{
             $boolCheckIp = false;
             $idRol = null;
             foreach($usuario as $user){
-                if($user->getIpModificacion() == $ip){
+                if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                     $boolCheckIp = true;
                     $idRol = $user->getIdRol()->getId();
                     break;
@@ -93,14 +93,14 @@ class AdminController extends AbstractController
 
     public function listCentroMedico(Request $request, EntityManagerInterface $em ,CacheService $cache){
         $usuario = $cache->get('usuario');
-        $ip = $request->getClientIp();
+        $idUserHash = $request->cookies->get('hash');
         if(!$usuario){
             return $this->redirectToRoute('login');
         }else{
             $boolCheckIp = false;
             $idRol = null;
             foreach($usuario as $user){
-                if($user->getIpModificacion() == $ip){
+                if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                     $boolCheckIp = true;
                     $idRol = $user->getIdRol()->getId();
                     break;
@@ -116,13 +116,13 @@ class AdminController extends AbstractController
     
     public function newInventory(Request $request, EntityManagerInterface $em ,CacheService $cache){
         $usuario = $cache->get('usuario');
-        $ip = $request->getClientIp();
+        $idUserHash = $request->cookies->get('hash');
         $cacheProducto = $cache->get('viewProducto');
         if(!$usuario):return $this->redirectToRoute('login');endif;
         $boolCheckIp = false;
         $idRol = null;
         foreach($usuario as $user){
-            if($user->getIpModificacion() == $ip){
+            if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                 $boolCheckIp = true;
                 $idRol = $user->getIdRol()->getId();
                 break;
@@ -157,12 +157,12 @@ class AdminController extends AbstractController
 
     public function usuariosGestion(Request $request, EntityManagerInterface $em ,CacheService $cache){
         $usuario = $cache->get('usuario');
-        $ip = $request->getClientIp();
+        $idUserHash = $request->cookies->get('hash');
         if(!$usuario):return $this->redirectToRoute('login');endif;
         $boolCheckIp = false;
         $idRol = null;
         foreach($usuario as $user){
-            if($user->getIpModificacion() == $ip){
+            if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                 $boolCheckIp = true;
                 $idRol = $user->getIdRol()->getId();
                 break;
@@ -176,24 +176,17 @@ class AdminController extends AbstractController
         }else{
             return $this->redirectToRoute('login');
         }
-        /* if($cacheProducto){
-            $producto = $em->getRepository(Producto::class)->findOneBy(['id'=>$cacheProducto->getId()]);
-            $form = $this->createForm(ProductoType::class, $producto = $producto);
-        }else{
-            $form = $this->createForm(ProductoType::class, $producto = new Producto());
-        } */
-        
     }
     public function listPatrimonio(Request $request, EntityManagerInterface $em ,CacheService $cache){
         $usuario = $cache->get('usuario');
-        $ip = $request->getClientIp();
+        $idUserHash = $request->cookies->get('hash');
         if(!$usuario){
             return $this->redirectToRoute('login');
         }else{
             $boolCheckIp = false;
             $idRol = null;
             foreach($usuario as $user){
-                if($user->getIpModificacion() == $ip){
+                if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                     $boolCheckIp = true;
                     $idRol = $user->getIdRol()->getId();
                     break;
@@ -208,14 +201,14 @@ class AdminController extends AbstractController
     }//asignarCustodio
     public function asignarCustodio(Request $request, EntityManagerInterface $em ,CacheService $cache){
         $usuario = $cache->get('usuario');
-        $ip = $request->getClientIp();
+        $idUserHash = $request->cookies->get('hash');
         if(!$usuario){
             return $this->redirectToRoute('login');
         }else{
             $boolCheckIp = false;
             $idRol = null;
             foreach($usuario as $user){
-                if($user->getIpModificacion() == $ip){
+                if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                     $boolCheckIp = true;
                     $idRol = $user->getIdRol()->getId();
                     break;
@@ -230,13 +223,13 @@ class AdminController extends AbstractController
     }
     public function gestionPatrimonio(Request $request, EntityManagerInterface $em ,CacheService $cache){
         $usuario = $cache->get('usuario');
-        $ip = $request->getClientIp();
+        $idUserHash = $request->cookies->get('hash');
         $cacheProducto = $cache->get('viewProducto');
         if(!$usuario):return $this->redirectToRoute('login');endif;
         $boolCheckIp = false;
         $idRol = null;
         foreach($usuario as $user){
-            if($user->getIpModificacion() == $ip){
+            if(password_verify($user->getId()."2".$user->getNombre(), $idUserHash)){
                 $boolCheckIp = true;
                 $idRol = $user->getIdRol()->getId();
                 break;
